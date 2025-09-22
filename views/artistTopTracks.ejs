@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include head partial (meta tags, CSS, etc.) -->
+  <%- include('partials/head') %>
+
+  <!-- Padding to account for fixed-top navbar -->
+  <body class="pt-5 d-flex flex-column min-vh-100">
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/navbar') %>
+
+    <!-- Main container -->
+    <div class="container mt-4">
+      <!-- Page header showing the artist dynamically -->
+      <h1 class="text-center mb-4">
+        The best of
+        <a
+          href="/showArtist?artist=<%= topTracks[0].artist %>"
+          class="text-success"
+          data-bs-toggle="tooltip"
+          data-bs-theme="light"
+          title="View artist details"
+        >
+          <%= topTracks[0].artist %>
+        </a>
+      </h1>
+
+      <div class="row justify-content-center">
+        <!-- List of top tracks -->
+        <ul
+          class="list-unstyled d-flex flex-column col-12 col-sm-10 col-md-8 col-lg-6 mx-auto"
+        >
+          <% for (let track of topTracks) { %>
+          <li id="id_<%= track.id %>" class="mb-4 p-2">
+            <!-- Horizontal separator -->
+            <hr class="border border-2 border-success rounded" />
+
+            <!-- Track info displayed as a Bootstrap list-group -->
+            <ul class="list-group list-group-flush text-start text-center">
+              <li class="list-group-item px-0 py-1 bg-light">
+                Album: <%= track.album %>
+              </li>
+              <li class="list-group-item px-0 py-1 bg-light">
+                Year: <%= track.year %>
+              </li>
+              <li
+                class="list-group-item px-0 py-1 bg-light"
+                data-bs-toggle="tooltip"
+                data-bs-theme="light"
+                title="Spotify popularity score (0–100)"
+              >
+                Popularity: <%= track.popularity %>/100
+              </li>
+            </ul>
+
+            <!-- Responsive Spotify iframe for track preview -->
+            <div class="ratio ratio-16x9 mb-2" style="max-height: 400px">
+              <iframe
+                src="https://open.spotify.com/embed/track/<%= track.id %>"
+                allow="encrypted-media"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+  </body>
+</html>

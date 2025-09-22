@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include common head partial (meta tags, title, CSS links, etc.) -->
+  <%- include('partials/head') %>
+
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Include navbar partial -->
+    <%- include('partials/navbar') %>
+
+    <!-- Main page header -->
+    <h1 class="text-center mt-5">RiffQuest</h1>
+    <h2 class="text-secondary text-center fs-5 mb-5">
+      Every song has its own riff
+    </h2>
+
+    <!-- Artist search form -->
+    <form method="get" id="artist-form">
+      <!-- Container for input + buttons; responsive layout -->
+      <div class="w-75 mx-auto d-flex flex-column flex-md-row">
+        <!-- Text input for artist name -->
+        <input
+          id="artist-input"
+          type="text"
+          name="artist"
+          class="form-control mb-2 mb-md-0 me-md-2"
+          placeholder="Enter artist name…"
+          required
+        />
+
+        <!-- Button to view all albums of the artist -->
+        <button
+          type="submit"
+          class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
+          formaction="/artistAlbums"
+        >
+          View all albums
+        </button>
+
+        <!-- Button to view top tracks of the artist -->
+        <button
+          type="submit"
+          class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
+          formaction="/artistTopTracks"
+        >
+          View top tracks
+        </button>
+
+        <!-- Button to view detailed artist profile -->
+        <button
+          type="submit"
+          class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
+          formaction="/showArtist"
+        >
+          View artist details
+        </button>
+      </div>
+    </form>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+  </body>
+</html>

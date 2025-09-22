@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include head partial (meta tags, CSS, etc.) -->
+  <%- include('partials/head') %>
+
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Include navbar partial -->
+    <%- include('partials/navbar') %>
+
+    <!-- Page header showing the error status -->
+    <h1 class="text-center text-danger mt-5">
+      <%= status || 500 %> - Something went wrong
+    </h1>
+
+    <!-- Optional detailed error message -->
+    <% if (message) { %>
+    <p class="text-center text-muted"><%= message %></p>
+    <% } %>
+
+    <!-- Optional context: artist, track, album -->
+    <div class="text-center text-secondary">
+      <% if (artist) { %>
+      <p>Artist: <%= artist %></p>
+      <% } %> <% if (track) { %>
+      <p>Track: <%= track %></p>
+      <% } %> <% if (album) { %>
+      <p>Album: <%= album %></p>
+      <% } %>
+    </div>
+
+    <!-- Back to home button -->
+    <div class="d-flex justify-content-center my-5">
+      <a href="/" class="btn btn-outline-success">Go back to Home</a>
+    </div>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+  </body>
+</html>

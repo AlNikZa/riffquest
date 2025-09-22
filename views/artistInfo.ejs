@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include head partial for meta tags, CSS, etc. -->
+  <%- include('partials/head') %>
+
+  <body style="padding-top: 0" class="d-flex flex-column min-vh-100">
+    <!-- Include navbar partial -->
+    <%- include('partials/navbar') %>
+
+    <!-- Main container for artist profile -->
+    <div class="container col-xxl-8 px-4 pt-5">
+      <div
+        class="row flex-lg-row-reverse justify-content-center align-items-center g-5 py-5"
+      >
+        <!-- Artist image -->
+        <div class="col-10 col-sm-8 col-lg-6">
+          <img
+            src="<%- artistData.images[0]?.url || '/default-image.jpg' %>"
+            class="d-block mx-lg-auto img-fluid rounded-3 border border-dark"
+            alt="<%- artistData.name %>"
+            width="700"
+            height="500"
+            loading="lazy"
+          />
+        </div>
+
+        <!-- Artist information -->
+        <div class="col-lg-6">
+          <!-- Artist name header -->
+          <h1 class="text-center mt-5"><%- artistData.name %></h1>
+
+          <!-- Info lists: genres, popularity, followers -->
+          <div
+            class="d-flex flex-wrap justify-content-center align-items-start gap-3 my-4"
+          >
+            <!-- Genres list -->
+            <% if (artistData.genres && artistData.genres.length > 0) { %>
+            <ul
+              class="list-group d-inline-block rounded-3"
+              data-bs-toggle="tooltip"
+              data-bs-theme="light"
+              title="Music genres of the artist"
+              style="width: max-content"
+            >
+              <li
+                class="list-group-item text-center h6 m-0 border-bottom border-dark"
+              >
+                Genres:
+              </li>
+              <% artistData.genres.forEach(genre => { %>
+              <li class="list-group-item text-center"><%= genre %></li>
+              <% }) %>
+            </ul>
+            <% } %>
+
+            <!-- Popularity score -->
+            <% if (artistData.popularity !== undefined) { %>
+            <ul
+              class="list-group d-inline-block rounded-3"
+              data-bs-toggle="tooltip"
+              data-bs-theme="light"
+              title="Spotify popularity score (0–100)"
+              style="width: max-content"
+            >
+              <li
+                class="list-group-item text-center h6 m-0 border-bottom border-dark"
+              >
+                Popularity:
+              </li>
+              <li class="list-group-item text-center">
+                <%= artistData.popularity %> / 100
+              </li>
+            </ul>
+            <% } %>
+
+            <!-- Followers count -->
+            <% if (artistData.followers?.total !== undefined) { %>
+            <ul
+              class="list-group d-inline-block rounded-3"
+              data-bs-toggle="tooltip"
+              data-bs-theme="light"
+              title="Total number of followers on Spotify"
+              style="width: max-content"
+            >
+              <li
+                class="list-group-item text-center h6 m-0 border-bottom border-dark"
+              >
+                Followers:
+              </li>
+              <li class="list-group-item text-center">
+                <%= artistData.followers.total.toLocaleString('en-US') %>
+              </li>
+            </ul>
+            <% } %>
+          </div>
+
+          <!-- Buttons to view albums or top tracks -->
+          <div class="d-grid gap-2 d-md-flex justify-content-center">
+            <form action="/" method="get">
+              <!-- Pass artist name as hidden input -->
+              <input
+                type="hidden"
+                name="artist"
+                value="<%- artistData.name %>"
+              />
+              <button
+                type="submit"
+                class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
+                formaction="/artistAlbums"
+              >
+                View all albums
+              </button>
+              <button
+                type="submit"
+                class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
+                formaction="/artistTopTracks"
+              >
+                View top tracks
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+  </body>
+</html>

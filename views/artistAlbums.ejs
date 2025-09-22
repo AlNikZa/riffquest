@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include common head partial (meta tags, CSS, etc.) -->
+  <%- include('partials/head') %>
+
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Include navbar partial -->
+    <%- include('partials/navbar') %>
+
+    <!-- Page header showing the artist name dynamically -->
+    <h1 class="text-center mt-4">
+      All albums of
+      <a
+        href="/showArtist?artist=<%= albums[0].artist %>"
+        class="text-success"
+        data-bs-toggle="tooltip"
+        data-bs-theme="light"
+        title="View artist details"
+      >
+        <%= albums[0].artist %>
+      </a>
+    </h1>
+
+    <!-- List container for albums -->
+    <ul
+      class="list-unstyled text-center d-flex flex-wrap justify-content-center"
+    >
+      <% for (let album of albums) { %>
+
+      <!-- Individual album card -->
+      <li id="id_<%= album.id %>" class="m-3 text-center p-2">
+        <div class="card" style="width: 375px">
+          <!-- Album cover image -->
+          <img
+            class="card-img-top"
+            src="<%= album.image %>"
+            alt="Album cover image"
+          />
+          <div class="card-body">
+            <!-- Album title -->
+            <h2 class="card-title h4 py-0 my-0"><%= album.album %></h2>
+          </div>
+
+          <!-- Album details: year and duration -->
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Year: <%= album.year %></li>
+            <li class="list-group-item">Duration: <%= album.duration %></li>
+          </ul>
+
+          <!-- Links: reveal embedded player or go to Spotify -->
+          <div class="card-body">
+            <a
+              href="#iframe_container_<%= album.id %>"
+              class="card-link text-success listen-here"
+            >
+              Listen here
+            </a>
+            <a
+              href="<%= album.url %>"
+              target="_blank"
+              class="card-link text-success"
+            >
+              Listen on Spotify
+            </a>
+          </div>
+        </div>
+
+        <!-- Hidden iframe container for embedded Spotify album -->
+        <div
+          id="iframe_container_<%= album.id %>"
+          class="row justify-content-center d-none iframe-container"
+          style="margin-top: 50px"
+        >
+          <div class="col-10 col-sm-8 col-md-6">
+            <iframe
+              src="https://open.spotify.com/embed/album/<%= album.id %>"
+              width="100%"
+              height="450"
+              frameborder="0"
+              allow="encrypted-media"
+            ></iframe>
+
+            <!-- Repeat album info below embedded player -->
+            <div class="text-muted small">Year: <%= album.year %></div>
+            <div class="text-muted small">Duration: <%= album.duration %></div>
+          </div>
+        </div>
+      </li>
+
+      <% } %>
+    </ul>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+
+    <!-- JavaScript to toggle album card → embedded Spotify iframe -->
+    <script>
+      document.querySelectorAll('.listen-here').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          // Find the parent list item
+          const li = link.closest('li');
+
+          // Hide the card and show the iframe container
+          li.querySelector('.card').classList.add('d-none');
+          li.querySelector('.iframe-container').classList.remove('d-none');
+
+          // Expand list item to full width
+          li.style.width = '100%';
+        });
+      });
+    </script>
+  </body>
+</html>

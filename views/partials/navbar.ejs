@@ -1,0 +1,92 @@
+<!-- Main navigation bar fixed at the top -->
+<nav class="navbar navbar-expand-lg bg-success navbar-dark fixed-top">
+  <div class="container-fluid">
+    <!-- Brand/logo linking to home page -->
+    <a class="navbar-brand text-white" href="/">RiffQuest</a>
+
+    <!-- Navbar toggler for mobile view -->
+    <button
+      class="navbar-toggler collapsed"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+      onclick="this.querySelector('i').classList.toggle('bi-arrow-bar-down'); this.querySelector('i').classList.toggle('bi-arrow-bar-up');"
+    >
+      <i class="bi bi-arrow-bar-down text-white"></i>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- Artist search form with dropdown inline -->
+      <form
+        id="artist-navbar-form"
+        class="d-flex align-items-center"
+        action="/artistRedirect"
+        method="get"
+      >
+        <!-- Artist input -->
+        <input
+          id="artist-navbar-input"
+          class="form-control me-2"
+          type="text"
+          name="artist"
+          placeholder="Enter artist name..."
+          aria-label="Artist"
+          style="width: 220px"
+          required
+        />
+
+        <!-- Dropdown -->
+        <div class="dropdown me-2">
+          <button
+            class="btn btn-success dropdown-toggle"
+            type="button"
+            id="artistDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Artist action
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="artistDropdown">
+            <li>
+              <button
+                class="dropdown-item"
+                type="submit"
+                formaction="/artistAlbums"
+              >
+                View all albums
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item"
+                type="submit"
+                formaction="/artistTopTracks"
+              >
+                View top tracks
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item"
+                type="submit"
+                formaction="/showArtist"
+              >
+                View artist details
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Hidden input to store dropdown selection -->
+        <!-- <input type="hidden" name="option" id="artistOption" value="" /> -->
+
+        <!-- Submit button -->
+        <!-- <button class="btn btn-outline-light" type="submit">Search</button> -->
+      </form>
+    </div>
+  </div>
+</nav>

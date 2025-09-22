@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include head partial (meta tags, CSS, etc.) -->
+  <%- include('partials/head') %>
+
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Include navbar partial -->
+    <%- include('partials/navbar') %>
+
+    <!-- Page header -->
+    <h1 class="text-center text-success mt-5">Please wait...</h1>
+    <!-- Informational text -->
+    <p class="text-center text-muted">
+      Getting things ready, this should only take a moment.
+    </p>
+
+    <!-- Loading spinner centered on the page -->
+    <div class="d-flex justify-content-center my-5">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Back to home button -->
+    <div class="d-flex justify-content-center my-5">
+      <a href="/" class="btn btn-outline-success">Go back to Home</a>
+    </div>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+  </body>
+</html>

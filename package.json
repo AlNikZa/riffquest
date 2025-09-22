@@ -1,0 +1,36 @@
+{
+  "name": "riffquest",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "spotify",
+    "music",
+    "express",
+    "ejs",
+    "riffquest",
+    "discography",
+    "songs",
+    "albums",
+    "bands",
+    "artists",
+    "tracks",
+    "genres"
+  ],
+  "author": "Aleksandar Nikolic",
+  "license": "ISC",
+  "description": "A Spotify-powered music discovery app to explore genres, artists, albums, and tracks.",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
