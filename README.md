@@ -1,4 +1,4 @@
-# RiffQuest 🎸
+# <img src="https://raw.githubusercontent.com/AlNikZa/riffquest/main/public/logo.png" alt="RiffQuest logo" height="24" display="inline"> RiffQuest
 
 _Every song has its own riff._
 
