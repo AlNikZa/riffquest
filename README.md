@@ -27,6 +27,12 @@ Search for your favorite artists and explore their albums, top tracks, and detai
 
 ---
 
+## Live Demo
+
+Check out the deployed app here: [RiffQuest on Render](https://riffquest.onrender.com) 🔗
+
+---
+
 ## Setup
 
 ### Clone the repo:
