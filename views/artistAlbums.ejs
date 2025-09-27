@@ -11,13 +11,13 @@
     <h1 class="text-center mt-4">
       All albums of
       <a
-        href="/showArtist?artist=<%= albums[0].artist %>"
+        href="/showArtist?artist=<%= albums[0]?.artist || artist || 'Unknown Artist' %>"
         class="text-success"
         data-bs-toggle="tooltip"
         data-bs-theme="light"
         title="View artist details"
       >
-        <%= albums[0].artist %>
+        <%= albums[0]?.artist || artist || 'Unknown Artist' %>
       </a>
     </h1>
 

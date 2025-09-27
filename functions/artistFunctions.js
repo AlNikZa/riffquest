@@ -31,8 +31,8 @@ export const getArtistId = async (artist, TOKEN) => {
 
     return foundArtist.id; // return Spotify artist ID
   } catch (err) {
-    console.error('Error in getArtistId function: ' + err);
-    return;
+    console.error('❌ Error in getArtistId function: ' + err);
+    return null;
   }
 };
 
@@ -67,7 +67,7 @@ export const getArtistTopTracks = async (artistId, TOKEN) => {
 
     return extractedSongsData;
   } catch (err) {
-    console.error('Error in getArtistTopTracks function: ' + err);
+    console.error('❌ Error in getArtistTopTracks function: ' + err);
     throw err;
   }
 };
@@ -83,7 +83,6 @@ const getAlbumDuration = async (albumId, TOKEN) => {
     const limit = 50;
     let hasMore = true;
 
-    // Fetch tracks in batches (limit=50)
     while (hasMore) {
       const response = await fetch(
         `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=${limit}&offset=${offset}`,
@@ -96,25 +95,25 @@ const getAlbumDuration = async (albumId, TOKEN) => {
       else offset += limit;
     }
 
-    // Sum durations of all tracks
-    let total_ms = allTracks.reduce((sum, song) => sum + song.duration_ms, 0);
+    // Safe sum of durations
+    let total_ms = allTracks.reduce(
+      (sum, song) => sum + (song?.duration_ms || 0),
+      0
+    );
+
     const hours = Math.floor(total_ms / 3600000);
     const minutes = Math.floor((total_ms % 3600000) / 60000);
     const seconds = Math.floor((total_ms % 60000) / 1000);
 
-    // Pad minutes and seconds with leading zeros
     const minutesStr = minutes.toString().padStart(2, '0');
     const secondsStr = seconds.toString().padStart(2, '0');
 
-    // Format as H:MM:SS if > 1 hour, else MM:SS
-    if (hours >= 1) {
-      return `${hours}:${minutesStr}:${secondsStr}`;
-    } else {
-      return `${minutesStr}:${secondsStr}`;
-    }
+    return hours >= 1
+      ? `${hours}:${minutesStr}:${secondsStr}`
+      : `${minutesStr}:${secondsStr}`;
   } catch (err) {
-    console.error('Error in getAlbumDuration function: ' + err);
-    throw err;
+    console.error('❌ Error in getAlbumDuration function: ' + err);
+    return 'Unknown'; // fallback duration
   }
 };
 
@@ -166,7 +165,7 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
 
     return albums;
   } catch (err) {
-    console.error('Error in getArtistAlbums function: ' + err);
+    console.error('❌ Error in getArtistAlbums function: ' + err);
     throw err;
   }
 };
@@ -185,7 +184,7 @@ export const getArtistInfo = async (artistId, TOKEN) => {
 
     return data;
   } catch (err) {
-    console.error('Error in getArtistInfo function: ' + err);
+    console.error('❌ Error in getArtistInfo function: ' + err);
     throw err;
   }
 };

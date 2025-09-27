@@ -14,13 +14,13 @@
       <h1 class="text-center mb-4">
         The best of
         <a
-          href="/showArtist?artist=<%= topTracks[0].artist %>"
+          href="/showArtist?artist=<%= topTracks[0]?.artist || artist || 'Unknown Artist' %>"
           class="text-success"
           data-bs-toggle="tooltip"
           data-bs-theme="light"
           title="View artist details"
         >
-          <%= topTracks[0].artist %>
+          <%= topTracks[0]?.artist || artist || 'Unknown Artist' %>
         </a>
       </h1>
 

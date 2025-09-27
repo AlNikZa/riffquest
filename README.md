@@ -98,6 +98,11 @@ RiffQuest/
 │  ├─ formModals.js
 │  └─ logo.png
 │
+├─ routes/
+│  ├─ artist.js
+│  ├─ error.js
+│  └─ home.js
+│
 ├─ views/
 │  ├─ partials/
 │  │  ├─ bootstrapModals.ejs

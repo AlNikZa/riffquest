@@ -44,13 +44,13 @@ const getToken = async (clientId, clientSecret) => {
 
     // Schedule automatic token refresh
     REFRESH_TIMEOUT = setTimeout(() => {
-      console.log('Refreshing token automatically...');
+      console.log('⏳ Refreshing token automatically...');
       getToken(clientId, clientSecret);
     }, delay);
 
     return TOKEN;
   } catch (err) {
-    console.error('Error in getToken function: ' + err);
+    console.error('❌ Error in getToken function: ' + err);
     throw err;
   }
 };
@@ -84,8 +84,8 @@ export const getTokenOrRenderLoadingPage = (res) => {
 export const initToken = async () => {
   try {
     await getToken(clientId, clientSecret);
-    console.log('Token fetched successfully at startup');
+    console.log('✅ Token fetched successfully at startup');
   } catch (err) {
-    console.error('Error fetching token at server startup: ' + err);
+    console.error('❌ Error fetching token at server startup: ' + err);
   }
 };
