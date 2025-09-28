@@ -4,6 +4,9 @@ _Every song has its own riff._
 
 Search for your favorite artists and explore their albums, top tracks, and detailed info via Spotify API.
 
+> ⚠️ **Project status:** This app is still under active development.  
+> Features and UI may change frequently.
+
 ---
 
 ## Features
