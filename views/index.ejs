@@ -18,14 +18,17 @@
       <!-- Container for input + buttons; responsive layout -->
       <div class="w-75 mx-auto d-flex flex-column flex-md-row">
         <!-- Text input for artist name -->
+        <!-- <div class="form-group"> -->
         <input
           id="artist-input"
           type="text"
           name="artist"
           class="form-control mb-2 mb-md-0 me-md-2"
           placeholder="Enter artist name…"
+          list="suggestions"
           required
         />
+        <datalist id="suggestions"></datalist>
 
         <!-- Button to view all albums of the artist -->
         <button
@@ -67,5 +70,6 @@
 
     <!-- Custom JavaScript for handling modal forms -->
     <script src="/formModals.js"></script>
+    <script src="/autocomplete.js"></script>
   </body>
 </html>

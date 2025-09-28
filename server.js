@@ -29,6 +29,7 @@ app.set('view engine', 'ejs');
 
 // Serve static assets from the "public" directory
 app.use(express.static('public'));
+app.use(express.json());
 
 // Initialize Spotify API token before routes
 await initToken();

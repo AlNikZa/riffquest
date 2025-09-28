@@ -95,6 +95,7 @@ RiffQuest/
 │  └─ tokenFunctions.js
 │
 ├─ public/
+│  ├─ autocomplete.js
 │  ├─ formModals.js
 │  └─ logo.png
 │

@@ -170,10 +170,6 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
   }
 };
 
-/* ------------------- getArtistInfo --------------------
-   Fetch general artist information by artist ID.
-   Returns the raw Spotify artist object.
------------------------------------------------------- */
 export const getArtistInfo = async (artistId, TOKEN) => {
   try {
     const response = await fetch(
@@ -185,6 +181,26 @@ export const getArtistInfo = async (artistId, TOKEN) => {
     return data;
   } catch (err) {
     console.error('❌ Error in getArtistInfo function: ' + err);
+    throw err;
+  }
+};
+/* ------------------- getArtistsList --------------------
+   Fetch a list of artists from Spotify matching the search query.
+   Returns an array of artist names (or full artist objects if needed).
+-------------------------------------------------------- */
+export const getArtistsList = async (query, TOKEN) => {
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        query
+      )}&type=artist&limit=5`,
+      { headers: { Authorization: `Bearer ${TOKEN}` } }
+    );
+    const data = await response.json();
+
+    return data.artists?.items?.map((artist) => artist.name) || [];
+  } catch (err) {
+    console.error('❌ Error in getArtistsList function: ' + err);
     throw err;
   }
 };

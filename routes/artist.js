@@ -5,6 +5,7 @@ import {
   getArtistTopTracks,
   getArtistAlbums,
   getArtistInfo,
+  getArtistsList,
 } from '../functions/artistFunctions.js';
 
 const router = express.Router();
@@ -152,6 +153,30 @@ router.get('/artistRedirect', (req, res) => {
       return res.redirect(`/showArtist?artist=${encodeURIComponent(artist)}`);
     default:
       return res.redirect(`/artistAlbums?artist=${encodeURIComponent(artist)}`);
+  }
+});
+/* -------------------------------------------------------------------- */
+// /* ------------------- Artist Input Suggestions -------------------- */
+/* -------------------------------------------------------------------- */
+// ------------------- Autocomplete Route -------------------
+router.post('/autocomplete', async (req, res, next) => {
+  try {
+    // Get Spotify access token (or render loading page if token is missing/expired)
+    const token = await getTokenOrRenderLoadingPage(res);
+    if (!token) return; // stop if no token is available
+
+    // Read the search query from the request body
+    const query = req.body.query;
+    if (!query) return res.json([]); // return empty array if no query provided
+
+    // Call helper function to fetch artist list from Spotify API
+    const artistsList = await getArtistsList(query, token);
+
+    // Send the array of artist names back to the frontend as JSON
+    res.json(artistsList);
+  } catch (err) {
+    // Forward any errors to the global error handler
+    next(err);
   }
 });
 
