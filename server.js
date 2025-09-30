@@ -37,12 +37,6 @@ app.use(express.urlencoded({ extended: true }));
 // Initialize Spotify API token before routes
 await initToken();
 
-// Register routes
-app.use('/', homeRoutes); // Home page route
-app.use('/', artistRoutes); // Artist-related routes
-app.use('/', loginRoutes);
-app.use('/', errorRoutes); // 404 + global error handler
-
 await mongoose.connection.asPromise();
 
 app.get('/test-atlas', async (req, res) => {
@@ -60,6 +54,12 @@ app.get('/test-atlas', async (req, res) => {
     res.status(500).send('MongoDB connection error ❌ ' + err);
   }
 });
+
+// Register routes
+app.use('/', homeRoutes); // Home page route
+app.use('/', artistRoutes); // Artist-related routes
+app.use('/', loginRoutes);
+app.use('/', errorRoutes); // 404 + global error handler
 
 // Start the server
 const PORT = process.env.PORT || 3000;
