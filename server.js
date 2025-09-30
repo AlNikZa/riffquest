@@ -43,21 +43,25 @@ app.use('/', artistRoutes); // Artist-related routes
 app.use('/', loginRoutes);
 app.use('/', errorRoutes); // 404 + global error handler
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server started on port ${PORT}`));
-//
-//test atlas:
+await mongoose.connection.asPromise();
+
 app.get('/test-atlas', async (req, res) => {
   try {
     const doc = await mongoose.connection.db
       .collection('testCollection')
       .insertOne({ test: 'Render test' });
-    res.send(`Inserted document with _id: ${doc.insertedId}`);
     await mongoose.connection.db
       .collection('testCollection')
       .deleteOne({ _id: doc.insertedId });
+    res.send(
+      `MongoDB connection working ✅ Inserted and deleted document with _id: ${doc.insertedId}`
+    );
   } catch (err) {
     res.status(500).send('MongoDB connection error ❌ ' + err);
   }
 });
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server started on port ${PORT}`));
+//
