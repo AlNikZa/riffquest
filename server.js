@@ -11,6 +11,7 @@ import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { initToken } from './functions/tokenFunctions.js';
+import mongoose from './db.js';
 
 // Import route modules
 import homeRoutes from './routes/home.js';
@@ -45,3 +46,18 @@ app.use('/', errorRoutes); // 404 + global error handler
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server started on port ${PORT}`));
+//
+//test atlas:
+app.get('/test-atlas', async (req, res) => {
+  try {
+    const doc = await mongoose.connection.db
+      .collection('testCollection')
+      .insertOne({ test: 'Render test' });
+    res.send(`Inserted document with _id: ${doc.insertedId}`);
+    await mongoose.connection.db
+      .collection('testCollection')
+      .deleteOne({ _id: doc.insertedId });
+  } catch (err) {
+    res.status(500).send('MongoDB connection error ❌ ' + err);
+  }
+});
