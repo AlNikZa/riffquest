@@ -9,9 +9,28 @@
 
     <!-- Main page header -->
     <h1 class="text-center mt-5">RiffQuest</h1>
-    <h2 class="text-secondary text-center fs-5 mb-5">
+    <h2 class="text-secondary text-center fs-4 mb-5">
       Every song has its own riff
     </h2>
+    <!-- Call to action: log in with Spotify -->
+    <div class="text-center mb-5">
+      <h3 class="text-secondary mb-3 fs-5">
+        For full experience, log in with your Spotify account
+      </h3>
+      <a href="/login" class="btn btn-success btn-lg mb-2 spotify-login-btn">
+        Log in with Spotify
+      </a>
+      <div class="fs-6 text-secondary">
+        Don't have a Spotify account?
+        <a
+          href="https://www.spotify.com/signup/"
+          target="_blank"
+          class="text-success"
+        >
+          Create one
+        </a>
+      </div>
+    </div>
 
     <!-- Artist search form -->
     <form method="get" id="artist-form" autocomplete="off">
@@ -71,5 +90,6 @@
     <!-- Custom JavaScript for handling modal forms -->
     <script src="/formModals.js"></script>
     <script src="/autocomplete.js"></script>
+    <script src="/popupLogin.js"></script>
   </body>
 </html>

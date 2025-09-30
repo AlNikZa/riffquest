@@ -94,34 +94,35 @@ View artist details
 RiffQuest/
 │
 ├─ functions/
-│  ├─ artistFunctions.js
-│  └─ tokenFunctions.js
+│   ├─ artistFunctions.js
+│   └─ tokenFunctions.js
 │
 ├─ public/
-│  ├─ autocomplete.js
-│  ├─ formModals.js
-│  └─ logo.png
+│   ├─ autocomplete.js
+│   ├─ formModals.js
+│   └─ logo.png
 │
 ├─ routes/
-│  ├─ artist.js
-│  ├─ error.js
-│  └─ home.js
+│   ├─ artist.js
+│   ├─ error.js
+│   └─ home.js
 │
 ├─ views/
-│  ├─ partials/
-│  │  ├─ bootstrapModals.ejs
-│  │  ├─ bootstrapScriptTag.ejs
-│  │  ├─ footer.ejs
-│  │  ├─ head.ejs
-│  │  └─ navbar.ejs
-│  ├─ artistAlbums.ejs
-│  ├─ artistInfo.ejs
-│  ├─ artistTopTracks.ejs
-│  ├─ error.ejs
-│  ├─ index.ejs
-│  ├─ loading.ejs
-│  └─ noResultsFound.ejs
+│   ├─ partials/
+│   │   ├─ bootstrapModals.ejs
+│   │   ├─ bootstrapScriptTag.ejs
+│   │   ├─ footer.ejs
+│   │   ├─ head.ejs
+│   │   └─ navbar.ejs
+│   ├─ artistAlbums.ejs
+│   ├─ artistInfo.ejs
+│   ├─ artistTopTracks.ejs
+│   ├─ error.ejs
+│   ├─ index.ejs
+│   ├─ loading.ejs
+│   └─ noResultsFound.ejs
 │
+├─ Procfile
 ├─ package.json
 └─ server.js
 ```
