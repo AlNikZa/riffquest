@@ -39,25 +39,9 @@ await initToken();
 
 await mongoose.connection.asPromise();
 
-app.get('/test-atlas', async (req, res) => {
-  try {
-    const doc = await mongoose.connection.db
-      .collection('testCollection')
-      .insertOne({ test: 'Render test' });
-    await mongoose.connection.db
-      .collection('testCollection')
-      .deleteOne({ _id: doc.insertedId });
-    res.send(
-      `MongoDB connection working ✅ Inserted and deleted document with _id: ${doc.insertedId}`
-    );
-  } catch (err) {
-    res.status(500).send('MongoDB connection error ❌ ' + err);
-  }
-});
-
 // Register routes
-app.use('/', homeRoutes); // Home page route
-app.use('/', artistRoutes); // Artist-related routes
+app.use('/', homeRoutes);
+app.use('/', artistRoutes);
 app.use('/', loginRoutes);
 app.use('/', errorRoutes); // 404 + global error handler
 
