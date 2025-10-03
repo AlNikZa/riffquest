@@ -1,7 +1,3 @@
-// Load environment variables from .env file
-import dotenv from 'dotenv';
-dotenv.config();
-
 // Get Spotify API credentials from environment variables
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
