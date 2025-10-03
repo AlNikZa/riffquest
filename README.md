@@ -95,17 +95,24 @@ RiffQuest/
 │
 ├─ functions/
 │   ├─ artistFunctions.js
-│   └─ tokenFunctions.js
+│   ├─ loginFunctions.js
+│   ├─ tokenFunctions.js
+│   └─ userFunctions.js
+│
+├─ models/
+│   └─ User.js
 │
 ├─ public/
 │   ├─ autocomplete.js
 │   ├─ formModals.js
-│   └─ logo.png
+│   ├─ logo.png
+│   └─ popupLogin.js
 │
 ├─ routes/
 │   ├─ artist.js
 │   ├─ error.js
-│   └─ home.js
+│   ├─ home.js
+│   └─ login.js
 │
 ├─ views/
 │   ├─ partials/
@@ -124,6 +131,7 @@ RiffQuest/
 │
 ├─ Procfile
 ├─ package.json
+├─ db.js
 └─ server.js
 ```
 

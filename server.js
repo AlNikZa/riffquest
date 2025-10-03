@@ -43,7 +43,7 @@ await mongoose.connection.asPromise();
 app.use('/', homeRoutes);
 app.use('/', artistRoutes);
 app.use('/', loginRoutes);
-app.use('/', errorRoutes); // 404 + global error handler
+app.use('/', errorRoutes); // 404 + global error handler at the end
 
 // Start the server
 const PORT = process.env.PORT || 3000;

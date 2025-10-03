@@ -39,9 +39,5 @@ export async function exchangeCodeForToken(code, isProduction) {
     throw new Error(data.error_description || 'Spotify token exchange failed');
   }
 
-  // Return the token data:
-  // data.access_token → used for API requests on behalf of the user
-  // data.refresh_token → used to refresh the access token when it expires
-  // data.expires_in → duration of the access token in seconds
   return data;
 }
