@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTokenOrRenderLoadingPage } from '../functions/tokenFunctions.js';
+import { getTokenOrRenderLoadingPage } from '../functions/globalTokenFunctions.js';
 
 const router = express.Router();
 /* ------------------------------------------------------------- */

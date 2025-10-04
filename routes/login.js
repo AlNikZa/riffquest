@@ -1,6 +1,7 @@
 import express from 'express';
 import { exchangeCodeForToken } from '../functions/loginFunctions.js';
 import { getUserData, upsertSpotifyUser } from '../functions/userFunctions.js';
+import { scheduleUserTokenRefresh } from '../functions/userTokenFunctions.js';
 // import User from '../models/User.js';
 
 const router = express.Router();
@@ -61,6 +62,7 @@ router.get('/callback', async (req, res) => {
 
     try {
       await upsertSpotifyUser(userDoc);
+      scheduleUserTokenRefresh(userDoc.spotify_user_id, userDoc.refresh_token);
     } catch (err) {
       console.error('Error saving user:', err);
       return res.status(500).send('Failed to save user');

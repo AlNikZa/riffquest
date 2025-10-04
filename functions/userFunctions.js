@@ -25,6 +25,7 @@ export const upsertSpotifyUser = async (userDoc) => {
       // token_created_timestamp: userDoc.token_created_timestamp, // Update token creation time
       display_name: userDoc.display_name, // Update display name
       followers: userDoc.followers, // Update followers count
+      token_created_timestamp: Date.now(),
     };
 
     const user = await User.findOneAndUpdate(
@@ -47,5 +48,24 @@ export const upsertSpotifyUser = async (userDoc) => {
     console.log('User saved or updated:', user); // Log the saved or updated user
   } catch (err) {
     console.error('❌ Error in upsertSpotifyUser function:', err); // Log any errors
+  }
+};
+//
+export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
+  try {
+    await User.updateOne(
+      { spotify_user_id: spotify_user_id },
+      {
+        $set: {
+          access_token: updatedUserTokens.accessToken,
+          refresh_token: updatedUserTokens.refreshToken,
+          token_expires_in: updatedUserTokens.expiresIn,
+          token_created_timestamp: Date.now(),
+        },
+      }
+    );
+    console.log(`✅ Updated Spotify user`);
+  } catch (err) {
+    console.error('❌ Error in updateSpotifyUser function:', err); // Log any errors
   }
 };

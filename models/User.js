@@ -2,10 +2,6 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
   {
-    // token_created_timestamp: {
-    //   type: Date,
-    //   default: Date.now,
-    // },
     access_token: {
       type: String,
       required: true,
@@ -18,10 +14,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    // user_created_timestamp: {
-    //   type: Date,
-    //   default: Date.now,
-    // },
+
     display_name: {
       type: String,
       default: null,
@@ -35,7 +28,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    token_created_timestamp: {
+      type: Date,
+      default: null,
+    },
   },
+
   { timestamps: true }
 );
 

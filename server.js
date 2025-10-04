@@ -14,7 +14,7 @@ import './config.js';
 import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { initToken } from './functions/tokenFunctions.js';
+import { initToken } from './functions/globalTokenFunctions.js';
 import mongoose from './db.js';
 
 // Import route modules
