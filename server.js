@@ -11,11 +11,13 @@
 // Load environment variables from .env into process.env before running the rest of the app
 import './config.js';
 
+// imports
 import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { initToken } from './functions/globalTokenFunctions.js';
 import mongoose from './db.js';
+import { sessionInit } from './sessionConfig.js';
 
 // Import route modules
 import homeRoutes from './routes/home.js';
@@ -24,6 +26,9 @@ import errorRoutes from './routes/error.js';
 import loginRoutes from './routes/login.js';
 
 const app = express();
+
+// Trust the first proxy to correctly detect HTTPS and client IP (needed for secure cookies)
+app.set('trust proxy', 1);
 
 // Resolve __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -38,11 +43,19 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize Spotify API token before loading routes
-await initToken();
-
 // Wait for MongoDB connection
 await mongoose.connection.asPromise();
+
+// Configure session middleware
+app.use(sessionInit());
+
+// Make login status available to all EJS views
+app.use((req, res, next) => {
+  res.locals.isLoggedIn = Boolean(req.session.spotify_user_id);
+  next();
+});
+// Initialize Spotify API token before loading routes
+await initToken();
 
 // Register application routes
 app.use('/', homeRoutes);

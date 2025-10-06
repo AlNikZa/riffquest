@@ -10,7 +10,6 @@ router.get('/', (req, res) => {
   // Get the Spotify API token; if not ready, render loading page
   const token = getTokenOrRenderLoadingPage(res);
   if (!token) return;
-
   // Render the home page with a title
   res.render('index', { title: 'RiffQuest' });
 });

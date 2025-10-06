@@ -82,6 +82,7 @@
       </form>
 
       <!-- Right side: Spotify login CTA -->
+      <% if (!isLoggedIn) { %>
       <div class="d-flex ms-auto align-items-center">
         <a
           href="/login"
@@ -90,6 +91,7 @@
           Log in with Spotify
         </a>
       </div>
+      <% } %>
     </div>
   </div>
 </nav>

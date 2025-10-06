@@ -134,6 +134,7 @@ RiffQuest/
 ├─ package.json
 ├─ config.js
 ├─ db.js
+├─ sessionConfig.js
 └─ server.js
 ```
 
