@@ -5,9 +5,11 @@ export async function exchangeCodeForToken(code, isProduction) {
 
   // Determine redirect URI based on environment
   // Must match the redirect URI used in /login route
+  // Use environment-specific redirect URI
   const redirect_uri = isProduction
-    ? 'https://riffquest.onrender.com/callback'
-    : 'http://127.0.0.1:3000/callback';
+    ? process.env.REDIRECT_URI_PROD
+    : process.env.REDIRECT_URI_DEV;
+
 
   // Build POST parameters for the token exchange request
   const params = new URLSearchParams({
