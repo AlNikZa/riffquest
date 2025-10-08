@@ -113,6 +113,7 @@ RiffQuest/
 │   ├─ artist.js
 │   ├─ error.js
 │   ├─ home.js
+│   ├─ logout.js
 │   └─ login.js
 │
 ├─ views/

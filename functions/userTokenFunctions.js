@@ -1,3 +1,4 @@
+import User from '../models/User.js';
 import { updateSpotifyUser } from './userFunctions.js';
 
 export const refreshUserToken = async (refresh_token) => {
@@ -54,5 +55,27 @@ export const scheduleUserTokenRefresh = async (
       `❌ Error in scheduleUserTokenRefresh function- Failed to refresh token for user ${spotify_user_id}:`,
       err
     );
+  }
+};
+
+export const removeTokensForUser = async (spotify_user_id) => {
+  try {
+    await User.updateOne(
+      { spotify_user_id: spotify_user_id },
+      {
+        $unset: {
+          access_token: '',
+          refresh_token: '',
+          token_expires_in: '',
+          token_created_timestamp: '',
+        },
+      }
+    );
+
+    console.log('🔍 Updated user:', await User.findOne({ spotify_user_id }));
+
+    console.log(`✅ Updated Spotify user`);
+  } catch (err) {
+    console.error('❌ Error in removeTokensForUser function:', err); // Log any errors
   }
 };

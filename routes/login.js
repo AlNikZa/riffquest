@@ -75,10 +75,7 @@ router.get('/callback', async (req, res) => {
     req.session.spotify_user_id = userDoc.spotify_user_id;
     req.session.save(() => {
       res.redirect(`${baseUrl}/`);
-      // res.send(`Session set for user: ${req.session.spotify_user_id}`);
     });
-
-    // res.send('Session set. Check cookies.');
   } catch (error) {
     // Catch and log any errors during the token exchange
     console.error(error);

@@ -24,6 +24,7 @@ import homeRoutes from './routes/home.js';
 import artistRoutes from './routes/artist.js';
 import errorRoutes from './routes/error.js';
 import loginRoutes from './routes/login.js';
+import logoutRoutes from './routes/logout.js';
 
 const app = express();
 
@@ -61,6 +62,7 @@ await initToken();
 app.use('/', homeRoutes);
 app.use('/', artistRoutes);
 app.use('/', loginRoutes);
+app.use('/', logoutRoutes);
 app.use('/', errorRoutes); // Handles 404 and global errors
 
 // Start the Express server
