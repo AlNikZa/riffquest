@@ -1,5 +1,8 @@
 import express from 'express';
-import { exchangeCodeForToken } from '../functions/loginFunctions.js';
+import {
+  exchangeCodeForToken,
+  getReturnToCookie,
+} from '../functions/loginFunctions.js';
 import { getUserData, upsertSpotifyUser } from '../functions/userFunctions.js';
 import { scheduleUserTokenRefresh } from '../functions/userTokenFunctions.js';
 // import User from '../models/User.js';
@@ -74,7 +77,10 @@ router.get('/callback', async (req, res) => {
         : process.env.BASE_URL_DEV;
     req.session.spotify_user_id = userDoc.spotify_user_id;
     req.session.save(() => {
-      res.redirect(`${baseUrl}/`);
+      res.setHeader('Set-Cookie', 'returnTo=; Path=/; Max-Age=0'); // clear cookie
+      res.redirect(
+        getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
+      );
     });
   } catch (error) {
     // Catch and log any errors during the token exchange

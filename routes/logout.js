@@ -1,5 +1,7 @@
 import express from 'express';
 import { removeTokensForUser } from '../functions/userTokenFunctions.js';
+import { getReturnToCookie } from '../functions/loginFunctions.js';
+
 const router = express.Router();
 //
 router.get('/logout', async (req, res) => {
@@ -17,7 +19,9 @@ router.get('/logout', async (req, res) => {
       //   Clear the session cookie from the browser
       res.clearCookie('connect.sid');
       //   Redirect the user to the current or homepage after logout
-      res.redirect(req.get('Referer') || '/');
+      const returnTo = getReturnToCookie(req);
+      res.setHeader('Set-Cookie', 'returnTo=; Path=/; Max-Age=0'); // clear cookie
+      res.redirect(returnTo || req.get('Referer') || '/');
     }
   });
 });

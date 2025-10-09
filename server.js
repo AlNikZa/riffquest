@@ -16,6 +16,7 @@ import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { initToken } from './functions/globalTokenFunctions.js';
+import { setReturnToCookie } from './functions/loginFunctions.js';
 import mongoose from './db.js';
 import { sessionInit } from './sessionConfig.js';
 
@@ -49,6 +50,8 @@ await mongoose.connection.asPromise();
 
 // Configure session middleware
 app.use(sessionInit());
+// Middleware that stores the current URL  cookie for post-login redirection
+app.use(setReturnToCookie);
 
 // Make login status available to all EJS views
 app.use((req, res, next) => {

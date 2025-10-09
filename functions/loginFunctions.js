@@ -6,10 +6,10 @@ export async function exchangeCodeForToken(code, isProduction) {
   // Determine redirect URI based on environment
   // Must match the redirect URI used in /login route
   // Use environment-specific redirect URI
+  // Use environment-specific redirect URI
   const redirect_uri = isProduction
     ? process.env.REDIRECT_URI_PROD
     : process.env.REDIRECT_URI_DEV;
-
 
   // Build POST parameters for the token exchange request
   const params = new URLSearchParams({
@@ -42,4 +42,41 @@ export async function exchangeCodeForToken(code, isProduction) {
   }
 
   return data;
+}
+export const setReturnToCookie = (req, res, next) => {
+  // Only handle GET requests that are not for /login or /callback
+  if (
+    req.method === 'GET' &&
+    !req.originalUrl.startsWith('/login') &&
+    !req.originalUrl.startsWith('/callback')
+  ) {
+    // Construct the full current URL
+    const currentURL = req.protocol + '://' + req.get('host') + req.originalUrl;
+
+    // Check if the app is running in production mode
+    const isProd = process.env.NODE_ENV === 'production';
+    const secureFlag = isProd ? 'Secure; ' : '';
+
+    // Set a cookie named 'returnTo' with the current URL
+    res.setHeader(
+      'Set-Cookie',
+      `returnTo=${encodeURIComponent(
+        currentURL
+      )}; Path=/; HttpOnly; ${secureFlag}Max-Age=6000`
+    );
+  }
+
+  // Continue to the next middleware or route
+  next();
+};
+
+export function getReturnToCookie(req) {
+  const raw = req.headers.cookie || '';
+  const cookies = Object.fromEntries(
+    raw.split('; ').map((c) => {
+      const [key, value] = c.split('=');
+      return [key, decodeURIComponent(value)];
+    })
+  );
+  return cookies.returnTo || null;
 }
