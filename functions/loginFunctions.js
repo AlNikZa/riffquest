@@ -58,12 +58,12 @@ export const setReturnToCookie = (req, res, next) => {
     const secureFlag = isProd ? 'Secure; ' : '';
 
     // Set a cookie named 'returnTo' with the current URL
-    res.setHeader(
-      'Set-Cookie',
-      `returnTo=${encodeURIComponent(
-        currentURL
-      )}; Path=/; HttpOnly; ${secureFlag}Max-Age=6000`
-    );
+    res.cookie('returnTo', currentURL, {
+      httpOnly: true,
+      maxAge: 6000 * 1000,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+    });
   }
 
   // Continue to the next middleware or route

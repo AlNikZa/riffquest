@@ -53,12 +53,11 @@ router.get('/callback', async (req, res) => {
 
     const userData = await getUserData(userTokens.access_token);
     const userDoc = {
-      // token_created_timestamp: Date.now(),
       access_token: userTokens.access_token,
       refresh_token: userTokens.refresh_token,
       token_expires_in: userTokens.expires_in,
-      // user_created_timestamp: Date.now(),
       display_name: userData.display_name,
+      profileImg: userData.images?.[0]?.url || null,
       followers: userData.followers?.total || 0,
       spotify_user_id: userData.id,
     };
@@ -76,8 +75,17 @@ router.get('/callback', async (req, res) => {
         ? process.env.BASE_URL_PROD
         : process.env.BASE_URL_DEV;
     req.session.spotify_user_id = userDoc.spotify_user_id;
-    req.session.save(() => {
-      res.setHeader('Set-Cookie', 'returnTo=; Path=/; Max-Age=0'); // clear cookie
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+      } else {
+        console.log('Session saved:', req.session);
+      }
+      res.clearCookie('returnTo', {
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      });
       res.redirect(
         getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
       );

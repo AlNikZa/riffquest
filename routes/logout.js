@@ -17,10 +17,14 @@ router.get('/logout', async (req, res) => {
     } else {
       console.log('✅ Session destroyed');
       //   Clear the session cookie from the browser
-      res.clearCookie('connect.sid');
+      res.clearCookie('connect.sid', {
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      });
+
       //   Redirect the user to the current or homepage after logout
       const returnTo = getReturnToCookie(req);
-      res.setHeader('Set-Cookie', 'returnTo=; Path=/; Max-Age=0'); // clear cookie
       res.redirect(returnTo || req.get('Referer') || '/');
     }
   });

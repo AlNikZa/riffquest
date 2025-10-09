@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    profile_img: {
+      type: String,
+      default: null,
+    },
     followers: {
       type: Number,
       default: 0,

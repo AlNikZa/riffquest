@@ -24,6 +24,7 @@ export const upsertSpotifyUser = async (userDoc) => {
       token_expires_in: userDoc.token_expires_in, // Update token expiry
       // token_created_timestamp: userDoc.token_created_timestamp, // Update token creation time
       display_name: userDoc.display_name, // Update display name
+      profile_img: userDoc.profileImg,
       followers: userDoc.followers, // Update followers count
       token_created_timestamp: Date.now(),
     };
