@@ -75,6 +75,14 @@ router.get('/callback', async (req, res) => {
         ? process.env.BASE_URL_PROD
         : process.env.BASE_URL_DEV;
     req.session.spotify_user_id = userDoc.spotify_user_id;
+    req.session.username = userDoc.display_name;
+    req.session.justLoggedIn = true;
+    console.log(
+      '[/callback] set justLoggedIn =',
+      req.session.justLoggedIn,
+      'sid=',
+      req.sessionID
+    );
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
@@ -95,5 +103,21 @@ router.get('/callback', async (req, res) => {
     console.error(error);
     res.status(500).send(error.message);
   }
+});
+router.post('/reset-login-flag', (req, res) => {
+  console.log(
+    '[reset route] before reset',
+    req.session.justLoggedIn,
+    'sid=',
+    req.sessionID
+  );
+  req.session.justLoggedIn = false;
+  console.log(
+    '[reset route] after reset',
+    req.session.justLoggedIn,
+    'sid=',
+    req.sessionID
+  );
+  res.sendStatus(200);
 });
 export default router;

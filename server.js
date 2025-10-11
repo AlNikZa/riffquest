@@ -55,7 +55,17 @@ app.use(setReturnToCookie);
 
 // Make login status available to all EJS views
 app.use((req, res, next) => {
+  console.log(
+    '[global middleware] session.justLoggedIn =',
+    req.session?.justLoggedIn,
+    'url=',
+    req.originalUrl,
+    'sid=',
+    req.sessionID
+  );
   res.locals.isLoggedIn = Boolean(req.session.spotify_user_id);
+  res.locals.justLoggedIn = req.session.justLoggedIn;
+  res.locals.username = req.session.username;
   next();
 });
 // Initialize Spotify API token before loading routes

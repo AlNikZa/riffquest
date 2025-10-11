@@ -39,3 +39,41 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for Login Confirmation -->
+<% if (typeof justLoggedIn !== 'undefined' && justLoggedIn) { %>
+<div
+  class="modal fade"
+  id="loginModal"
+  tabindex="-1"
+  aria-labelledby="loginModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Welcome to RiffQuest</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Logged in as <strong><%=username %></strong><br />
+        You're now connected to your Spotify account.
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <a href="#" class="btn btn-success" data-bs-dismiss="modal">Continue</a>
+        <a href="/logout" class="btn btn-secondary">Log out</a>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>

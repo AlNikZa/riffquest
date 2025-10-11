@@ -56,6 +56,13 @@ router.get('/artistTopTracks', async (req, res, next) => {
 /* ------------------- Artist Albums Route ------------------- */
 /* ----------------------------------------------------------- */
 router.get('/artistAlbums', async (req, res, next) => {
+  console.log(
+    '[artistAlbums route] session.justLoggedIn =',
+    req.session.justLoggedIn,
+    'sid=',
+    req.sessionID
+  );
+
   try {
     // Ensure token is available, otherwise render loading page
     const token = getTokenOrRenderLoadingPage(res);

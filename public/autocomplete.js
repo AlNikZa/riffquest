@@ -44,7 +44,7 @@ function initAutocomplete(inputSelector, datalistSelector) {
   };
 
   // Wrap fetchArtists with debounce (400ms delay)
-  const debouncedFetch = debounce(fetchArtists, 400);
+  const debouncedFetch = debounce(fetchArtists, 200);
 
   // Listen for input events on the input field
   input.addEventListener('input', debouncedFetch);
