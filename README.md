@@ -107,7 +107,7 @@ RiffQuest/
 │   ├─ autocomplete.js
 │   ├─ formModals.js
 │   ├─ logo.png
-│   └─ popupLogin.js
+│   └─ auth-modals.js
 │
 ├─ routes/
 │   ├─ artist.js

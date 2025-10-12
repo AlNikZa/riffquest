@@ -70,10 +70,58 @@
 
       <!-- Modal footer -->
       <div class="modal-footer">
-        <a href="#" class="btn btn-success" data-bs-dismiss="modal">Continue</a>
+        <a
+          id="loginContinue"
+          href="#"
+          class="btn btn-success"
+          data-bs-dismiss="modal"
+          >Continue</a
+        >
         <a href="/logout" class="btn btn-secondary">Log out</a>
       </div>
     </div>
   </div>
 </div>
 <% } %>
+
+<!-- Modal for Logout Confirmation -->
+<div
+  class="modal fade"
+  id="logoutModal"
+  tabindex="-1"
+  aria-labelledby="logoutModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <!-- Modal header -->
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="logoutModalLabel">Confirm Sign Out</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">Are you sure you want to sign out?</div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer border-secondary">
+        <button
+          id="logoutNo"
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          No
+        </button>
+        <button type="button" id="confirmLogout" class="btn btn-danger">
+          Yes, log out
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

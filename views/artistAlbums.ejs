@@ -29,36 +29,40 @@
 
       <!-- Individual album card -->
       <li id="id_<%= album.id %>" class="m-3 text-center p-2">
-        <div class="card" style="width: 375px">
+        <div class="card" style="width: 275px">
           <!-- Album cover image -->
           <img
             class="card-img-top"
             src="<%= album.image %>"
             alt="Album cover image"
           />
-          <div class="card-body">
+          <div class="card-body bg-success">
             <!-- Album title -->
-            <h2 class="card-title h4 py-0 my-0"><%= album.album %></h2>
+            <h2 class="card-title h6 py-0 my-0 text-white">
+              <%= album.album %>
+            </h2>
           </div>
 
           <!-- Album details: year and duration -->
           <ul class="list-group list-group-flush">
-            <li class="list-group-item">Year: <%= album.year %></li>
-            <li class="list-group-item">Duration: <%= album.duration %></li>
+            <li class="list-group-item small">Year: <%= album.year %></li>
+            <li class="list-group-item small">
+              Duration: <%= album.duration %>
+            </li>
           </ul>
 
           <!-- Links: reveal embedded player or go to Spotify -->
           <div class="card-body">
             <a
               href="#iframe_container_<%= album.id %>"
-              class="card-link text-success listen-here"
+              class="card-link text-success listen-here small"
             >
               Listen here
             </a>
             <a
               href="<%= album.url %>"
               target="_blank"
-              class="card-link text-success"
+              class="card-link text-success small"
             >
               Listen on Spotify
             </a>
