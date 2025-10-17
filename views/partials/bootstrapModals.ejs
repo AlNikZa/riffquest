@@ -64,7 +64,14 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-        Logged in as <strong><%=username %></strong><br />
+        Logged in as <strong><%=username %></strong>
+        <% if (userImg) {%>
+        <img
+          src="<%=userImg%>"
+          style="width: 50px; border: 2px solid #198754; border-radius: 50%"
+        />
+        <% } %>
+        <br />
         You're now connected to your Spotify account.
       </div>
 
@@ -92,8 +99,8 @@
   aria-labelledby="logoutModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-light">
+  <div class="modal-dialog">
+    <div class="modal-content">
       <!-- Modal header -->
       <div class="modal-header border-secondary">
         <h5 class="modal-title" id="logoutModalLabel">Confirm Sign Out</h5>
@@ -106,7 +113,7 @@
       </div>
 
       <!-- Modal body -->
-      <div class="modal-body">Are you sure you want to sign out?</div>
+      <div class="modal-body">Are you sure you want to log out?</div>
 
       <!-- Modal footer -->
       <div class="modal-footer border-secondary">

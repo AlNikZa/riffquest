@@ -76,6 +76,7 @@ router.get('/callback', async (req, res) => {
         : process.env.BASE_URL_DEV;
     req.session.spotify_user_id = userDoc.spotify_user_id;
     req.session.username = userDoc.display_name;
+    req.session.userImg = userDoc.profileImg;
     req.session.justLoggedIn = true;
     console.log(
       '[/callback] set justLoggedIn =',

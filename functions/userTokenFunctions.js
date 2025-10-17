@@ -43,7 +43,7 @@ export const scheduleUserTokenRefresh = async (
   try {
     const updatedUserTokens = await refreshUserToken(refresh_token);
     const timeout = updatedUserTokens.expiresIn * 1000 - 3000;
-    console.log('token refreshed');
+    console.log('user token refreshed');
     await updateSpotifyUser(updatedUserTokens, spotify_user_id);
     console.log('user updated');
 
