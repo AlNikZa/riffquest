@@ -43,32 +43,6 @@ export async function exchangeCodeForToken(code, isProduction) {
 
   return data;
 }
-export const setReturnToCookie = (req, res, next) => {
-  // Only handle GET requests that are not for /login or /callback
-  if (
-    req.method === 'GET' &&
-    !req.originalUrl.startsWith('/login') &&
-    !req.originalUrl.startsWith('/callback')
-  ) {
-    // Construct the full current URL
-    const currentURL = req.protocol + '://' + req.get('host') + req.originalUrl;
-
-    // Check if the app is running in production mode
-    const isProd = process.env.NODE_ENV === 'production';
-    const secureFlag = isProd ? 'Secure; ' : '';
-
-    // Set a cookie named 'returnTo' with the current URL
-    res.cookie('returnTo', currentURL, {
-      httpOnly: true,
-      maxAge: 6000 * 1000,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-    });
-  }
-
-  // Continue to the next middleware or route
-  next();
-};
 
 export function getReturnToCookie(req) {
   const raw = req.headers.cookie || '';

@@ -100,6 +100,10 @@ RiffQuest/
 │   ├─ userFunctions.js
 │   └─ userTokenFunctions.js
 │
+├─ middleware/
+│   ├─ returnTo.js
+│   └─ userSession.js
+│
 ├─ models/
 │   └─ User.js
 │

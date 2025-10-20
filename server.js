@@ -16,7 +16,8 @@ import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { initToken } from './functions/globalTokenFunctions.js';
-import { setReturnToCookie } from './functions/loginFunctions.js';
+import { setReturnToCookie } from './middleware/returnTo.js';
+import { userSessionMiddleware } from './middleware/userSession.js';
 import mongoose from './db.js';
 import { sessionInit } from './sessionConfig.js';
 
@@ -52,23 +53,8 @@ await mongoose.connection.asPromise();
 app.use(sessionInit());
 // Middleware that stores the current URL  cookie for post-login redirection
 app.use(setReturnToCookie);
-
 // Make login status available to all EJS views
-app.use((req, res, next) => {
-  console.log(
-    '[global middleware] session.justLoggedIn =',
-    req.session?.justLoggedIn,
-    'url=',
-    req.originalUrl,
-    'sid=',
-    req.sessionID
-  );
-  res.locals.isLoggedIn = Boolean(req.session.spotify_user_id);
-  res.locals.justLoggedIn = req.session.justLoggedIn;
-  res.locals.username = req.session.username;
-  res.locals.userImg = req.session.userImg;
-  next();
-});
+app.use(userSessionMiddleware);
 // Initialize Spotify API token before loading routes
 await initToken();
 
