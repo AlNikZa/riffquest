@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
   const token = getTokenOrRenderLoadingPage(res);
   if (!token) return;
   // Render the home page with a title
-  res.render('index', { title: 'RiffQuest' });
+  res.render('index', { title: 'Riff Quest' });
 });
 
 export default router;

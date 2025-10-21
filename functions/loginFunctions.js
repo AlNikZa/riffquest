@@ -1,4 +1,27 @@
-// Function to exchange Spotify authorization code for access and refresh tokens
+export function buildSpotifyAuthUrl() {
+  // const scope = 'user-read-private user-read-email';
+  const scope =
+    'playlist-read-private playlist-read-collaborative user-top-read user-library-read';
+
+  const redirect_uri =
+    process.env.NODE_ENV === 'production'
+      ? process.env.REDIRECT_URI_PROD
+      : process.env.REDIRECT_URI_DEV;
+
+  // Build query string using URLSearchParams (modern alternative to querystring)
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: process.env.CLIENT_ID,
+    scope: scope,
+    redirect_uri: redirect_uri,
+  });
+
+  // Final Spotify authorization URL
+  const authUrl = 'https://accounts.spotify.com/authorize?' + params.toString();
+
+  return authUrl;
+}
+
 export async function exchangeCodeForToken(code, isProduction) {
   // Throw an error if no code is provided
   if (!code) throw new Error('No authorization code provided');

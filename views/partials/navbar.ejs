@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg bg-success navbar-dark fixed-top">
   <div class="container-fluid">
     <!-- Brand/logo -->
-    <a class="navbar-brand text-white" href="/">RiffQuest</a>
+    <a class="navbar-brand text-white" href="/">Riff Quest</a>
 
     <!-- Navbar toggler for mobile view -->
     <button
@@ -93,6 +93,11 @@
       </div>
       <% } else { %>
       <div class="d-flex ms-auto align-items-center">
+        <a href="#" class="btn btn-outline-light mt-2 mt-lg-0 mx-2">
+          <%= username %> <% if (userImg) { %>
+          <img src="<%=userImg%>" style="height: 22px" alt="" srcset="" />
+          <% } %>
+        </a>
         <a
           href="/logout"
           class="btn btn-outline-light mt-2 mt-lg-0 spotify-logout-btn"

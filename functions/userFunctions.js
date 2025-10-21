@@ -70,3 +70,16 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
     console.error('❌ Error in updateSpotifyUser function:', err); // Log any errors
   }
 };
+
+export const getUserDocObject = (userTokens, userData) => {
+  const userDoc = {
+    access_token: userTokens.access_token,
+    refresh_token: userTokens.refresh_token,
+    token_expires_in: userTokens.expires_in,
+    display_name: userData.display_name,
+    profileImg: userData.images?.[0]?.url || null,
+    followers: userData.followers?.total || 0,
+    spotify_user_id: userData.id,
+  };
+  return userDoc;
+};

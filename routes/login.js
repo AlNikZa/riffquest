@@ -1,35 +1,21 @@
 import express from 'express';
 import {
+  buildSpotifyAuthUrl,
   exchangeCodeForToken,
   getReturnToCookie,
 } from '../functions/loginFunctions.js';
-import { getUserData, upsertSpotifyUser } from '../functions/userFunctions.js';
+import {
+  getUserData,
+  upsertSpotifyUser,
+  getUserDocObject,
+} from '../functions/userFunctions.js';
 import { scheduleUserTokenRefresh } from '../functions/userTokenFunctions.js';
 // import User from '../models/User.js';
 
 const router = express.Router();
 
 router.get('/login', (req, res) => {
-  // const scope = 'user-read-private user-read-email';
-  const scope =
-    'playlist-read-private playlist-read-collaborative user-top-read user-library-read';
-
-  const redirect_uri =
-    process.env.NODE_ENV === 'production'
-      ? process.env.REDIRECT_URI_PROD
-      : process.env.REDIRECT_URI_DEV;
-
-  // Build query string using URLSearchParams (modern alternative to querystring)
-  const params = new URLSearchParams({
-    response_type: 'code',
-    client_id: process.env.CLIENT_ID,
-    scope: scope,
-    redirect_uri: redirect_uri,
-  });
-
-  // Final Spotify authorization URL
-  const authUrl = 'https://accounts.spotify.com/authorize?' + params.toString();
-
+  const authUrl = buildSpotifyAuthUrl();
   // Redirect the user to Spotify's login/authorization page
   res.redirect(authUrl);
 });
@@ -37,9 +23,11 @@ router.get('/login', (req, res) => {
 router.get('/callback', async (req, res) => {
   // Get the authorization code sent by Spotify in the query string
   const code = req.query.code;
+
   if (!code) {
     return res.status(400).send('Authorization code missing');
   }
+
   try {
     // Exchange the authorization code for access and refresh tokens
     // The function handles both production and development redirect URIs
@@ -49,18 +37,10 @@ router.get('/callback', async (req, res) => {
     );
 
     // Log the tokens (access_token, refresh_token, expires_in) for debugging
-    console.log('Spotify user tokens:', userTokens);
+    // console.log('Spotify user tokens:', userTokens);
 
     const userData = await getUserData(userTokens.access_token);
-    const userDoc = {
-      access_token: userTokens.access_token,
-      refresh_token: userTokens.refresh_token,
-      token_expires_in: userTokens.expires_in,
-      display_name: userData.display_name,
-      profileImg: userData.images?.[0]?.url || null,
-      followers: userData.followers?.total || 0,
-      spotify_user_id: userData.id,
-    };
+    const userDoc = getUserDocObject(userTokens, userData);
 
     try {
       await upsertSpotifyUser(userDoc);
@@ -74,16 +54,19 @@ router.get('/callback', async (req, res) => {
       process.env.NODE_ENV === 'production'
         ? process.env.BASE_URL_PROD
         : process.env.BASE_URL_DEV;
+
     req.session.spotify_user_id = userDoc.spotify_user_id;
     req.session.username = userDoc.display_name;
     req.session.userImg = userDoc.profileImg;
     req.session.justLoggedIn = true;
-    console.log(
-      '[/callback] set justLoggedIn =',
-      req.session.justLoggedIn,
-      'sid=',
-      req.sessionID
-    );
+
+    // console.log(
+    //   '[/callback] set justLoggedIn =',
+    //   req.session.justLoggedIn,
+    //   'sid=',
+    //   req.sessionID
+    // );
+
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
@@ -95,6 +78,7 @@ router.get('/callback', async (req, res) => {
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
+
       res.redirect(
         getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
       );
@@ -105,6 +89,7 @@ router.get('/callback', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
 router.post('/reset-login-flag', (req, res) => {
   console.log(
     '[reset route] before reset',
@@ -112,7 +97,9 @@ router.post('/reset-login-flag', (req, res) => {
     'sid=',
     req.sessionID
   );
+
   req.session.justLoggedIn = false;
+
   console.log(
     '[reset route] after reset',
     req.session.justLoggedIn,
@@ -121,4 +108,5 @@ router.post('/reset-login-flag', (req, res) => {
   );
   res.sendStatus(200);
 });
+
 export default router;
