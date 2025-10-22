@@ -95,6 +95,7 @@ RiffQuest/
 │
 ├─ functions/
 │   ├─ artistFunctions.js
+│   ├─ cryptoFunctions.js
 │   ├─ globalTokenFunctions.js
 │   ├─ loginFunctions.js
 │   ├─ userFunctions.js
