@@ -4,10 +4,11 @@ const router = express.Router();
 // 404 handler
 // This middleware is executed if no route above matches the request
 router.use((req, res, next) => {
-  console.error(
-    '❌ 404 error handler: Requested URL not found ->',
-    req.originalUrl
-  );
+  console.error('❌ 404: Not found:', {
+    path: req.path,
+    query: req.query,
+  });
+
   // Extract possible query parameters from the request
   // Example: /artistTopTracks?artist=Queen
   const { artist, track, album } = req.query; // or req.params for dynamic routes

@@ -10,7 +10,7 @@ export const getUserData = async (userAccessToken) => {
     const data = await response.json();
     return data;
   } catch (err) {
-    console.error('❌ Error in getUserData function: ' + err);
+    console.error('❌ Error in getUserData function: ', err);
     throw err;
   }
 };
@@ -45,10 +45,8 @@ export const upsertSpotifyUser = async (userDoc) => {
         setDefaultsOnInsert: true, // Apply default values (like user_created_timestamp) if inserting
       }
     );
-
-    console.log('User saved or updated:', user); // Log the saved or updated user
   } catch (err) {
-    console.error('❌ Error in upsertSpotifyUser function:', err); // Log any errors
+    console.error('❌ Error in upsertSpotifyUser function: ', err); // Log any errors
   }
 };
 //
@@ -65,9 +63,8 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
         },
       }
     );
-    console.log(`✅ Updated Spotify user`);
   } catch (err) {
-    console.error('❌ Error in updateSpotifyUser function:', err); // Log any errors
+    console.error('❌ Error in updateSpotifyUser function: ', err); // Log any errors
   }
 };
 

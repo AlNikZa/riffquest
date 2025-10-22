@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
           credentials: 'include', // Include cookies
         });
       } catch (err) {
-        console.error('reset-login-flag failed', err);
+        console.error('❌ reset-login-flag failed: ', err);
       }
     });
 

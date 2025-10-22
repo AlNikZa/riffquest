@@ -37,7 +37,6 @@ router.get('/callback', async (req, res) => {
     );
 
     // Log the tokens (access_token, refresh_token, expires_in) for debugging
-    // console.log('Spotify user tokens:', userTokens);
 
     const userData = await getUserData(userTokens.access_token);
     const userDoc = getUserDocObject(userTokens, userData);
@@ -60,18 +59,9 @@ router.get('/callback', async (req, res) => {
     req.session.userImg = userDoc.profileImg;
     req.session.justLoggedIn = true;
 
-    // console.log(
-    //   '[/callback] set justLoggedIn =',
-    //   req.session.justLoggedIn,
-    //   'sid=',
-    //   req.sessionID
-    // );
-
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
-      } else {
-        console.log('Session saved:', req.session);
       }
       res.clearCookie('returnTo', {
         path: '/',
@@ -91,22 +81,7 @@ router.get('/callback', async (req, res) => {
 });
 
 router.post('/reset-login-flag', (req, res) => {
-  console.log(
-    '[reset route] before reset',
-    req.session.justLoggedIn,
-    'sid=',
-    req.sessionID
-  );
-
   req.session.justLoggedIn = false;
-
-  console.log(
-    '[reset route] after reset',
-    req.session.justLoggedIn,
-    'sid=',
-    req.sessionID
-  );
-  res.sendStatus(200);
 });
 
 export default router;

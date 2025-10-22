@@ -31,7 +31,7 @@ export const getArtistId = async (artist, TOKEN) => {
 
     return foundArtist.id; // return Spotify artist ID
   } catch (err) {
-    console.error('❌ Error in getArtistId function: ' + err);
+    console.error('❌ Error in getArtistId function: ', err);
     return null;
   }
 };
@@ -67,7 +67,7 @@ export const getArtistTopTracks = async (artistId, TOKEN) => {
 
     return extractedSongsData;
   } catch (err) {
-    console.error('❌ Error in getArtistTopTracks function: ' + err);
+    console.error('❌ Error in getArtistTopTracks function: ', err);
     throw err;
   }
 };
@@ -112,7 +112,7 @@ const getAlbumDuration = async (albumId, TOKEN) => {
       ? `${hours}:${minutesStr}:${secondsStr}`
       : `${minutesStr}:${secondsStr}`;
   } catch (err) {
-    console.error('❌ Error in getAlbumDuration function: ' + err);
+    console.error('❌ Error in getAlbumDuration function: ', err);
     return 'Unknown'; // fallback duration
   }
 };
@@ -165,7 +165,7 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
 
     return albums;
   } catch (err) {
-    console.error('❌ Error in getArtistAlbums function: ' + err);
+    console.error('❌ Error in getArtistAlbums function: ', err);
     throw err;
   }
 };
@@ -180,7 +180,7 @@ export const getArtistInfo = async (artistId, TOKEN) => {
 
     return data;
   } catch (err) {
-    console.error('❌ Error in getArtistInfo function: ' + err);
+    console.error('❌ Error in getArtistInfo function: ', err);
     throw err;
   }
 };
@@ -200,7 +200,7 @@ export const getArtistsList = async (query, TOKEN) => {
 
     return data.artists?.items?.map((artist) => artist.name) || [];
   } catch (err) {
-    console.error('❌ Error in getArtistsList function: ' + err);
+    console.error('❌ Error in getArtistsList function: ', err);
     throw err;
   }
 };

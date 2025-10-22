@@ -26,7 +26,6 @@ export const encrypt = (stringToBeEncrypted) => {
 };
 
 const encryptedString = encrypt('uB6i-W0eQYwdFvHl7PSZHu9TOvSC');
-console.log(encryptedString);
 
 // --- Decrypting ---
 
@@ -51,4 +50,3 @@ export const decrypt = (stringToBeDecrypted) => {
 };
 
 const decryptedString = decrypt(encryptedString);
-console.log(decryptedString);

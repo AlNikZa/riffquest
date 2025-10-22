@@ -12,10 +12,9 @@ router.get('/logout', async (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       // If there's an error destroying the session, log it and send a 500 response
-      console.error('❌ Error destroying session:', err);
+      console.error('❌ Error destroying session: ', err);
       return res.status(500).send('Error logging out');
     } else {
-      console.log('✅ Session destroyed');
       //   Clear the session cookie from the browser
       res.clearCookie('connect.sid', {
         path: '/',

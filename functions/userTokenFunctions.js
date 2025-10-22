@@ -23,10 +23,7 @@ export const refreshUserToken = async (refresh_token) => {
     throw new Error(
       `❌ Spotify user token refresh failed in refreshUserToken function: ${response.status}`
     );
-  } else {
-    console.log('✅ Spotify user token refreshed successfully');
   }
-
   const data = await response.json();
 
   return {
@@ -43,16 +40,14 @@ export const scheduleUserTokenRefresh = async (
   try {
     const updatedUserTokens = await refreshUserToken(refresh_token);
     const timeout = updatedUserTokens.expiresIn * 1000 - 3000;
-    console.log('user token refreshed');
     await updateSpotifyUser(updatedUserTokens, spotify_user_id);
-    console.log('user updated');
 
     setTimeout(() => {
       scheduleUserTokenRefresh(spotify_user_id, updatedUserTokens.refreshToken);
     }, timeout);
   } catch (err) {
     console.error(
-      `❌ Error in scheduleUserTokenRefresh function- Failed to refresh token for user ${spotify_user_id}:`,
+      `❌ Error in scheduleUserTokenRefresh function- Failed to refresh token for user: `,
       err
     );
   }
@@ -71,11 +66,7 @@ export const removeTokensForUser = async (spotify_user_id) => {
         },
       }
     );
-
-    console.log('🔍 Updated user:', await User.findOne({ spotify_user_id }));
-
-    console.log(`✅ Updated Spotify user`);
   } catch (err) {
-    console.error('❌ Error in removeTokensForUser function:', err); // Log any errors
+    console.error('❌ Error in removeTokensForUser function: ', err); // Log any errors
   }
 };

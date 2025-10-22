@@ -46,7 +46,7 @@ const getToken = async (clientId, clientSecret) => {
 
     return TOKEN;
   } catch (err) {
-    console.error('❌ Error in getToken function: ' + err);
+    console.error('❌ Error in getToken function: ', err);
     throw err;
   }
 };
@@ -82,6 +82,6 @@ export const initToken = async () => {
     await getToken(clientId, clientSecret);
     console.log('✅ Token fetched successfully at startup');
   } catch (err) {
-    console.error('❌ Error fetching token at server startup: ' + err);
+    console.error('❌ Error fetching token at server startup: ', err);
   }
 };
