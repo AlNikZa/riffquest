@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import { encrypt } from '../functions/cryptoFunctions.js';
 
 export const getUserData = async (userAccessToken) => {
   try {
@@ -17,7 +18,7 @@ export const getUserData = async (userAccessToken) => {
 
 export const upsertSpotifyUser = async (userDoc) => {
   try {
-    // Prepare only the fields we want to update for an existing user
+    // Prepare only the fields to update for an existing user
     const updateFields = {
       access_token: userDoc.access_token, // Update access token
       refresh_token: userDoc.refresh_token, // Update refresh token
@@ -29,7 +30,7 @@ export const upsertSpotifyUser = async (userDoc) => {
       token_created_timestamp: Date.now(),
     };
 
-    const user = await User.findOneAndUpdate(
+    await User.findOneAndUpdate(
       { spotify_user_id: userDoc.spotify_user_id }, // Find user by Spotify ID
       {
         $set: updateFields,
@@ -56,8 +57,8 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
       { spotify_user_id: spotify_user_id },
       {
         $set: {
-          access_token: updatedUserTokens.accessToken,
-          refresh_token: updatedUserTokens.refreshToken,
+          access_token: encrypt(updatedUserTokens.accessToken),
+          refresh_token: encrypt(updatedUserTokens.refreshToken),
           token_expires_in: updatedUserTokens.expiresIn,
           token_created_timestamp: Date.now(),
         },
@@ -69,14 +70,18 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
 };
 
 export const getUserDocObject = (userTokens, userData) => {
+  const encryptedAccessToken = encrypt(userTokens.access_token);
+  const encryptedRefreshToken = encrypt(userTokens.refresh_token);
+
   const userDoc = {
-    access_token: userTokens.access_token,
-    refresh_token: userTokens.refresh_token,
+    access_token: encryptedAccessToken,
+    refresh_token: encryptedRefreshToken,
     token_expires_in: userTokens.expires_in,
     display_name: userData.display_name,
     profileImg: userData.images?.[0]?.url || null,
     followers: userData.followers?.total || 0,
     spotify_user_id: userData.id,
   };
+
   return userDoc;
 };

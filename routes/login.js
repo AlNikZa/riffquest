@@ -9,6 +9,7 @@ import {
   upsertSpotifyUser,
   getUserDocObject,
 } from '../functions/userFunctions.js';
+import { decrypt } from '../functions/cryptoFunctions.js';
 import { scheduleUserTokenRefresh } from '../functions/userTokenFunctions.js';
 // import User from '../models/User.js';
 
@@ -36,14 +37,16 @@ router.get('/callback', async (req, res) => {
       process.env.NODE_ENV === 'production'
     );
 
-    // Log the tokens (access_token, refresh_token, expires_in) for debugging
-
     const userData = await getUserData(userTokens.access_token);
+
     const userDoc = getUserDocObject(userTokens, userData);
 
     try {
       await upsertSpotifyUser(userDoc);
-      scheduleUserTokenRefresh(userDoc.spotify_user_id, userDoc.refresh_token);
+      scheduleUserTokenRefresh(
+        userDoc.spotify_user_id,
+        decrypt(userDoc.refresh_token)
+      );
     } catch (err) {
       console.error('Error saving user:', err);
       return res.status(500).send('Failed to save user');
