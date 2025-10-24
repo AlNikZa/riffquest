@@ -22,9 +22,23 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/callback', async (req, res) => {
-  // Get the authorization code sent by Spotify in the query string
-  const code = req.query.code;
+  // Extract authorization code and error from Spotify's redirect query parameters
+  const { code, error } = req.query;
 
+  // Determine base URL based on environment (production or development)
+  const baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.BASE_URL_PROD
+      : process.env.BASE_URL_DEV;
+
+  // If user canceled Spotify login, redirect back to previous page or home
+  if (error === 'access_denied') {
+    return res.redirect(
+      getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
+    );
+  }
+
+  // If no authorization code is provided, return a 400 Bad Request
   if (!code) {
     return res.status(400).send('Authorization code missing');
   }
@@ -51,11 +65,6 @@ router.get('/callback', async (req, res) => {
       console.error('Error saving user:', err);
       return res.status(500).send('Failed to save user');
     }
-
-    const baseUrl =
-      process.env.NODE_ENV === 'production'
-        ? process.env.BASE_URL_PROD
-        : process.env.BASE_URL_DEV;
 
     req.session.spotify_user_id = userDoc.spotify_user_id;
     req.session.username = userDoc.display_name;
