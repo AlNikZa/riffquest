@@ -14,6 +14,7 @@ export function buildSpotifyAuthUrl() {
     client_id: process.env.CLIENT_ID,
     scope: scope,
     redirect_uri: redirect_uri,
+    show_dialog: true, // Ensures user can choose a different Spotify account
   });
 
   // Final Spotify authorization URL
