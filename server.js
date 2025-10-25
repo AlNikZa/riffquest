@@ -9,7 +9,7 @@
 // -------------------------------------------------------------
 
 // Load environment variables from .env into process.env before running the rest of the app
-import './config.js';
+import './config/env.js';
 
 // imports
 import express from 'express';
@@ -18,8 +18,8 @@ import { fileURLToPath } from 'url';
 import { initToken } from './functions/globalTokenFunctions.js';
 import { setReturnToCookie } from './middleware/returnTo.js';
 import { userSessionMiddleware } from './middleware/userSession.js';
-import mongoose from './db.js';
-import { sessionInit } from './sessionConfig.js';
+import mongoose from './config/db.js';
+import { sessionInit } from './config/session.js';
 
 // Import route modules
 import homeRoutes from './routes/home.js';

@@ -93,6 +93,11 @@ View artist details
 ```
 RiffQuest/
 │
+├─ config/
+│   ├─ db.js
+│   ├─ ejs.js
+│   └─ session.js
+│
 ├─ functions/
 │   ├─ artistFunctions.js
 │   ├─ cryptoFunctions.js
@@ -138,9 +143,6 @@ RiffQuest/
 │
 ├─ Procfile
 ├─ package.json
-├─ config.js
-├─ db.js
-├─ sessionConfig.js
 └─ server.js
 ```
 
