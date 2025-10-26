@@ -1,4 +1,5 @@
 import express from 'express';
+import { loginLimiter } from '../config/rateLimit.js';
 import {
   buildSpotifyAuthUrl,
   exchangeCodeForToken,
@@ -15,7 +16,7 @@ import { scheduleUserTokenRefresh } from '../functions/userTokenFunctions.js';
 
 const router = express.Router();
 
-router.get('/login', (req, res) => {
+router.get('/login', loginLimiter, (req, res) => {
   const authUrl = buildSpotifyAuthUrl();
   // Redirect the user to Spotify's login/authorization page
   res.redirect(authUrl);

@@ -12,14 +12,15 @@
 import './config/env.js';
 
 // imports
-import express from 'express';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import express from 'express';
+import mongoose from './config/db.js';
+import { sessionInit } from './config/session.js';
+import { generalLimiter } from './config/rateLimit.js';
 import { initToken } from './functions/globalTokenFunctions.js';
 import { setReturnToCookie } from './middleware/returnTo.js';
 import { userSessionMiddleware } from './middleware/userSession.js';
-import mongoose from './config/db.js';
-import { sessionInit } from './config/session.js';
 
 // Import route modules
 import homeRoutes from './routes/home.js';
@@ -51,6 +52,8 @@ await mongoose.connection.asPromise();
 
 // Configure session middleware
 app.use(sessionInit());
+// General limiter: applies to all requests
+app.use(generalLimiter);
 // Middleware that stores the current URL  cookie for post-login redirection
 app.use(setReturnToCookie);
 // Make login status available to all EJS views

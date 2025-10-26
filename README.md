@@ -95,7 +95,8 @@ RiffQuest/
 │
 ├─ config/
 │   ├─ db.js
-│   ├─ ejs.js
+│   ├─ env.js
+│   ├─ rateLimit.js
 │   └─ session.js
 │
 ├─ functions/
