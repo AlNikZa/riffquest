@@ -96,6 +96,7 @@ RiffQuest/
 ├─ config/
 │   ├─ db.js
 │   ├─ env.js
+│   ├─ helmet.js
 │   ├─ rateLimit.js
 │   └─ session.js
 │
@@ -115,7 +116,9 @@ RiffQuest/
 │   └─ User.js
 │
 ├─ public/
+│   ├─ auth-modals.js
 │   ├─ autocomplete.js
+│   ├─ favicon.ico
 │   ├─ formModals.js
 │   ├─ logo.png
 │   └─ auth-modals.js

@@ -15,6 +15,7 @@ import './config/env.js';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
+import { helmetConfig } from './config/helmet.js';
 import mongoose from './config/db.js';
 import { sessionInit } from './config/session.js';
 import { generalLimiter } from './config/rateLimit.js';
@@ -43,18 +44,20 @@ app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Serve static assets and parse incoming requests
-app.use(express.static('public'));
+app.use(express.static(join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Wait for MongoDB connection
 await mongoose.connection.asPromise();
 
+// Apply the helmet configuration
+app.use(helmetConfig);
 // Configure session middleware
 app.use(sessionInit());
 // General limiter: applies to all requests
 app.use(generalLimiter);
-// Middleware that stores the current URL  cookie for post-login redirection
+// Middleware that stores the current URL in a cookie for post-login redirection
 app.use(setReturnToCookie);
 // Make login status available to all EJS views
 app.use(userSessionMiddleware);

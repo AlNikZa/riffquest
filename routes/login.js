@@ -95,6 +95,7 @@ router.get('/callback', async (req, res) => {
 
 router.post('/reset-login-flag', (req, res) => {
   req.session.justLoggedIn = false;
+  res.sendStatus(200);
 });
 
 export default router;
