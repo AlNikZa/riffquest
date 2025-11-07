@@ -74,7 +74,7 @@ node server.js
 
 ### Open in browser:
 
-http://localhost:3000
+http://127.0.0.1:3000
 
 ## Usage
 

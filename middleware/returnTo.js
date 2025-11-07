@@ -4,9 +4,24 @@ export const setReturnToCookie = (req, res, next) => {
   if (
     req.method === 'GET' &&
     !req.originalUrl.startsWith('/login') &&
-    !req.originalUrl.startsWith('/callback')
+    !req.originalUrl.startsWith('/callback') &&
+    !req.originalUrl.startsWith('/logout')
   ) {
-    const currentURL = req.protocol + '://' + req.get('host') + req.originalUrl;
+    const host = req.get('host');
+    const validHosts = [
+      'riffquest.onrender.com',
+      'www.riffquest.onrender.com',
+      'riffquestsandbox.onrender.com',
+      'www.riffquestsandbox.onrender.com',
+      '127.0.0.1:3000',
+      'localhost:3000',
+    ];
+
+    // If the host is not on the list, skip setting the cookie
+    if (!validHosts.includes(host)) {
+      return next();
+    }
+    const currentURL = req.protocol + '://' + host + req.originalUrl;
 
     const isProd = process.env.NODE_ENV === 'production';
 

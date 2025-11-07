@@ -5,6 +5,10 @@ import { getReturnToCookie } from '../functions/loginFunctions.js';
 const router = express.Router();
 //
 router.get('/logout', async (req, res) => {
+  if (!req.session?.spotify_user_id) {
+    return res.redirect('/');
+  }
+
   //  Remove the user's Spotify tokens from the database
   await removeTokensForUser(req.session.spotify_user_id);
 
@@ -16,11 +20,15 @@ router.get('/logout', async (req, res) => {
       return res.status(500).send('Error logging out');
     } else {
       //   Clear the session cookie from the browser
-      res.clearCookie('connect.sid', {
+      const isLocal = process.env.BASE_URL_DEV === 'http://127.0.0.1:3000';
+      res.clearCookie('riffQuestUserSid', {
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: !isLocal,
+        sameSite: isLocal ? 'lax' : 'none',
+        httpOnly: true,
       });
+
+      req.session = null;
 
       //   Redirect the user to the current or homepage after logout
       const returnTo = getReturnToCookie(req);
