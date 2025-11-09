@@ -141,6 +141,7 @@ RiffQuest/
 │   ├─ artistInfo.ejs
 │   ├─ artistTopTracks.ejs
 │   ├─ error.ejs
+│   ├─ cookiePolicy.ejs
 │   ├─ index.ejs
 │   ├─ loading.ejs
 │   └─ noResultsFound.ejs

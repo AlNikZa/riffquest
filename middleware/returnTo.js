@@ -19,6 +19,7 @@ export const setReturnToCookie = (req, res, next) => {
 
     // If the host is not on the list, skip setting the cookie
     if (!validHosts.includes(host)) {
+      console.log(`⚠️  Invalid host attempted to set returnTo cookie: ${host}`);
       return next();
     }
     const currentURL = req.protocol + '://' + host + req.originalUrl;

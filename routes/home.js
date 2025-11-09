@@ -14,4 +14,8 @@ router.get('/', (req, res) => {
   res.render('index', { title: 'Riff Quest' });
 });
 
+router.get('/cookie-policy', (req, res) => {
+  res.render('cookiePolicy', { title: 'Riff Quest Cookie Policy' });
+});
+
 export default router;

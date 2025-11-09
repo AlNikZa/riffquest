@@ -83,6 +83,33 @@
     <!-- Include Bootstrap navbar -->
     <%- include('partials/footer') %>
 
+    <!-- Cookie notice -->
+    <div
+      id="cookie-banner"
+      class="fixed-bottom bg-dark text-white py-2 px-3 d-flex justify-content-between align-items-center"
+      style="display: none; z-index: 2050; opacity: 0.85"
+    >
+      <span>
+        We use cookies to keep you logged in and make the app work properly. We
+        don’t collect any personal info.
+
+        <a
+          id="learn-more"
+          href="/cookie-policy"
+          class="text-success text-decoration-underline ms-1"
+        >
+          Learn more
+        </a>
+      </span>
+      <button
+        id="cookie-accept-btn"
+        type="button"
+        class="btn btn-sm btn-light ms-2"
+      >
+        Got it
+      </button>
+    </div>
+
     <!-- Include Bootstrap JS + dependencies -->
     <%- include('partials/bootstrapScriptTag') %>
 
@@ -93,5 +120,43 @@
     <script src="/formModals.js"></script>
     <script src="/autocomplete.js"></script>
     <script src="/auth-modals.js"></script>
+
+    <!-- Custom JavaScript for handling the cookie banner -->
+    <script>
+      // Check if the user has already acknowledged the cookie notification
+      if (localStorage.getItem('cookieNotificationRead') === 'true') {
+        // If they have, immediately remove the banner from the DOM
+        document.getElementById('cookie-banner').remove();
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Get references to the banner and the two buttons
+        const banner = document.getElementById('cookie-banner');
+        const gotIt = document.getElementById('cookie-accept-btn');
+        const learnMore = document.getElementById('learn-more');
+
+        // Make sure all elements exist before continuing
+        if (!banner || !gotIt || !learnMore)
+          return console.error('Cookie banner or button not found!');
+
+        // Only show the banner if it hasn't been acknowledged and the user is on the homepage
+        if (
+          !localStorage.getItem('cookieNotificationRead') &&
+          window.location.pathname === '/'
+        ) {
+          banner.style.display = 'flex';
+        }
+
+        // Add click event listeners to both buttons
+        [gotIt, learnMore].forEach((btn) => {
+          btn.addEventListener('click', () => {
+            // When either button is clicked, mark the banner as read in localStorage
+            localStorage.setItem('cookieNotificationRead', 'true');
+            // Remove the banner from the DOM
+            banner.remove();
+          });
+        });
+      });
+    </script>
   </body>
 </html>

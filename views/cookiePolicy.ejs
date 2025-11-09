@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-padding-top: 60px">
+  <!-- Include head partial (meta tags, CSS, etc.) -->
+  <%- include('partials/head') %>
+
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Include navbar partial -->
+    <%- include('partials/navbar') %>
+    <div class="container my-5">
+      <h1 class="text-center text-success mb-4">RiffQuest Cookie Policy</h1>
+
+      <p class="mb-3">
+        RiffQuest uses only essential cookies to keep you logged in and make the
+        app work properly. We don’t use tracking, advertising, or analytics
+        cookies — ever.
+      </p>
+
+      <p class="mb-2">The cookies we use are:</p>
+
+      <ul class="mb-4">
+        <li>
+          Session cookies — to maintain your login after signing in with
+          Spotify.
+        </li>
+        <li>Redirect cookies — to return you to the right page after login.</li>
+        <li>
+          Local storage — used only to remember that we’ve shown you the cookie
+          message, so it doesn’t appear again.
+        </li>
+      </ul>
+
+      <p class="mb-3">
+        We store only basic Spotify user info and tokens needed for the app to
+        function — nothing personal or unnecessary.
+      </p>
+
+      <p class="mb-4">
+        You can clear cookies or local storage anytime in your browser settings,
+        but doing so might log you out of RiffQuest.
+      </p>
+
+      <!-- Back to home button -->
+      <div class="text-center mt-5">
+        <a href="/" class="btn btn-outline-success btn-lg"> Go back to Home </a>
+      </div>
+    </div>
+
+    <!-- Include Bootstrap navbar -->
+    <%- include('partials/footer') %>
+
+    <!-- Include Bootstrap JS + dependencies -->
+    <%- include('partials/bootstrapScriptTag') %>
+
+    <!-- Include Bootstrap modals (if any) -->
+    <%- include('partials/bootstrapModals') %>
+
+    <!-- Custom JavaScript for handling modal forms -->
+    <script src="/formModals.js"></script>
+    <script src="/autocomplete.js"></script>
+    <script src="/auth-modals.js"></script>
+  </body>
+</html>
