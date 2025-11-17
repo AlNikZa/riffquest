@@ -1,21 +1,19 @@
 import express from 'express';
-import { getTokenOrRenderLoadingPage } from '../functions/globalTokenFunctions.js';
-
 const router = express.Router();
+
+import {
+  homePageController,
+  cookiePolicyPageController,
+} from '../controllers/homeController.js';
 /* ------------------------------------------------------------- */
 /* ---------------------- Home Page Route ---------------------- */
 /* ------------------------------------------------------------- */
 
-router.get('/', (req, res) => {
-  // Get the Spotify API token; if not ready, render loading page
-  const token = getTokenOrRenderLoadingPage(res);
-  if (!token) return;
-  // Render the home page with a title
-  res.render('index', { title: 'Riff Quest' });
-});
+router.get('/', homePageController);
 
-router.get('/cookie-policy', (req, res) => {
-  res.render('cookiePolicy', { title: 'Riff Quest Cookie Policy' });
-});
+/* ------------------------------------------------------------- */
+/* -------------------- Cookie Policy Route -------------------- */
+/* ------------------------------------------------------------- */
+router.get('/cookie-policy', cookiePolicyPageController);
 
 export default router;

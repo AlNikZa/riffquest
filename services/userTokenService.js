@@ -1,5 +1,5 @@
 import User from '../models/User.js';
-import { updateSpotifyUser } from './userFunctions.js';
+import { updateSpotifyUser } from './userService.js';
 
 export const refreshUserToken = async (refresh_token) => {
   const clientId = process.env.CLIENT_ID;

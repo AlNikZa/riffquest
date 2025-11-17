@@ -38,7 +38,7 @@ if (forms.length > 0 && modal) {
         // Handle "View Albums" click
         if (viewAlbumsBtn) {
           viewAlbumsBtn.onclick = () => {
-            activeForm.action = '/artistAlbums';
+            activeForm.action = '/artists/albums';
             modal.hide();
             activeForm.submit();
           };
@@ -47,7 +47,7 @@ if (forms.length > 0 && modal) {
         // Handle "View Tracks" click
         if (viewTracksBtn) {
           viewTracksBtn.onclick = () => {
-            activeForm.action = '/artistTopTracks';
+            activeForm.action = '/artists/top-tracks';
             modal.hide();
             activeForm.submit();
           };
@@ -56,7 +56,7 @@ if (forms.length > 0 && modal) {
         // Handle "View Info" click
         if (viewInfoBtn) {
           viewInfoBtn.onclick = () => {
-            activeForm.action = '/showArtist';
+            activeForm.action = '/artists/profile';
             modal.hide();
             activeForm.submit();
           };

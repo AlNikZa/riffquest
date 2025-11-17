@@ -7,6 +7,15 @@ export const setReturnToCookie = (req, res, next) => {
     !req.originalUrl.startsWith('/callback') &&
     !req.originalUrl.startsWith('/logout')
   ) {
+    //  Skip static files (images, CSS, JS, icons, etc.)
+    if (
+      req.originalUrl.match(
+        /\.(png|jpg|jpeg|gif|svg|ico|css|js|woff2?|ttf|map)$/i
+      )
+    ) {
+      return next();
+    }
+
     const host = req.get('host');
     const validHosts = [
       'riffquest.onrender.com',

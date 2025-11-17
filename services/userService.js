@@ -1,5 +1,5 @@
 import User from '../models/User.js';
-import { encrypt } from '../functions/cryptoFunctions.js';
+import { encrypt } from '../services/cryptoService.js';
 
 export const getUserData = async (userAccessToken) => {
   try {

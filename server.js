@@ -14,19 +14,26 @@ import './config/env.js';
 // imports
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+
 import express from 'express';
+
 import { helmetConfig } from './config/helmet.js';
 import mongoose from './config/db.js';
 import { sessionInit } from './config/session.js';
 import { generalLimiter } from './config/rateLimit.js';
-import { initToken } from './functions/globalTokenFunctions.js';
+
+import { initToken } from './services/globalTokenService.js';
+
 import { setReturnToCookie } from './middleware/returnTo.js';
 import { userSessionMiddleware } from './middleware/userSession.js';
+import {
+  notFoundHandler,
+  globalErrorHandler,
+} from './middleware/errorHandler.js';
 
 // Import route modules
 import homeRoutes from './routes/home.js';
 import artistRoutes from './routes/artist.js';
-import errorRoutes from './routes/error.js';
 import loginRoutes from './routes/login.js';
 import logoutRoutes from './routes/logout.js';
 
@@ -69,7 +76,10 @@ app.use('/', homeRoutes);
 app.use('/', artistRoutes);
 app.use('/', loginRoutes);
 app.use('/', logoutRoutes);
-app.use('/', errorRoutes); // Handles 404 and global errors
+
+// Handle 404 and global errors
+app.use('/', notFoundHandler);
+app.use('/', globalErrorHandler);
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;

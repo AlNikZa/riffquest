@@ -32,7 +32,7 @@ Search for your favorite artists and explore their albums, top tracks, and detai
 
 ## Live Demo
 
-Check out the deployed app here: [RiffQuest on Render](https://riffquest.onrender.com) 🔗
+Check out the deployed app here: [RiffQuest on Render](https://riffquestsandbox.onrender.com) 🔗
 
 ---
 
@@ -58,6 +58,7 @@ You can get your credentials from the [Spotify Developer Dashboard](https://deve
 ```env
 CLIENT_ID=your_spotify_client_id
 CLIENT_SECRET=your_spotify_client_secret
+...
 ```
 
 ### Start the server:
@@ -100,15 +101,14 @@ RiffQuest/
 │   ├─ rateLimit.js
 │   └─ session.js
 │
-├─ functions/
-│   ├─ artistFunctions.js
-│   ├─ cryptoFunctions.js
-│   ├─ globalTokenFunctions.js
-│   ├─ loginFunctions.js
-│   ├─ userFunctions.js
-│   └─ userTokenFunctions.js
+├─ controllers/
+│   ├─ artistController.js
+│   ├─ homeController.js
+│   ├─ loginController.js
+│   └─ logoutController.js
 │
 ├─ middleware/
+│   ├─ errorHandler.js
 │   ├─ returnTo.js
 │   └─ userSession.js
 │
@@ -116,19 +116,25 @@ RiffQuest/
 │   └─ User.js
 │
 ├─ public/
-│   ├─ auth-modals.js
+│   ├─ authModals.js
 │   ├─ autocomplete.js
 │   ├─ favicon.ico
 │   ├─ formModals.js
-│   ├─ logo.png
-│   └─ auth-modals.js
+│   └─ logo.png
 │
 ├─ routes/
 │   ├─ artist.js
-│   ├─ error.js
 │   ├─ home.js
-│   ├─ logout.js
-│   └─ login.js
+│   ├─ login.js
+│   └─ logout.js
+│
+├─ services/
+│   ├─ artistService.js
+│   ├─ cryptoService.js
+│   ├─ globalTokenService.js
+│   ├─ loginService.js
+│   ├─ userService.js
+│   └─ userTokenService.js
 │
 ├─ views/
 │   ├─ partials/
@@ -140,14 +146,14 @@ RiffQuest/
 │   ├─ artistAlbums.ejs
 │   ├─ artistInfo.ejs
 │   ├─ artistTopTracks.ejs
-│   ├─ error.ejs
 │   ├─ cookiePolicy.ejs
+│   ├─ error.ejs
 │   ├─ index.ejs
 │   ├─ loading.ejs
 │   └─ noResultsFound.ejs
 │
-├─ Procfile
 ├─ package.json
+├─ Procfile
 └─ server.js
 ```
 

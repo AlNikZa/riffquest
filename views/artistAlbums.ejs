@@ -11,7 +11,7 @@
     <h1 class="text-center mt-4">
       All albums of
       <a
-        href="/showArtist?artist=<%= albums[0]?.artist || artist || 'Unknown Artist' %>"
+        href="/artists/profile?artist=<%= albums[0]?.artist || artist || 'Unknown Artist' %>"
         class="text-success"
         data-bs-toggle="tooltip"
         data-bs-theme="light"
@@ -106,7 +106,7 @@
     <!-- Custom JavaScript for handling modal forms -->
     <script src="/formModals.js"></script>
     <script src="/autocomplete.js"></script>
-    <script src="/auth-modals.js"></script>
+    <script src="/authModals.js"></script>
 
     <!-- JavaScript to toggle album card → embedded Spotify iframe -->
     <script>

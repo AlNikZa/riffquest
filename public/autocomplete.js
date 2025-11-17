@@ -21,7 +21,7 @@ function initAutocomplete(inputSelector, datalistSelector) {
     if (!query) return; // Do nothing if input is empty
 
     try {
-      const response = await fetch('/autocomplete', {
+      const response = await fetch('/artists/autocomplete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
