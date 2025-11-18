@@ -15,9 +15,9 @@
         <!-- Artist image -->
         <div class="col-10 col-sm-8 col-lg-6">
           <img
-            src="<%- artistData.images[0]?.url %>"
+            src="<%= artistData.images[0]?.url %>"
             class="d-block mx-lg-auto img-fluid rounded-3 border border-dark"
-            alt="<%- artistData.name %>"
+            alt="<%= artistData.name %>"
             width="700"
             height="500"
             loading="lazy"
@@ -27,7 +27,7 @@
         <!-- Artist information -->
         <div class="col-lg-6">
           <!-- Artist name header -->
-          <h1 class="text-center mt-5"><%- artistData.name %></h1>
+          <h1 class="text-center mt-5"><%= artistData.name %></h1>
 
           <!-- Info lists: genres, popularity, followers -->
           <div
@@ -101,7 +101,7 @@
               <input
                 type="hidden"
                 name="artist"
-                value="<%- artistData.name %>"
+                value="<%= artistData.name %>"
               />
               <button
                 type="submit"
