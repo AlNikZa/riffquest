@@ -15,11 +15,17 @@ export const artistTopTracksController = async (req, res, next) => {
 
     const artist = req.query.artist;
 
+    if (!artist) {
+      return res
+        .status(400)
+        .render('noResultsFound', { title: 'Missing artist name' });
+    }
+
     // Get artist ID from Spotify API
     const artistId = await getArtistId(artist, token);
     if (!artistId) {
-      return res.render('noResultsFound', {
-        artist,
+      return res.status(404).render('noResultsFound', {
+        artist: artist || 'Unknown Artist',
         title: 'Artist not found',
       });
     }
@@ -27,14 +33,14 @@ export const artistTopTracksController = async (req, res, next) => {
     // Fetch top tracks for the artist
     const topTracks = await getArtistTopTracks(artistId, token);
     if (!topTracks || topTracks.length === 0) {
-      return res.render('noResultsFound', {
+      return res.status(404).render('noResultsFound', {
         artist: artist || 'Unknown Artist',
         title: 'No tracks found',
       });
     }
 
     // Render the top tracks page with dynamic title
-    res.render('artistTopTracks', {
+    res.status(200).render('artistTopTracks', {
       topTracks,
       artist: topTracks[0]?.artist || artist || 'Unknown Artist',
       title: `The Best Of ${
@@ -54,11 +60,17 @@ export const artistAlbumsController = async (req, res, next) => {
 
     const artist = req.query.artist;
 
+    if (!artist) {
+      return res
+        .status(400)
+        .render('noResultsFound', { title: 'Missing artist name' });
+    }
+
     // Get artist ID from Spotify API
     const artistId = await getArtistId(artist, token);
     if (!artistId) {
-      return res.render('noResultsFound', {
-        artist,
+      return res.status(404).render('noResultsFound', {
+        artist: artist || 'Unknown artist',
         title: 'Artist not found',
       });
     }
@@ -66,17 +78,19 @@ export const artistAlbumsController = async (req, res, next) => {
     // Fetch all albums for the artist
     const albums = await getArtistAlbums(artistId, token);
     if (!albums || albums.length === 0) {
-      return res.render('noResultsFound', {
-        artist,
+      return res.status(404).render('noResultsFound', {
+        artist: artist || 'Unknown artist',
         title: 'No albums found',
       });
     }
 
     // Render the albums page with dynamic title and artist info
-    res.render('artistAlbums', {
+    res.status(200).render('artistAlbums', {
       albums,
-      artist: albums[0]?.artist || artist || 'Unknown Artist',
-      title: `All albums of ${albums[0]?.artist || artist || 'Unknown Artist'}`,
+      artist: albums[0]?.artists[0]?.name || artist || 'Unknown Artist',
+      title: `All albums of ${
+        albums[0]?.artists[0]?.name || artist || 'Unknown Artist'
+      }`,
     });
   } catch (err) {
     next(err); //  Forward error to global error handler
@@ -90,10 +104,16 @@ export const artistProfileController = async (req, res, next) => {
 
     const artist = req.query.artist;
 
+    if (!artist) {
+      return res
+        .status(400)
+        .render('noResultsFound', { title: 'Missing artist name' });
+    }
+
     // Get artist ID from Spotify API
     const artistId = await getArtistId(artist, token);
     if (!artistId) {
-      return res.render('noResultsFound', {
+      return res.status(404).render('noResultsFound', {
         artist: artist || 'Unknown Artist',
         title: 'Artist not found',
       });
@@ -102,11 +122,14 @@ export const artistProfileController = async (req, res, next) => {
     // Fetch full artist information
     const artistData = await getArtistInfo(artistId, token);
     if (!artistData) {
-      return res.render('noResultsFound', { artist, title: 'No artist found' });
+      return res.status(404).render('noResultsFound', {
+        artist: artist || 'Unknown Artist',
+        title: 'Artist not found',
+      });
     }
 
     // Render the artist profile page with dynamic title
-    res.render('artistInfo', {
+    res.status(200).render('artistInfo', {
       artistData,
       title: `${
         artistData?.name || artist || 'Unknown Artist'
@@ -121,29 +144,29 @@ export const artistRedirectController = (req, res) => {
   const { artist, option } = req.query;
 
   if (!artist) {
-    return res.render('noResultsFound', {
-      artist: null,
+    return res.status(404).render('noResultsFound', {
+      artist: artist || 'Unknown Artist',
       title: 'No artist entered',
     });
   }
 
   switch (option) {
     case 'allAlbums':
-      return res.redirect(
-        `/artists/albums?artist=${encodeURIComponent(artist)}`
-      );
+      return res
+        .status(302)
+        .redirect(`/artists/albums?artist=${encodeURIComponent(artist)}`);
     case 'topTracks':
-      return res.redirect(
-        `/artists/top-tracks?artist=${encodeURIComponent(artist)}`
-      );
+      return res
+        .status(302)
+        .redirect(`/artists/top-tracks?artist=${encodeURIComponent(artist)}`);
     case 'details':
-      return res.redirect(
-        `/artists/profile?artist=${encodeURIComponent(artist)}`
-      );
+      return res
+        .status(302)
+        .redirect(`/artists/profile?artist=${encodeURIComponent(artist)}`);
     default:
-      return res.redirect(
-        `/artists/albums?artist=${encodeURIComponent(artist)}`
-      );
+      return res
+        .status(302)
+        .redirect(`/artists/profile?artist=${encodeURIComponent(artist)}`);
   }
 };
 
@@ -155,13 +178,13 @@ export const artistAutocompleteController = async (req, res, next) => {
 
     // Read the search query from the request body
     const query = req.body.query;
-    if (!query) return res.json([]); // return empty array if no query provided
+    if (!query) return res.status(200).json([]); // return empty array if no query provided
 
     // Call helper function to fetch artist list from Spotify API
     const artistsList = await getArtistsList(query, token);
 
     // Send the array of artist names back to the frontend as JSON
-    res.json(artistsList);
+    res.status(200).json(artistsList);
   } catch (err) {
     // Forward any errors to the global error handler
     next(err);

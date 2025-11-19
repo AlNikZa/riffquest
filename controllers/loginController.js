@@ -14,7 +14,7 @@ import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
 export const loginController = (req, res) => {
   const authUrl = buildSpotifyAuthUrl();
   // Redirect the user to Spotify's login/authorization page
-  res.redirect(authUrl);
+  res.status(302).redirect(authUrl);
 };
 
 export const loginCallbackController = async (req, res) => {
@@ -29,9 +29,9 @@ export const loginCallbackController = async (req, res) => {
 
   // If user canceled Spotify login, redirect back to previous page or home
   if (error === 'access_denied') {
-    return res.redirect(
-      getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
-    );
+    return res
+      .status(302)
+      .redirect(getReturnToCookie(req) || req.get('Referer') || baseUrl || '/');
   }
 
   // If no authorization code is provided, return a 400 Bad Request
@@ -77,9 +77,11 @@ export const loginCallbackController = async (req, res) => {
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
 
-      res.redirect(
-        getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
-      );
+      res
+        .status(302)
+        .redirect(
+          getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
+        );
     });
   } catch (error) {
     // Catch and log any errors during the token exchange

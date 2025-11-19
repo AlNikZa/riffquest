@@ -5,9 +5,9 @@ export const homePageController = (req, res) => {
   const token = getTokenOrRenderLoadingPage(res);
   if (!token) return;
   // Render the home page with a title
-  res.render('index', { title: 'Riff Quest' });
+  res.status(200).render('index', { title: 'Riff Quest' });
 };
 
 export const cookiePolicyPageController = (req, res) => {
-  res.render('cookiePolicy', { title: 'Riff Quest Cookie Policy' });
+  res.status(200).render('cookiePolicy', { title: 'Riff Quest Cookie Policy' });
 };

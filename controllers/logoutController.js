@@ -3,7 +3,7 @@ import { getReturnToCookie } from '../services/loginService.js';
 
 export const logoutController = async (req, res) => {
   if (!req.session?.spotify_user_id) {
-    return res.redirect('/');
+    return res.status(302).redirect('/');
   }
 
   //  Remove the user's Spotify tokens from the database
@@ -29,7 +29,7 @@ export const logoutController = async (req, res) => {
 
       //   Redirect the user to the current or homepage after logout
       const returnTo = getReturnToCookie(req);
-      res.redirect(returnTo || req.get('Referer') || '/');
+      res.status(302).redirect(returnTo || req.get('Referer') || '/');
     }
   });
 };
