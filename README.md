@@ -152,6 +152,7 @@ RiffQuest/
 │   ├─ loading.ejs
 │   └─ noResultsFound.ejs
 │
+├─ app.js
 ├─ package.json
 ├─ Procfile
 └─ server.js
