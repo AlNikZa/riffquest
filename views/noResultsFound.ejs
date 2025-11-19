@@ -12,8 +12,17 @@
 
     <!-- Informational message about no results found -->
     <h2 class="text-center fs-5 mb-5 mx-5 px-5">
-      No results found for <span class="text-warning">"<%= artist %>"</span>.
+      <% if (artist) { %> No results found for "<span class="text-warning"
+        ><%= artist %></span
+      >".
+      <!--  -->
       Please check the spelling and try again.
+      <!--  -->
+      <% } else { %>
+      <!--  -->
+      No artist provided. Please enter an artist name to search.
+      <!--  -->
+      <% } %>
     </h2>
 
     <!-- Back to home button -->
