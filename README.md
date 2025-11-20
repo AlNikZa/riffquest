@@ -110,7 +110,8 @@ RiffQuest/
 ├─ middleware/
 │   ├─ errorHandler.js
 │   ├─ returnTo.js
-│   └─ userSession.js
+│   ├─ userSession.js
+│   └─ validationHandler.js
 │
 ├─ models/
 │   └─ User.js
@@ -135,6 +136,9 @@ RiffQuest/
 │   ├─ loginService.js
 │   ├─ userService.js
 │   └─ userTokenService.js
+│
+├─ validators/
+│   └─ searchValidator.js
 │
 ├─ views/
 │   ├─ partials/

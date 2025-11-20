@@ -2,6 +2,13 @@ import express from 'express';
 const router = express.Router();
 
 import {
+  artistQueryValidator,
+  autocompleteBodyValidator,
+  redirectQueryValidator,
+} from '../validators/searchValidator.js';
+import { handleValidationErrors } from '../middleware/validationHandler.js';
+
+import {
   artistTopTracksController,
   artistAlbumsController,
   artistProfileController,
@@ -12,25 +19,50 @@ import {
 /* ----------------------------------------------------------- */
 /* ---------------- Artist Top Tracks Route ------------------ */
 /* ----------------------------------------------------------- */
-router.get('/artists/top-tracks', artistTopTracksController);
+router.get(
+  '/artists/top-tracks',
+  artistQueryValidator,
+  handleValidationErrors,
+  artistTopTracksController
+);
 
 /* ----------------------------------------------------------- */
 /* ------------------- Artist Albums Route ------------------- */
 /* ----------------------------------------------------------- */
-router.get('/artists/albums', artistAlbumsController);
+router.get(
+  '/artists/albums',
+  artistQueryValidator,
+  handleValidationErrors,
+  artistAlbumsController
+);
 
 /* ---------------------------------------------------------- */
 /* ------------------- Show Artist Route -------------------- */
 /* ---------------------------------------------------------- */
-router.get('/artists/profile', artistProfileController);
+router.get(
+  '/artists/profile',
+  artistQueryValidator,
+  handleValidationErrors,
+  artistProfileController
+);
 
 /* -------------------------------------------------------- */
 /* ------------------- Artist Redirect -------------------- */
 /* -------------------------------------------------------- */
-router.get('/artists/redirect', artistRedirectController);
+router.get(
+  '/artists/redirect',
+  redirectQueryValidator,
+  handleValidationErrors,
+  artistRedirectController
+);
 /* -------------------------------------------------------------------- */
 /* ------------------- Artist Input Suggestions -------------------- */
 /* -------------------------------------------------------------------- */
-router.post('/artists/autocomplete', artistAutocompleteController);
+router.post(
+  '/artists/autocomplete',
+  autocompleteBodyValidator,
+  handleValidationErrors,
+  artistAutocompleteController
+);
 
 export default router;

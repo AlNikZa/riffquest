@@ -87,7 +87,7 @@ export const artistAlbumsController = async (req, res, next) => {
     // Render the albums page with dynamic title and artist info
     res.status(200).render('artistAlbums', {
       albums,
-      artist: albums[0]?.artist | artist || 'Unknown Artist',
+      artist: albums[0]?.artist || artist || 'Unknown Artist',
       title: `All albums of ${albums[0]?.artist || artist || 'Unknown Artist'}`,
     });
   } catch (err) {
