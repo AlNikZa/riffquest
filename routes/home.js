@@ -1,10 +1,12 @@
 import express from 'express';
-const router = express.Router();
 
 import {
   homePageController,
   cookiePolicyPageController,
 } from '../controllers/homeController.js';
+
+const router = express.Router();
+
 /* ------------------------------------------------------------- */
 /* ---------------------- Home Page Route ---------------------- */
 /* ------------------------------------------------------------- */

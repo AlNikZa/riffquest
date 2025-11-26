@@ -1,8 +1,9 @@
-import mongoose from './db.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import mongoose from './db.js';
 
 const isLocal = process.env.BASE_URL_DEV === 'http://127.0.0.1:3000';
+
 export const sessionInit = () => {
   return session({
     name: 'riffQuestUserSid',

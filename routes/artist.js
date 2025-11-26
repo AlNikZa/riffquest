@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 
 import {
   artistQueryValidator,
@@ -15,6 +14,8 @@ import {
   artistRedirectController,
   artistAutocompleteController,
 } from '../controllers/artistController.js';
+
+const router = express.Router();
 
 /* ----------------------------------------------------------- */
 /* ---------------- Artist Top Tracks Route ------------------ */
