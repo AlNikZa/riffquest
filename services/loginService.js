@@ -1,4 +1,6 @@
-export function buildSpotifyAuthUrl() {
+import crypto from 'crypto';
+
+export function buildSpotifyAuthUrl(req) {
   // const scope = 'user-read-private user-read-email';
   const scope =
     'playlist-read-private playlist-read-collaborative user-top-read user-library-read';
@@ -8,11 +10,18 @@ export function buildSpotifyAuthUrl() {
       ? process.env.REDIRECT_URI_PROD
       : process.env.REDIRECT_URI_DEV;
 
+  // Generate a secure random state token
+  const state = crypto.randomBytes(16).toString('hex');
+
+  // Store state in the session for later comparison
+  req.session.oauthState = state;
+
   // Build query string using URLSearchParams (modern alternative to querystring)
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: process.env.CLIENT_ID,
     scope: scope,
+    state: state,
     redirect_uri: redirect_uri,
     show_dialog: true, // Ensures user can choose a different Spotify account
   });

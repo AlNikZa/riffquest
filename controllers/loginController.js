@@ -12,14 +12,14 @@ import { decrypt } from '../services/cryptoService.js';
 import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
 
 export const loginController = (req, res) => {
-  const authUrl = buildSpotifyAuthUrl();
+  const authUrl = buildSpotifyAuthUrl(req);
   // Redirect the user to Spotify's login/authorization page
   res.status(302).redirect(authUrl);
 };
 
 export const loginCallbackController = async (req, res) => {
   // Extract authorization code and error from Spotify's redirect query parameters
-  const { code, error } = req.query;
+  const { code, error, state } = req.query;
 
   // Determine base URL based on environment (production or development)
   const baseUrl =
@@ -32,6 +32,18 @@ export const loginCallbackController = async (req, res) => {
     return res
       .status(302)
       .redirect(getReturnToCookie(req) || req.get('Referer') || baseUrl || '/');
+  }
+
+  // Validate state parameter (protects against OAuth CSRF)
+  if (!state || state !== req.session.oauthState) {
+    console.error('OAuth state mismatch:', {
+      expected: req.session.oauthState,
+      received: state,
+    });
+
+    return res.status(403).render('error', {
+      message: 'Invalid OAuth state. Please try logging in again.',
+    });
   }
 
   // If no authorization code is provided, return a 400 Bad Request
@@ -66,6 +78,8 @@ export const loginCallbackController = async (req, res) => {
     req.session.username = userDoc.display_name;
     req.session.userImg = userDoc.profileImg;
     req.session.justLoggedIn = true;
+
+    delete req.session.oauthState;
 
     req.session.save((err) => {
       if (err) {
