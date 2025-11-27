@@ -156,6 +156,7 @@ RiffQuest/
 │   ├─ loading.ejs
 │   └─ noResultsFound.ejs
 │
+├─ .env.example
 ├─ app.js
 ├─ package.json
 ├─ Procfile
