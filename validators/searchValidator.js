@@ -10,7 +10,7 @@ export const artistQueryValidator = [
     .withMessage('Artist name is required.')
     .isLength({ min: 1, max: 80 })
     .withMessage('Artist name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
+    .matches(/^[\p{L}\d\s\-.,!?'"()&:/+]+$/u)
     .withMessage('Artist name contains invalid characters.'),
 ];
 
