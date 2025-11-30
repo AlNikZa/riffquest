@@ -138,6 +138,7 @@ RiffQuest/
 │   └─ userTokenService.js
 │
 ├─ validators/
+│   ├─ loginValidator.js
 │   └─ searchValidator.js
 │
 ├─ views/
