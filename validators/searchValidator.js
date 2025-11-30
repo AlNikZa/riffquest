@@ -1,46 +1,43 @@
 import { query, body } from 'express-validator';
 
+const REGEX = /^[\p{L}\d\s\-.,!?'"()&:/+]+$/u;
+
+const MIN = 1;
+const MAX = 80;
+
+const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
+const validate = (fieldName) => {
+  const capitalizedFieldName = capitalize(fieldName);
+
+  return [
+    query(fieldName)
+      .trim()
+      .notEmpty()
+      .withMessage(`${capitalizedFieldName} is required.`)
+      .isLength({ min: MIN, max: MAX })
+      .withMessage(
+        `${capitalizedFieldName} must be ${MIN}–${MAX} characters long.`
+      )
+      .matches(REGEX)
+      .withMessage(`${capitalizedFieldName} contains invalid characters.`),
+  ];
+};
+
 /* ----------------------------------------------------------- */
 /* ----------------- Artist Query Validator ----------------- */
 /* ----------------------------------------------------------- */
-export const artistQueryValidator = [
-  query('artist')
-    .trim()
-    .notEmpty()
-    .withMessage('Artist name is required.')
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Artist name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-.,!?'"()&:/+]+$/u)
-    .withMessage('Artist name contains invalid characters.'),
-];
+export const artistQueryValidator = validate('artist');
 
 /* ----------------------------------------------------------- */
 /* ----------------- Album Query Validator ------------------ */
 /* ----------------------------------------------------------- */
-export const albumQueryValidator = [
-  query('album')
-    .trim()
-    .notEmpty()
-    .withMessage('Album name is required.')
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Album name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
-    .withMessage('Album name contains invalid characters.'),
-];
+export const albumQueryValidator = validate('album');
 
 /* ----------------------------------------------------------- */
 /* ----------------- Track Query Validator ------------------ */
 /* ----------------------------------------------------------- */
-export const trackQueryValidator = [
-  query('track')
-    .trim()
-    .notEmpty()
-    .withMessage('Track name is required.')
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Track name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
-    .withMessage('Track name contains invalid characters.'),
-];
+export const trackQueryValidator = validate('track');
 
 /* ----------------------------------------------------------- */
 /* ---------------- Autocomplete Validator ------------------ */
@@ -51,9 +48,9 @@ export const autocompleteBodyValidator = [
     .trim() // remove leading/trailing whitespace
     .notEmpty()
     .withMessage('Search query is required.')
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Search query must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
+    .isLength({ min: MIN, max: MAX })
+    .withMessage(`Search query must be ${MIN}–${MAX} characters long.`)
+    .matches(REGEX)
     .withMessage('Search query contains invalid characters.'),
 ];
 
@@ -62,33 +59,23 @@ export const autocompleteBodyValidator = [
 /* ----------------------------------------------------------- */
 // Validates query parameters for /redirect route
 // Can handle artist, album, and track, plus an optional 'option' param
+const validateOptionalQuery = (fieldName) => {
+  const capitalizedFieldName = capitalize(fieldName);
+  return query(fieldName)
+    .optional()
+    .trim()
+    .isLength({ min: MIN, max: MAX })
+    .withMessage(
+      `${capitalizedFieldName} must be ${MIN}–${MAX} characters long.`
+    )
+    .matches(REGEX)
+    .withMessage(`${capitalizedFieldName} contains invalid characters.`);
+};
+
 export const redirectQueryValidator = [
-  query('artist')
-    .optional() // artist param is optional
-    .trim()
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Artist name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
-
-    .withMessage('Artist name contains invalid characters.'),
-
-  query('album')
-    .optional() // album param is optional
-    .trim()
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Album name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
-
-    .withMessage('Album name contains invalid characters.'),
-
-  query('track')
-    .optional() // track param is optional
-    .trim()
-    .isLength({ min: 1, max: 80 })
-    .withMessage('Track name must be 1–80 characters long.')
-    .matches(/^[\p{L}\d\s\-,.!?'"()]+$/u)
-
-    .withMessage('Track name contains invalid characters.'),
+  validateOptionalQuery('artist'),
+  validateOptionalQuery('album'),
+  validateOptionalQuery('track'),
 
   // Custom validator to ensure at least one of artist, album, or track is present
   (req, res, next) => {
