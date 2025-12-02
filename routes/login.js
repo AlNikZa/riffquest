@@ -7,6 +7,7 @@ import {
   resetLoginFlagController,
 } from '../controllers/loginController.js';
 import { handleValidationErrors } from '../middleware/validationHandler.js';
+import { checkCsrfToken } from '../middleware/csrf.js';
 import { loginCallbackValidator } from '../validators/loginValidator.js';
 
 const router = express.Router();
@@ -20,6 +21,6 @@ router.get(
   loginCallbackController
 );
 
-router.post('/reset-login-flag', resetLoginFlagController);
+router.post('/reset-login-flag', checkCsrfToken, resetLoginFlagController);
 
 export default router;

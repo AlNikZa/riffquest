@@ -26,6 +26,11 @@
         method="get"
         autocomplete="off"
       >
+        <!-- CSRF token for JS POST requests -->
+        <script>
+          window.csrfToken = '<%= csrfToken %>';
+        </script>
+
         <input
           id="artist-navbar-input"
           class="form-control me-2 w-50"

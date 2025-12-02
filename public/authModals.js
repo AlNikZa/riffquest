@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
         await fetch('/reset-login-flag', {
           method: 'POST',
           credentials: 'include', // Include cookies
+          headers: {
+            'Content-Type': 'application/json',
+            'x-csrf-token': window.csrfToken, // <-- CSRF token
+          },
         });
       } catch (err) {
         console.error('❌ reset-login-flag failed: ', err);

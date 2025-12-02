@@ -19,6 +19,7 @@ import { helmetConfig } from './config/helmet.js';
 import { generalLimiter } from './config/rateLimit.js';
 
 // Custom application middleware
+import { createCsrfToken } from './middleware/csrf.js';
 import { setReturnToCookie } from './middleware/returnTo.js';
 import { userSessionMiddleware } from './middleware/userSession.js';
 import {
@@ -64,6 +65,8 @@ app.use(generalLimiter);
 app.use(setReturnToCookie);
 // Expose user session data to all views
 app.use(userSessionMiddleware);
+// CSRF token generator for GET routes
+app.use(createCsrfToken);
 
 // Initialize the global Spotify API token before handling any requests
 // This ensures the token is available for all routes and services

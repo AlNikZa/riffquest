@@ -6,7 +6,7 @@ import {
   redirectQueryValidator,
 } from '../validators/searchValidator.js';
 import { handleValidationErrors } from '../middleware/validationHandler.js';
-
+import { checkCsrfToken } from '../middleware/csrf.js';
 import {
   artistTopTracksController,
   artistAlbumsController,
@@ -61,6 +61,7 @@ router.get(
 /* -------------------------------------------------------------------- */
 router.post(
   '/artists/autocomplete',
+  checkCsrfToken,
   autocompleteBodyValidator,
   handleValidationErrors,
   artistAutocompleteController

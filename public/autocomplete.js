@@ -23,12 +23,14 @@ function initAutocomplete(inputSelector, datalistSelector) {
     try {
       const response = await fetch('/artists/autocomplete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': window.csrfToken,
+        },
         body: JSON.stringify({ query }),
       });
 
       const artists = await response.json(); // parse JSON array
-
       // Clear previous options
       datalist.innerHTML = '';
 
@@ -39,12 +41,12 @@ function initAutocomplete(inputSelector, datalistSelector) {
         datalist.appendChild(option);
       });
     } catch (err) {
-      console.error(err);
+      console.error('❌ Autocomplete fetch failed:', err);
     }
   };
 
   // Wrap fetchArtists with debounce (400ms delay)
-  const debouncedFetch = debounce(fetchArtists, 200);
+  const debouncedFetch = debounce(fetchArtists, 300);
 
   // Listen for input events on the input field
   input.addEventListener('input', debouncedFetch);
