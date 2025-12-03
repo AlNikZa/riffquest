@@ -104,12 +104,12 @@
     <%- include('partials/bootstrapModals') %>
 
     <!-- Custom JavaScript for handling modal forms -->
-    <script src="/formModals.js"></script>
-    <script src="/autocomplete.js"></script>
-    <script src="/authModals.js"></script>
+    <script nonce="<%= nonce %>" src="/formModals.js"></script>
+    <script nonce="<%= nonce %>" src="/autocomplete.js"></script>
+    <script nonce="<%= nonce %>" src="/authModals.js"></script>
 
     <!-- JavaScript to toggle album card → embedded Spotify iframe -->
-    <script>
+    <script nonce="<%= nonce %>">
       document.querySelectorAll('.listen-here').forEach((link) => {
         link.addEventListener('click', (e) => {
           // Find the parent list item

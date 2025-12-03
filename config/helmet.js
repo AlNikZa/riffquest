@@ -9,60 +9,65 @@
  */
 
 import helmet from 'helmet';
+import crypto from 'crypto';
 
-export const helmetConfig = helmet({
-  contentSecurityPolicy: {
-    directives: {
-      // Allow same-origin requests by default
-      defaultSrc: ["'self'"],
+export const helmetConfig = (req, res, next) => {
+  const nonce = crypto.randomBytes(16).toString('base64');
+  res.locals.nonce = nonce;
 
-      // Scripts: own domain, inline scripts (for EJS templates), Bootstrap JS CDN
-      scriptSrc: [
-        "'self'",
-        //  "'unsafe-inline'": temporarily allows inline <script> tags (needed for EJS templates or Bootstrap JS snippets).
-        //   ⚠️ Note: This weakens CSP and should be replaced with a nonce system in production for stronger XSS protection.
-        "'unsafe-inline'", // Required for inline <script> blocks
-        'https://cdn.jsdelivr.net', // Bootstrap JS CDN
-      ],
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        // Allow same-origin requests by default
+        defaultSrc: ["'self'"],
 
-      // Styles: own domain, inline styles, Bootstrap CSS, Google Fonts
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'", // Needed for inline styles in EJS templates
-        'https://cdn.jsdelivr.net', // Bootstrap CSS CDN
-        'https://fonts.googleapis.com', // Google Fonts CSS
-      ],
+        // Scripts: own domain, inline scripts (for EJS templates), Bootstrap JS CDN
+        scriptSrc: [
+          "'self'",
+          `'nonce-${nonce}'`, // Allow inline scripts with this nonce
+          'https://cdn.jsdelivr.net', // Bootstrap JS CDN
+        ],
 
-      // Fonts: own domain, Bootstrap CDN, Google Fonts
-      fontSrc: [
-        "'self'",
-        'https://cdn.jsdelivr.net',
-        'https://fonts.gstatic.com', // Google Fonts font files
-      ],
+        // Styles: own domain, inline styles, Bootstrap CSS, Google Fonts
+        styleSrc: [
+          "'self'",
+          `'nonce-${nonce}'`, // inline style nonce
+          'https://cdn.jsdelivr.net', // Bootstrap CSS CDN
+          'https://fonts.googleapis.com', // Google Fonts CSS
+        ],
 
-      // Images: own domain, base64 images, Spotify images
-      imgSrc: [
-        "'self'",
-        'data:',
-        'https://i.scdn.co', // Spotify images
-      ],
+        // Fonts: own domain, Bootstrap CDN, Google Fonts
+        fontSrc: [
+          "'self'",
+          'https://cdn.jsdelivr.net',
+          'https://fonts.gstatic.com', // Google Fonts font files
+        ],
 
-      // Frames / iframes: Spotify embeds
-      frameSrc: ["'self'", 'https://open.spotify.com'],
+        // Images: own domain, base64 images, Spotify images
+        imgSrc: [
+          "'self'",
+          'data:',
+          'https://i.scdn.co', // Spotify images
+        ],
 
-      // AJAX / fetch / WebSocket connections: own domain, CDN, Spotify API
-      connectSrc: [
-        "'self'",
-        'https://cdn.jsdelivr.net',
-        'https://api.spotify.com', // Spotify API calls
-      ],
+        // Frames / iframes: Spotify embeds
+        frameSrc: ["'self'", 'https://open.spotify.com'],
+
+        // AJAX / fetch / WebSocket connections: own domain, CDN, Spotify API
+        connectSrc: [
+          "'self'",
+          'https://cdn.jsdelivr.net',
+          'https://api.spotify.com', // Spotify API calls
+        ],
+      },
     },
-  },
-});
+  })(req, res, next);
+};
 
 /**
  * Later improvements for production could include:
- * - Removing 'unsafe-inline' and replacing it with a dynamic nonce system.
- * - Adding a CSP reporting endpoint (report-to / report-uri) to log policy violations.
- * - Extending frameSrc or connectSrc if more external APIs are used.
+ * - Adding a CSP reporting endpoint (`report-to` / `report-uri`) to monitor policy violations.
+ * - Extending `frameSrc` or `connectSrc` if new external APIs or iframes are added.
+ * - Optionally, centralizing nonce generation and CSP configuration for easier maintenance.
+ * - Considering additional security HTTP headers that Helmet provides (e.g., `Referrer-Policy`, `Permissions-Policy`).
  */
