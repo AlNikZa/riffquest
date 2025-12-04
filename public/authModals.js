@@ -60,13 +60,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // When user confirms logout
     confirmBtn.addEventListener('click', () => {
       logoutModal.hide(); // Hide modal first
-      // Redirect to /logout after modal fade-out
       logoutModalEl.addEventListener(
         'hidden.bs.modal',
-        () => {
-          window.location.href = logoutBtn.href;
+        async () => {
+          try {
+            await fetch('/logout', {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-Token': window.csrfToken,
+              },
+              body: `_csrf=${encodeURIComponent(window.csrfToken)}`,
+            });
+            window.location.href = '/';
+          } catch (err) {
+            console.error('❌ Logout failed: ', err);
+          }
         },
-        { once: true } // Ensure event runs only once
+        { once: true }
       );
     });
 

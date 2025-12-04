@@ -81,7 +81,10 @@
           data-bs-dismiss="modal"
           >Continue</a
         >
-        <a href="/logout" class="btn btn-secondary">Log out</a>
+        <form action="/logout" method="POST" class="d-inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="btn btn-secondary">Log out</button>
+        </form>
       </div>
     </div>
   </div>
@@ -122,9 +125,10 @@
         >
           No
         </button>
-        <button type="button" id="confirmLogout" class="btn btn-danger">
-          Yes, log out
-        </button>
+        <form action="/logout" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="btn btn-danger">Yes, log out</button>
+        </form>
       </div>
     </div>
   </div>

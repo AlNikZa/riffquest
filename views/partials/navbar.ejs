@@ -103,12 +103,15 @@
           <img src="<%=userImg%>" id="user-navbar-img" alt="" srcset="" />
           <% } %>
         </a>
-        <a
-          href="/logout"
-          class="btn btn-outline-light mt-2 mt-lg-0 spotify-logout-btn"
-        >
-          Log out
-        </a>
+        <form action="/logout" method="POST" class="d-inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button
+            type="submit"
+            class="btn btn-outline-light mt-2 mt-lg-0 spotify-logout-btn"
+          >
+            Log out
+          </button>
+        </form>
       </div>
       <% } %>
     </div>
