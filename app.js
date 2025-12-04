@@ -26,6 +26,7 @@ import {
   notFoundHandler,
   globalErrorHandler,
 } from './middleware/errorHandler.js';
+import { noCacheMiddleware } from './middleware/noCacheMiddleware.js';
 
 // Import services needed before handling any requests
 import { initToken } from './services/globalTokenService.js';
@@ -61,6 +62,8 @@ app.use(helmetConfig);
 app.use(sessionInit());
 // Global rate limiting
 app.use(generalLimiter);
+// Prevent caching of dynamic pages (skip static files automatically)
+app.use(noCacheMiddleware);
 // Store current URL for post-login redirect
 app.use(setReturnToCookie);
 // Expose user session data to all views
