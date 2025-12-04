@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="scroll-padding-top: 60px">
+<html lang="en">
   <!-- Include common head partial (meta tags, CSS, etc.) -->
   <%- include('partials/head') %>
 
@@ -29,7 +29,7 @@
 
       <!-- Individual album card -->
       <li id="id_<%= album.id %>" class="m-3 text-center p-2">
-        <div class="card" style="width: 275px">
+        <div class="card artist-album-card">
           <!-- Album cover image -->
           <img
             class="card-img-top"
@@ -72,8 +72,7 @@
         <!-- Hidden iframe container for embedded Spotify album -->
         <div
           id="iframe_container_<%= album.id %>"
-          class="row justify-content-center d-none iframe-container"
-          style="margin-top: 50px"
+          class="row justify-content-center d-none iframe-container artist-album-iframe-container"
         >
           <div class="col-10 col-sm-8 col-md-6">
             <iframe

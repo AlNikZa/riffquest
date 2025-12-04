@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="scroll-padding-top: 60px">
+<html lang="en">
   <!-- Include head partial (meta tags, CSS, etc.) -->
   <%- include('partials/head') %>
 
@@ -53,7 +53,7 @@
             </ul>
 
             <!-- Responsive Spotify iframe for track preview -->
-            <div class="ratio ratio-16x9 mb-2" style="max-height: 400px">
+            <div class="ratio ratio-16x9 mb-2 max-height-400px">
               <iframe
                 src="https://open.spotify.com/embed/track/<%= track.id %>"
                 allow="encrypted-media"

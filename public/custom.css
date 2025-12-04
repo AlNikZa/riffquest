@@ -1,0 +1,48 @@
+* {
+  font-family: 'Coda', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+html {
+  scroll-padding-top: 60px;
+}
+
+body {
+  background-color: #f8f9fa;
+  padding-top: 60px;
+}
+
+body.no-padding-top {
+  padding-top: 0;
+}
+
+.navbar-toggler {
+  color: white;
+}
+.navbar .dropdown-menu .dropdown-item:hover {
+  background-color: #198754; /* Bootstrap "success" color */
+  color: #fff;
+}
+#user-navbar-img {
+  height: 22px;
+}
+.artist-album-card {
+  width: 275px;
+}
+.artist-album-iframe-container {
+  margin-top: 50px;
+}
+.max-content-width {
+  width: max-content;
+}
+.max-height-400px {
+  max-height: 400px;
+}
+#cookie-banner {
+  display: none;
+  z-index: 2050;
+  opacity: 0.85;
+}
+#modal-user-img {
+  width: 100px;
+}

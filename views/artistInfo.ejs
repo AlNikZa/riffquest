@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" style="scroll-padding-top: 60px">
+<html lang="en">
   <!-- Include head partial for meta tags, CSS, etc. -->
   <%- include('partials/head') %>
 
-  <body style="padding-top: 0" class="d-flex flex-column min-vh-100">
+  <body class="d-flex flex-column min-vh-100 no-padding-top">
     <!-- Include navbar partial -->
     <%- include('partials/navbar') %>
 
@@ -36,11 +36,10 @@
             <!-- Genres list -->
             <% if (artistData.genres && artistData.genres.length > 0) { %>
             <ul
-              class="list-group d-inline-block rounded-3"
+              class="list-group d-inline-block rounded-3 max-content-width"
               data-bs-toggle="tooltip"
               data-bs-theme="light"
               title="Music genres of the artist"
-              style="width: max-content"
             >
               <li
                 class="list-group-item text-center h6 m-0 border-bottom border-dark"
@@ -56,11 +55,10 @@
             <!-- Popularity score -->
             <% if (artistData.popularity !== undefined) { %>
             <ul
-              class="list-group d-inline-block rounded-3"
+              class="list-group d-inline-block rounded-3 max-content-width"
               data-bs-toggle="tooltip"
               data-bs-theme="light"
               title="Spotify popularity score (0–100)"
-              style="width: max-content"
             >
               <li
                 class="list-group-item text-center h6 m-0 border-bottom border-dark"
@@ -76,11 +74,10 @@
             <!-- Followers count -->
             <% if (artistData.followers?.total !== undefined) { %>
             <ul
-              class="list-group d-inline-block rounded-3"
+              class="list-group d-inline-block rounded-3 max-content-width"
               data-bs-toggle="tooltip"
               data-bs-theme="light"
               title="Total number of followers on Spotify"
-              style="width: max-content"
             >
               <li
                 class="list-group-item text-center h6 m-0 border-bottom border-dark"
