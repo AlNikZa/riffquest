@@ -40,6 +40,9 @@ import logoutRoutes from './routes/logout.js';
 // Create Express application
 const app = express();
 
+// Disable the 'X-Powered-By' header for security reasons
+app.disable('x-powered-by');
+
 // Trust the first proxy to correctly detect HTTPS and client IP (needed for secure cookies)
 app.set('trust proxy', 1);
 
