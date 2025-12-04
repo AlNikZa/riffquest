@@ -120,6 +120,7 @@ RiffQuest/
 ├─ public/
 │   ├─ authModals.js
 │   ├─ autocomplete.js
+│   ├─ custom.css
 │   ├─ favicon.ico
 │   ├─ formModals.js
 │   └─ logo.png
