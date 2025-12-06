@@ -18,14 +18,12 @@ export const logoutController = async (req, res) => {
     } else {
       //   Clear the session cookie from the browser
       const isLocal = process.env.BASE_URL_DEV === 'http://127.0.0.1:3000';
-      res.clearCookie('riffQuestUserSid', {
+      res.clearCookie('riffQuestSessionId', {
         path: '/',
         secure: !isLocal,
         sameSite: isLocal ? 'lax' : 'none',
         httpOnly: true,
       });
-
-      req.session = null;
 
       //   Redirect the user to the current or homepage after logout
       const returnTo = getReturnToCookie(req);

@@ -6,7 +6,7 @@ const isLocal = process.env.BASE_URL_DEV === 'http://127.0.0.1:3000';
 
 export const sessionInit = () => {
   return session({
-    name: 'riffQuestUserSid',
+    name: 'riffQuestSessionId',
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -17,6 +17,7 @@ export const sessionInit = () => {
       autoRemove: 'native',
     }),
     cookie: {
+      path: '/',
       maxAge: 1000 * 60 * 60 * 24,
       secure: !isLocal, // true on Render, false locally
       sameSite: isLocal ? 'lax' : 'none',
