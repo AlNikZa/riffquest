@@ -28,7 +28,7 @@
       >
         <!-- CSRF token for JS POST requests -->
         <script nonce="<%= nonce %>">
-          window.csrfToken = '<%= csrfToken %>';
+          window.csrfToken = '<%= csrfToken || "" %> ';
         </script>
 
         <input
