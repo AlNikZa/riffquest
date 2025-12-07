@@ -36,6 +36,7 @@ import homeRoutes from './routes/home.js';
 import artistRoutes from './routes/artist.js';
 import loginRoutes from './routes/login.js';
 import logoutRoutes from './routes/logout.js';
+import devRoutes from './routes/dev.js';
 
 // Create Express application
 const app = express();
@@ -83,6 +84,7 @@ app.use('/', homeRoutes);
 app.use('/', artistRoutes);
 app.use('/', loginRoutes);
 app.use('/', logoutRoutes);
+app.use('/', devRoutes);
 
 // 404 handler (no route matched)
 app.use('/', notFoundHandler);

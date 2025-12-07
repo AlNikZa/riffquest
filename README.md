@@ -128,6 +128,7 @@ RiffQuest/
 │
 ├─ routes/
 │   ├─ artist.js
+│   ├─ dev.js
 │   ├─ home.js
 │   ├─ login.js
 │   └─ logout.js
