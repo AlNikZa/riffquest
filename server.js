@@ -21,4 +21,11 @@ await mongoose.connection.asPromise();
 
 // Start the Express server and listen for incoming requests
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server started on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Server started on port ${PORT}`);
+
+  const emoji = process.env.NODE_ENV === 'production' ? '🚀' : '🛠️';
+  if (process.env.NODE_ENV !== 'production')
+    process.env.NODE_ENV = 'development';
+  console.log(emoji, `Running in ${process.env.NODE_ENV.toUpperCase()} MODE.`);
+});
