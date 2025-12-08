@@ -80,15 +80,15 @@ app.use(createCsrfToken);
 await initToken();
 
 // Register application routes
-app.use('/', homeRoutes);
-app.use('/', artistRoutes);
-app.use('/', loginRoutes);
-app.use('/', logoutRoutes);
-app.use('/', devRoutes);
+app.use(homeRoutes);
+app.use(artistRoutes);
+app.use(loginRoutes);
+app.use(logoutRoutes);
+app.use(devRoutes);
 
 // 404 handler (no route matched)
-app.use('/', notFoundHandler);
+app.use(notFoundHandler);
 // Global error handler (must be last)
-app.use('/', globalErrorHandler);
+app.use(globalErrorHandler);
 
 export default app;
