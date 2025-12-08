@@ -5,6 +5,6 @@ import { checkCsrfToken } from '../middleware/csrf.js';
 
 const router = express.Router();
 
-router.post('/logout', checkCsrfToken, logoutController);
+router.post('/auth/logout', checkCsrfToken, logoutController);
 
 export default router;

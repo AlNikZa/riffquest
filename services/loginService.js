@@ -37,7 +37,7 @@ export async function exchangeCodeForToken(code, isProduction) {
   if (!code) throw new Error('No authorization code provided');
 
   // Determine redirect URI based on environment
-  // Must match the redirect URI used in /login route
+  // Must match the redirect URI used in /auth/login route
   // Use environment-specific redirect URI
   // Use environment-specific redirect URI
   const redirect_uri = isProduction
@@ -48,7 +48,7 @@ export async function exchangeCodeForToken(code, isProduction) {
   const params = new URLSearchParams({
     grant_type: 'authorization_code', // required by Spotify
     code: code, // the code received from Spotify login
-    redirect_uri: redirect_uri, // must match /login
+    redirect_uri: redirect_uri, // must match /auth/login
   });
 
   // Make a POST request to Spotify Accounts API to exchange code for tokens

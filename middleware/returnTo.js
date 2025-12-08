@@ -3,9 +3,9 @@
 export const setReturnToCookie = (req, res, next) => {
   if (
     req.method === 'GET' &&
-    !req.originalUrl.startsWith('/login') &&
+    !req.originalUrl.startsWith('/auth/login') &&
     !req.originalUrl.startsWith('/callback') &&
-    !req.originalUrl.startsWith('/logout')
+    !req.originalUrl.startsWith('/auth/logout')
   ) {
     //  Skip static files (images, CSS, JS, icons, etc.)
     if (

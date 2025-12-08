@@ -90,7 +90,7 @@
       <% if (!isLoggedIn) { %>
       <div class="d-flex ms-auto align-items-center">
         <a
-          href="/login"
+          href="/auth/login"
           class="btn btn-outline-light mt-2 mt-lg-0 spotify-login-btn"
         >
           Log in with Spotify
@@ -103,7 +103,7 @@
           <img src="<%=userImg%>" id="user-navbar-img" alt="" srcset="" />
           <% } %>
         </a>
-        <form action="/logout" method="POST" class="d-inline">
+        <form action="/auth/logout" method="POST" class="d-inline">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button
             type="submit"

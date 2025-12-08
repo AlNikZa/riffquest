@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // When the login modal is shown, reset login flag on server
     loginModalEl.addEventListener('shown.bs.modal', async () => {
       try {
-        await fetch('/reset-login-flag', {
+        await fetch('/auth/reset-login-flag', {
           method: 'POST',
           credentials: 'include', // Include cookies
           headers: {
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'hidden.bs.modal',
         async () => {
           try {
-            await fetch('/logout', {
+            await fetch('/auth/logout', {
               method: 'POST',
               credentials: 'include',
               headers: {

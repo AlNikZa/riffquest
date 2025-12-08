@@ -81,7 +81,7 @@
           data-bs-dismiss="modal"
           >Continue</a
         >
-        <form action="/logout" method="POST" class="d-inline">
+        <form action="/auth/logout" method="POST" class="d-inline">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button type="submit" class="btn btn-secondary">Log out</button>
         </form>
@@ -125,7 +125,7 @@
         >
           No
         </button>
-        <form action="/logout" method="POST">
+        <form action="/auth/logout" method="POST">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button type="submit" class="btn btn-danger">Yes, log out</button>
         </form>

@@ -33,7 +33,7 @@ router.get(
 // });
 
 // 4. FAST LOGIN (Test User Injection)
-// router.get('/test/login/:id', isDevelopment, checkAdminPassword, (req, res) => {
+// router.get('/test/auth/login/:id', isDevelopment, checkAdminPassword, (req, res) => {
 //     req.session.user = { id: req.params.id, username: `TestUser_${req.params.id}`, isAdmin: true };
 //     req.session.isLoggedIn = true;
 //     req.session.save(() => {

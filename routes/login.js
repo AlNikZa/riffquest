@@ -12,7 +12,7 @@ import { loginCallbackValidator } from '../validators/loginValidator.js';
 
 const router = express.Router();
 
-router.get('/login', loginLimiter, loginController);
+router.get('/auth/login', loginLimiter, loginController);
 
 router.get(
   '/callback',
@@ -21,6 +21,6 @@ router.get(
   loginCallbackController
 );
 
-router.post('/reset-login-flag', checkCsrfToken, resetLoginFlagController);
+router.post('/auth/reset-login-flag', checkCsrfToken, resetLoginFlagController);
 
 export default router;
