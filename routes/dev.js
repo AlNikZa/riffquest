@@ -1,39 +1,17 @@
 import express from 'express';
-import listRoutes from 'express-list-routes';
 
-import { notFoundHandler } from '../middleware/errorHandler.js';
+import { isDevelopment } from '../middleware/devMiddleware.js';
+import { checkAdminPassword } from '../middleware/devMiddleware.js';
 
+import { getAllRoutesListController } from '../controllers/devController.js';
 const router = express.Router();
 
-const checkAdminPassword = (req, res, next) => {
-  const expectedPassword = process.env.ADMIN_PASSWORD;
-
-  const submittedPassword = req.header('x-admin-pass');
-
-  // Reject the request if the password is not set or if they do not match
-  if (!expectedPassword || expectedPassword !== submittedPassword) {
-    // Use 401 Unauthorized for an incorrect password
-    return res.status(401).json({
-      message: 'Unauthorized: Invalid access password.',
-      error: 'Access denied.',
-    });
-  }
-
-  // If the passwords match, allow access
-  next();
-};
-
-const isDevelopment = (req, res, next) => {
-  if (process.env.NODE_ENV === 'production') {
-    return notFoundHandler(req, res, next);
-  }
-  next();
-};
-
-router.get('/dev/routes', isDevelopment, checkAdminPassword, (req, res) => {
-  const routes = listRoutes(req.app, { logger: false });
-  res.status(200).json(routes);
-});
+router.get(
+  '/dev/routes',
+  isDevelopment,
+  checkAdminPassword,
+  getAllRoutesListController
+);
 
 // ====================================================================
 // SUGGESTIONS FOR FUTURE DEV ROUTES (Prioritized)

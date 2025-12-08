@@ -103,12 +103,14 @@ RiffQuest/
 │
 ├─ controllers/
 │   ├─ artistController.js
+│   ├─ devController.js
 │   ├─ homeController.js
 │   ├─ loginController.js
 │   └─ logoutController.js
 │
 ├─ middleware/
 │   ├─ csrf.js
+│   ├─ devMiddleware.js
 │   ├─ errorHandler.js
 │   ├─ noCacheMiddleware.js
 │   ├─ returnTo.js
