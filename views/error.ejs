@@ -8,25 +8,10 @@
     <%- include('partials/navbar') %>
 
     <!-- Page header showing the error status -->
-    <h1 class="text-center text-danger mt-5">
-      <%= status || 500 %> - Something went wrong
-    </h1>
-
-    <!-- Optional detailed error message -->
-    <% if (message) { %>
-    <p class="text-center text-muted"><%= message %></p>
-    <% } %>
-
-    <!-- Optional context: artist, track, album -->
-    <div class="text-center text-secondary">
-      <% if (artist) { %>
-      <p>Artist: <%= artist %></p>
-      <% } %> <% if (track) { %>
-      <p>Track: <%= track %></p>
-      <% } %> <% if (album) { %>
-      <p>Album: <%= album %></p>
-      <% } %>
-    </div>
+    <h1 class="text-center text-danger mt-5"><%= status || 500 %> Error</h1>
+    <h2 class="text-center text-muted fs-5">
+      <%= message || 'Something went wrong.' %>
+    </h2>
 
     <!-- Back to home button -->
     <div class="d-flex justify-content-center my-5">

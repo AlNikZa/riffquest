@@ -8,23 +8,30 @@
     <%- include('partials/navbar') %>
 
     <!-- Page header showing the error title dynamically -->
-    <h1 class="text-warning text-center mt-5"><%= title %></h1>
-
-    <!-- Informational message about no results found -->
-    <h2 class="text-center fs-5 mb-5 mx-5 px-5">
-      <% if (artist) { %> No results found for "<span class="text-warning"
-        ><%= artist %></span
-      >".
-      <!--  -->
-      Please check the spelling and try again.
-      <!--  -->
-      <% } else { %>
-      <!--  -->
-      No artist provided. Please enter an artist name to search.
-      <!--  -->
-      <% } %>
+    <h1 class="text-center text-warning mt-5">404 Error</h1>
+    <h2 class="text-center text-muted fs-5">
+      <%= message || 'Page not found.' %>
     </h2>
+    <!-- Informational message about no results found -->
+    <div class="text-center fs-5 mb-5 mx-5 px-5">
+      <% if (typeof artist !== 'undefined' && artist || typeof album !==
+      'undefined' && album || typeof track !== 'undefined' && track) { %> No
+      results found for <% let hasPrevious = false; %> <% if (typeof artist !==
+      'undefined' && artist) { %> artist "<span class="text-warning"
+        ><%= artist %></span
+      >" <% hasPrevious = true; %> <% } %> <% if (typeof album !== 'undefined'
+      && album) { %> <% if (hasPrevious) { %>, <% } %>album "<span
+        class="text-warning"
+        ><%= album %></span
+      >" <% hasPrevious = true; %> <% } %> <% if (typeof track !== 'undefined'
+      && track) { %> <% if (hasPrevious) { %>, <% } %>track "<span
+        class="text-warning"
+        ><%= track %></span
+      >" <% hasPrevious = true; %> <% } %>.
 
+      <br />
+      Please check the spelling or try different search terms. <% } %>
+    </div>
     <!-- Back to home button -->
     <div class="d-flex justify-content-center my-5">
       <a href="/" class="btn btn-outline-success">Go back to Home</a>

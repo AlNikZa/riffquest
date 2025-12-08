@@ -1,42 +1,57 @@
+// appError class to create operational errors
+export class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
 // 404 handler
 // This middleware is executed if no route above matches the request
-export const notFoundHandler = (req, res) => {
-  console.error('❌ 404: Not found:', {
-    path: req.path,
-    query: req.query,
-  });
-
-  // Extract possible query parameters from the request
-  // Example: /artists/top-tracks?artist=Queen
-  const { artist, track, album } = req.query; // or req.params for dynamic routes
-
-  // Render a "not found" page and pass optional context
-  // If artist/track/album were not provided, set them to null
-  res.status(404).render('noResultsFound', {
-    artist: artist || null,
-    track: track || null,
-    album: album || null,
-    title: 'Nothing found',
-  });
+export const notFoundHandler = (req, res, next) => {
+  next(new AppError('Page Not Found.', 404));
 };
 
 // Global error handler
 // This middleware will catch errors thrown in async routes or anywhere else
-export const globalErrorHandler = (err, req, res) => {
-  // Log the full error stack for debugging purposes
-  console.error('❌ Global error handler:', err.stack);
+export const globalErrorHandler = (err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  console.error(
+    `❌ ${err.status}: ${err.statusCode} Global error handler: ${err.message}`
+  );
 
-  // Extract optional query parameters from the request
-  const { artist, track, album } = req.query; // or req.params for dynamic routes
   const isProd = process.env.NODE_ENV === 'production';
+  if (!isProd) {
+    console.error(err.stack);
+  }
+
+  // If it is 404 → render noResultsFound.ejs
+  if (err.statusCode === 404) {
+    return res.status(404).render('noResultsFound', {
+      title: 'Nothing found',
+      artist: req.query.artist || null,
+      album: req.query.album || null,
+      track: req.query.track || null,
+      csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
+      nonce: res.locals.nonce || req.nonce || null,
+      message: err.message || 'Page Not Found.',
+    });
+  }
 
   // Render the error page with error details and optional context
-  res.status(err.status || 500).render('error', {
+  res.status(err.statusCode).render('error', {
     title: 'Error',
-    message: isProd ? 'Something went wrong' : err.message,
-    artist: artist || null,
-    track: track || null,
-    album: album || null,
-    status: err.status || 500, // optionally pass the status code to the view
+    message: err.isOperational ? err.message : 'Something went wrong',
+    status: err.statusCode || 500,
+    artist: req.query.artist || null,
+    album: req.query.album || null,
+    track: req.query.track || null,
+    csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
+    nonce: res.locals.nonce || req.nonce || null,
   });
 };
