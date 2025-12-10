@@ -17,12 +17,22 @@ export const notFoundHandler = (req, res, next) => {
   next(new AppError('Page Not Found.', 404));
 };
 
+const getViewContext = (req, res) => ({
+  artist: req.query.artist || null,
+  album: req.query.album || null,
+  track: req.query.track || null,
+  csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
+  nonce: res.locals.nonce || req.nonce || null,
+});
+
 // Global error handler
 // This middleware will catch errors thrown in async routes or anywhere else
 export const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   console.error(
-    `❌ ${err.status}: ${err.statusCode} Global error handler: ${err.message}`
+    `❌ ${err.status || 'error'}: ${err.statusCode} Global error handler: ${
+      err.message
+    }`
   );
 
   const isProd = process.env.NODE_ENV === 'production';
@@ -34,12 +44,8 @@ export const globalErrorHandler = (err, req, res, next) => {
   if (err.statusCode === 404) {
     return res.status(404).render('noResultsFound', {
       title: 'Nothing found',
-      artist: req.query.artist || null,
-      album: req.query.album || null,
-      track: req.query.track || null,
-      csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
-      nonce: res.locals.nonce || req.nonce || null,
       message: err.message || 'Page Not Found.',
+      ...getViewContext(req, res),
     });
   }
 
@@ -47,11 +53,7 @@ export const globalErrorHandler = (err, req, res, next) => {
   res.status(err.statusCode).render('error', {
     title: 'Error',
     message: err.isOperational ? err.message : 'Something went wrong',
-    status: err.statusCode || 500,
-    artist: req.query.artist || null,
-    album: req.query.album || null,
-    track: req.query.track || null,
-    csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
-    nonce: res.locals.nonce || req.nonce || null,
+    statusCode: err.statusCode,
+    ...getViewContext(req, res),
   });
 };
