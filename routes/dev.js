@@ -4,6 +4,8 @@ import { isDevelopment } from '../middleware/devMiddleware.js';
 import { checkAdminPassword } from '../middleware/devMiddleware.js';
 
 import { getAllRoutesListController } from '../controllers/devController.js';
+import { getFileTreeController } from '../controllers/devController.js';
+
 const router = express.Router();
 
 router.get(
@@ -11,6 +13,13 @@ router.get(
   isDevelopment,
   checkAdminPassword,
   getAllRoutesListController
+);
+
+router.get(
+  '/dev/filetree',
+  isDevelopment,
+  checkAdminPassword,
+  getFileTreeController
 );
 
 // ====================================================================

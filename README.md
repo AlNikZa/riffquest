@@ -94,80 +94,83 @@ View artist details
 ```
 RiffQuest/
 │
-├─ config/
-│   ├─ db.js
-│   ├─ env.js
-│   ├─ helmet.js
-│   ├─ rateLimit.js
-│   └─ session.js
+├── config
+│   ├── db.js
+│   ├── env.js
+│   ├── helmet.js
+│   ├── rateLimit.js
+│   └── session.js
 │
-├─ controllers/
-│   ├─ artistController.js
-│   ├─ devController.js
-│   ├─ homeController.js
-│   ├─ loginController.js
-│   └─ logoutController.js
+├── controllers
+│   ├── artistController.js
+│   ├── devController.js
+│   ├── homeController.js
+│   ├── loginController.js
+│   └── logoutController.js
 │
-├─ middleware/
-│   ├─ csrf.js
-│   ├─ devMiddleware.js
-│   ├─ errorHandler.js
-│   ├─ noCacheMiddleware.js
-│   ├─ returnTo.js
-│   ├─ userSession.js
-│   └─ validationHandler.js
+├── middleware
+│   ├── csrf.js
+│   ├── devMiddleware.js
+│   ├── errorHandler.js
+│   ├── noCacheMiddleware.js
+│   ├── returnTo.js
+│   ├── userSession.js
+│   └── validationHandler.js
 │
-├─ models/
-│   └─ User.js
+├── models
+│   └── User.js
 │
-├─ public/
-│   ├─ authModals.js
-│   ├─ autocomplete.js
-│   ├─ custom.css
-│   ├─ favicon.ico
-│   ├─ formModals.js
-│   └─ logo.png
+├── public
+│   ├── authModals.js
+│   ├── autocomplete.js
+│   ├── custom.css
+│   ├── favicon.ico
+│   ├── formModals.js
+│   └── logo.png
 │
-├─ routes/
-│   ├─ artist.js
-│   ├─ dev.js
-│   ├─ home.js
-│   ├─ login.js
-│   └─ logout.js
+├── routes
+│   ├── artist.js
+│   ├── dev.js
+│   ├── home.js
+│   ├── login.js
+│   └── logout.js
 │
-├─ services/
-│   ├─ artistService.js
-│   ├─ cryptoService.js
-│   ├─ globalTokenService.js
-│   ├─ loginService.js
-│   ├─ userService.js
-│   └─ userTokenService.js
+├── services
+│   ├── artistService.js
+│   ├── cryptoService.js
+│   ├── devService.js
+│   ├── globalTokenService.js
+│   ├── loginService.js
+│   ├── userService.js
+│   └── userTokenService.js
 │
-├─ validators/
-│   ├─ loginValidator.js
-│   └─ searchValidator.js
+├── validators
+│   ├── loginValidator.js
+│   └── searchValidator.js
 │
-├─ views/
-│   ├─ partials/
-│   │   ├─ bootstrapModals.ejs
-│   │   ├─ bootstrapScriptTag.ejs
-│   │   ├─ footer.ejs
-│   │   ├─ head.ejs
-│   │   └─ navbar.ejs
-│   ├─ artistAlbums.ejs
-│   ├─ artistInfo.ejs
-│   ├─ artistTopTracks.ejs
-│   ├─ cookiePolicy.ejs
-│   ├─ error.ejs
-│   ├─ index.ejs
-│   ├─ loading.ejs
-│   └─ noResultsFound.ejs
+├── views
+│   ├── partials
+│   │   ├── bootstrapModals.ejs
+│   │   ├── bootstrapScriptTag.ejs
+│   │   ├── footer.ejs
+│   │   ├── head.ejs
+│   │   └── navbar.ejs
+│   ├── artistAlbums.ejs
+│   ├── artistInfo.ejs
+│   ├── artistTopTracks.ejs
+│   ├── cookiePolicy.ejs
+│   ├── error.ejs
+│   ├── index.ejs
+│   ├── loading.ejs
+│   └── noResultsFound.ejs
 │
 ├─ .env.example
 ├─ app.js
 ├─ package.json
 ├─ Procfile
 └─ server.js
+
+10 directories, 56 files
 ```
 
 ## Error Handling
