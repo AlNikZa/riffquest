@@ -11,13 +11,19 @@ import {
 import { decrypt } from '../services/cryptoService.js';
 import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
 
-export const loginController = (req, res) => {
-  const authUrl = buildSpotifyAuthUrl(req);
-  // Redirect the user to Spotify's login/authorization page
-  res.status(302).redirect(authUrl);
+import { AppError } from '../middleware/errorHandler.js';
+
+export const loginController = (req, res, next) => {
+  try {
+    const authUrl = buildSpotifyAuthUrl(req);
+    // Redirect the user to Spotify's login/authorization page
+    res.status(302).redirect(authUrl);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const loginCallbackController = async (req, res) => {
+export const loginCallbackController = async (req, res, next) => {
   // Extract authorization code and error from Spotify's redirect query parameters
   const { code, error, state } = req.query;
 
@@ -41,14 +47,14 @@ export const loginCallbackController = async (req, res) => {
       received: state,
     });
 
-    return res.status(403).render('error', {
-      message: 'Invalid OAuth state. Please try logging in again.',
-    });
+    return next(
+      new AppError('Invalid OAuth state. Please try logging in again.', 403)
+    );
   }
 
   // If no authorization code is provided, return a 400 Bad Request
   if (!code) {
-    return res.status(400).send('Authorization code missing');
+    return next(new AppError('Authorization code missing', 400));
   }
 
   try {
@@ -70,8 +76,7 @@ export const loginCallbackController = async (req, res) => {
         decrypt(userDoc.refresh_token)
       );
     } catch (err) {
-      console.error('Error saving user:', err);
-      return res.status(500).send('Failed to save user');
+      return next(err);
     }
 
     req.session.spotify_user_id = userDoc.spotify_user_id;
@@ -83,7 +88,7 @@ export const loginCallbackController = async (req, res) => {
 
     req.session.save((err) => {
       if (err) {
-        console.error('Session save error:', err);
+        return next(err);
       }
       res.clearCookie('returnTo', {
         path: '/',
@@ -98,9 +103,7 @@ export const loginCallbackController = async (req, res) => {
         );
     });
   } catch (error) {
-    // Catch and log any errors during the token exchange
-    console.error(error);
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 

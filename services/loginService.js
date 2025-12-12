@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 
+import { AppError } from '../middleware/errorHandler.js';
+
 export function buildSpotifyAuthUrl(req) {
   // const scope = 'user-read-private user-read-email';
   const scope =
@@ -34,7 +36,8 @@ export function buildSpotifyAuthUrl(req) {
 
 export async function exchangeCodeForToken(code, isProduction) {
   // Throw an error if no code is provided
-  if (!code) throw new Error('No authorization code provided');
+  if (!code)
+    throw new AppError('Failed to log in with Spotify. Please try again.', 400);
 
   // Determine redirect URI based on environment
   // Must match the redirect URI used in /auth/login route
@@ -66,12 +69,22 @@ export async function exchangeCodeForToken(code, isProduction) {
     body: params.toString(), // send parameters in URL-encoded format
   });
 
+  if (!response.ok) {
+    throw new AppError(
+      'Failed to log in with Spotify. Please try again.',
+      Number(response.status) || 500
+    );
+  }
+
   // Parse the JSON response containing the tokens
   const data = await response.json();
 
   // Handle any errors returned by Spotify
   if (data.error) {
-    throw new Error(data.error_description || 'Spotify token exchange failed');
+    throw new AppError(
+      'Failed to log in with Spotify. Please try again.',
+      Number(data.status) || 502
+    );
   }
 
   return data;
