@@ -3,8 +3,11 @@ import express from 'express';
 import { isDevelopment } from '../middleware/devMiddleware.js';
 import { checkAdminPassword } from '../middleware/devMiddleware.js';
 
-import { getAllRoutesListController } from '../controllers/devController.js';
-import { getFileTreeController } from '../controllers/devController.js';
+import {
+  getAllRoutesListController,
+  getFileTreeController,
+  getDatabaseCollectionController,
+} from '../controllers/devController.js';
 
 const router = express.Router();
 
@@ -20,6 +23,13 @@ router.get(
   isDevelopment,
   checkAdminPassword,
   getFileTreeController
+);
+
+router.get(
+  '/dev/db/:collection',
+  isDevelopment,
+  checkAdminPassword,
+  getDatabaseCollectionController
 );
 
 // ====================================================================

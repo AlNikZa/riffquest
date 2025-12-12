@@ -1,5 +1,6 @@
 import listRoutes from 'express-list-routes';
 import directoryTree from 'directory-tree';
+import mongoose from 'mongoose';
 
 import { generateFileTreeString, countNodes } from '../services/devService.js';
 
@@ -30,4 +31,21 @@ export const getFileTreeController = (req, res) => {
     `\n${counts.dirs - 1} directories, ${counts.files} files`;
 
   res.status(200).send(`<pre>${fileTreeString}</pre>`);
+};
+
+export const getDatabaseCollectionController = async (req, res, next) => {
+  const { collection } = req.params;
+
+  try {
+    const allowedCollections = ['users', 'sessions'];
+    if (!allowedCollections.includes(collection)) {
+      return res.status(400).json({ error: 'Invalid collection' });
+    }
+
+    const coll = mongoose.connection.db.collection(collection);
+    const documents = await coll.find({}).limit(100).toArray();
+    res.json(documents);
+  } catch (err) {
+    next(err);
+  }
 };
