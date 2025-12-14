@@ -7,21 +7,21 @@ import { generateFileTreeString, countNodes } from '../services/devService.js';
 export const getAllRoutesListController = (req, res) => {
   const routes = listRoutes(req.app, { logger: false });
 
-  const routesAdditionalInfo = {
-    total: routes.length,
-    byMethod: {
-      GET: routes.filter((r) => r.method.includes('GET')).length,
-      POST: routes.filter((r) => r.method.includes('POST')).length,
-      PUT: routes.filter((r) => r.method.includes('PUT')).length,
-      PATCH: routes.filter((r) => r.method.includes('PATCH')).length,
-      DELETE: routes.filter((r) => r.method.includes('DELETE')).length,
-    },
-  };
+  const byMethod = routes.reduce((acc, route) => {
+    const methods = Array.isArray(route.method) ? route.method : [route.method];
 
-  routes.unshift({
-    ...routesAdditionalInfo,
+    methods.forEach((method) => {
+      acc[method] = (acc[method] || 0) + 1;
+    });
+
+    return acc;
+  }, {});
+
+  res.status(200).json({
+    total: routes.length,
+    byMethod,
+    routes,
   });
-  res.status(200).json(routes);
 };
 
 export const getFileTreeController = (req, res) => {
