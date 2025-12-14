@@ -7,6 +7,7 @@ import {
   getAllRoutesListController,
   getFileTreeController,
   getDatabaseCollectionController,
+  getCommitsController,
 } from '../controllers/devController.js';
 
 const router = express.Router();
@@ -30,6 +31,13 @@ router.get(
   isDevelopment,
   checkAdminPassword,
   getDatabaseCollectionController
+);
+
+router.get(
+  '/dev/commits',
+  isDevelopment,
+  checkAdminPassword,
+  getCommitsController
 );
 
 // ====================================================================

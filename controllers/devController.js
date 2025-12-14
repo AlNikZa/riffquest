@@ -64,3 +64,25 @@ export const getDatabaseCollectionController = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getCommitsController = (req, res, next) => {
+  const username = req.query.username;
+  const repo = req.query.repo;
+  const branchName = req.query.branch || 'main';
+  const limit = parseInt(req.query.limit) || 10;
+
+  const apiUrl = `https://api.github.com/repos/${username}/${repo}/commits?sha=${branchName}&per_page=${limit}`;
+
+  fetch(apiUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      const filteredData = data.map((commit) => ({
+        date: commit.commit.committer.date,
+        message: commit.commit.message,
+      }));
+      res.status(200).json(filteredData);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
