@@ -67,6 +67,6 @@ export const removeTokensForUser = async (spotify_user_id) => {
       }
     );
   } catch (err) {
-    console.error('❌ Error in removeTokensForUser function: ', err); // Log any errors
+    throw err;
   }
 };
