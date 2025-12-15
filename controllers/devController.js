@@ -65,24 +65,78 @@ export const getDatabaseCollectionController = async (req, res, next) => {
   }
 };
 
-export const getCommitsController = (req, res, next) => {
-  const username = req.query.username;
-  const repo = req.query.repo;
-  const branchName = req.query.branch || 'main';
-  const limit = parseInt(req.query.limit) || 10;
+export const getCommitsController = async (req, res, next) => {
+  try {
+    const { username, repo } = req.query;
+    const branchName = req.query.branch || 'main';
+    const limit = parseInt(req.query.limit) || 10;
 
-  const apiUrl = `https://api.github.com/repos/${username}/${repo}/commits?sha=${branchName}&per_page=${limit}`;
+    if (!username || !repo) {
+      const missingParams = [];
+      if (!username) missingParams.push('username');
+      if (!repo) missingParams.push('repo');
 
-  fetch(apiUrl)
-    .then((response) => response.json())
-    .then((data) => {
+      return res.status(400).json({
+        status: 'fail',
+        message: `parameter${
+          missingParams.length > 1 ? 's' : ''
+        } required: ${missingParams.join(', ')}.`,
+      });
+    }
+
+    let page = 1;
+    let commits = [];
+
+    while (commits.length < limit) {
+      const perPage = Math.min(100, limit - commits.length);
+      const apiUrl =
+        `https://api.github.com/repos/${username}/${repo}/commits` +
+        `?sha=${branchName}&per_page=${perPage}&page=${page}`;
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.length === 0) break;
+
       const filteredData = data.map((commit) => ({
         date: commit.commit.committer.date,
         message: commit.commit.message,
       }));
-      res.status(200).json(filteredData);
-    })
-    .catch((err) => {
-      next(err);
+
+      commits.push(...filteredData);
+
+      if (data.length < perPage) break;
+      page++;
+    }
+
+    const slicedCommits = commits.slice(0, limit);
+
+    const totalResponse = await fetch(
+      `https://api.github.com/repos/${username}/${repo}/commits?sha=${branchName}&per_page=1`
+    );
+    const linkHeader = totalResponse.headers.get('link');
+
+    let totalCommitsCount = null;
+    if (linkHeader) {
+      const match = linkHeader.match(/&page=(\d+)>; rel="last"/);
+      if (match) {
+        totalCommitsCount = parseInt(match[1]);
+      }
+    } else {
+      const data = await totalResponse.json();
+      totalCommitsCount = data.length;
+    }
+
+    res.status(200).json({
+      username,
+      repo,
+      branch: branchName,
+      totalCommitsCount,
+      requestedLimit: limit,
+      returnedCommitsCount: slicedCommits.length,
+      commits: slicedCommits,
     });
+  } catch (err) {
+    next(err);
+  }
 };
