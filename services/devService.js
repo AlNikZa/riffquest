@@ -1,32 +1,86 @@
-const renderFileTree = (node, prefix = '', isLast = true) => {
-  let output = '';
-  const linePrefix = isLast ? '└──' : '├──';
-  const nextPrefix = isLast ? '    ' : '│   ';
+import fs from 'fs';
+import { execSync } from 'child_process';
 
-  output += `${prefix}${linePrefix} ${node.name}\n`;
+const getFileDates = (filePath) => {
+  try {
+    const gitCreated = execSync(
+      `git log --diff-filter=A --follow --format=%aI -1 -- "${filePath}"`,
+      { stdio: ['pipe', 'pipe', 'ignore'] }
+    )
+      .toString()
+      .trim();
 
-  if (node.children) {
-    node.children.sort((a, b) => {
-      if (a.type === 'directory' && b.type === 'file') return -1;
-      if (a.type === 'file' && b.type === 'directory') return 1;
-      return a.name.localeCompare(b.name);
-    });
+    const gitModified = execSync(`git log -1 --format=%aI -- "${filePath}"`, {
+      stdio: ['pipe', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trim();
 
-    for (let i = 0; i < node.children.length; i++) {
-      const child = node.children[i];
-      const isChildLast = i === node.children.length - 1;
-      output += renderFileTree(child, prefix + nextPrefix, isChildLast);
+    return {
+      created: gitCreated ? new Date(gitCreated) : null,
+      modified: gitModified ? new Date(gitModified) : null,
+    };
+  } catch {
+    try {
+      const stats = fs.statSync(filePath);
+      return {
+        created: stats.birthtime || stats.ctime || null,
+        modified: stats.mtime || null,
+      };
+    } catch {
+      return { created: null, modified: null };
     }
   }
-
-  return output;
 };
 
-const renderTreeNode = (node, prefix = '', isLast = true) => {
+const annotateDates = (node) => {
+  if (node.type === 'file') {
+    const { created, modified } = getFileDates(node.path);
+    node.created = created;
+    node.modified = modified;
+  } else if (node.type === 'directory') {
+    let earliestCreated = null;
+    let latestModified = null;
+
+    if (node.children) {
+      node.children.forEach((child) => {
+        annotateDates(child);
+        if (
+          child.created &&
+          (!earliestCreated || child.created < earliestCreated)
+        )
+          earliestCreated = child.created;
+        if (
+          child.modified &&
+          (!latestModified || child.modified > latestModified)
+        )
+          latestModified = child.modified;
+      });
+    }
+
+    node.created = earliestCreated;
+    node.modified = latestModified;
+  }
+};
+
+const renderTreeNode = (node, prefix = '', isLast = true, showDates = true) => {
   const linePrefix = isLast ? '└── ' : '├── ';
   const nextPrefix = isLast ? '    ' : '│   ';
 
-  let output = `${prefix}${linePrefix}${node.name}\n`;
+  const { created, modified } =
+    node.type === 'directory'
+      ? { created: node.created, modified: node.modified }
+      : getFileDates(node.path);
+
+  const dateStr = showDates
+    ? ` (Created: ${
+        created ? created.toISOString().split('T')[0] : 'N/A'
+      } Modified: ${modified ? modified.toISOString().split('T')[0] : 'N/A'})`
+    : '';
+
+  let output = `${prefix}${linePrefix}${node.name}${
+    node.type === 'directory' ? '/' : ''
+  }${dateStr}\n`;
 
   if (node.children && node.children.length > 0) {
     node.children.sort((a, b) => {
@@ -37,8 +91,10 @@ const renderTreeNode = (node, prefix = '', isLast = true) => {
 
     node.children.forEach((child, i) => {
       const last = i === node.children.length - 1;
-      output += renderTreeNode(child, prefix + nextPrefix, last);
+      output += renderTreeNode(child, prefix + nextPrefix, last, showDates);
     });
+
+    output += prefix + '│\n';
   }
 
   return output;
@@ -62,8 +118,24 @@ export const countNodes = (node) => {
   return { dirs, files };
 };
 
-export const generateFileTreeString = (treeObject) => {
-  let output = `${treeObject.name}/\n│\n`;
+export const generateFileTreeString = (treeObject, showDates = true) => {
+  annotateDates(treeObject);
+
+  const dateStr = showDates
+    ? ` (Created: ${
+        treeObject.created
+          ? treeObject.created.toISOString().split('T')[0]
+          : 'N/A'
+      } Modified: ${
+        treeObject.modified
+          ? treeObject.modified.toISOString().split('T')[0]
+          : 'N/A'
+      })`
+    : '';
+
+  let output = `${treeObject.name}${
+    treeObject.type === 'directory' ? '/' : ''
+  }${dateStr}\n│\n`;
 
   const children = treeObject.children || [];
   const total = children.length;
@@ -76,15 +148,7 @@ export const generateFileTreeString = (treeObject) => {
 
   children.forEach((child, i) => {
     const isLast = i === total - 1;
-
-    if (child.type === 'directory') {
-      output += renderTreeNode(child, '', isLast);
-      output += '│\n';
-    }
-
-    if (child.type === 'file') {
-      output += `${isLast ? '└─ ' : '├─ '}${child.name}\n`;
-    }
+    output += renderTreeNode(child, '', isLast, showDates);
   });
 
   return output;

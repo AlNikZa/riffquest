@@ -25,6 +25,7 @@ export const getAllRoutesListController = (req, res) => {
 };
 
 export const getFileTreeController = (req, res) => {
+  const showDates = req.query.showDates === 'true';
   const treeObject = directoryTree(process.cwd(), {
     attributes: ['type'],
     exclude: [
@@ -42,7 +43,7 @@ export const getFileTreeController = (req, res) => {
 
   const counts = countNodes(treeObject);
   const fileTreeString =
-    generateFileTreeString(treeObject) +
+    generateFileTreeString(treeObject, showDates) +
     `\n${counts.dirs - 1} directories, ${counts.files} files`;
 
   res.status(200).send(`<pre>${fileTreeString}</pre>`);
