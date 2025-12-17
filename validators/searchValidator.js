@@ -1,4 +1,5 @@
 import { query, body } from 'express-validator';
+import { AppError } from '../middleware/errorHandler.js';
 
 const REGEX = /^[\p{L}\d\s\-.,!?'"()&:/+]+$/u;
 
@@ -80,9 +81,12 @@ export const redirectQueryValidator = [
   // Custom validator to ensure at least one of artist, album, or track is present
   (req, res, next) => {
     if (!req.query.artist && !req.query.album && !req.query.track) {
-      return res.status(400).render('error', {
-        message: 'At least one of artist, album or track must be provided.',
-      });
+      return next(
+        new AppError(
+          'At least one of artist, album or track must be provided.',
+          400
+        )
+      );
     }
     next();
   },
