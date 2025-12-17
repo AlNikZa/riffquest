@@ -1,4 +1,4 @@
-import { getTokenOrRenderLoadingPage } from '../services/globalTokenService.js';
+import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
 import {
   getArtistId,
   getArtistTopTracks,
@@ -9,9 +9,7 @@ import {
 
 export const artistTopTracksController = async (req, res, next) => {
   try {
-    // Ensure token is available, otherwise render loading page
-    const token = getTokenOrRenderLoadingPage(res);
-    if (!token) return;
+    const token = getTokenOrThrowNewAppError();
 
     const artist = req.query.artist;
 
@@ -54,9 +52,7 @@ export const artistTopTracksController = async (req, res, next) => {
 
 export const artistAlbumsController = async (req, res, next) => {
   try {
-    // Ensure token is available, otherwise render loading page
-    const token = getTokenOrRenderLoadingPage(res);
-    if (!token) return;
+    const token = getTokenOrThrowNewAppError();
 
     const artist = req.query.artist;
 
@@ -97,8 +93,7 @@ export const artistAlbumsController = async (req, res, next) => {
 
 export const artistProfileController = async (req, res, next) => {
   try {
-    const token = getTokenOrRenderLoadingPage(res);
-    if (!token) return;
+    const token = getTokenOrThrowNewAppError();
 
     const artist = req.query.artist;
 
@@ -170,9 +165,7 @@ export const artistRedirectController = (req, res) => {
 
 export const artistAutocompleteController = async (req, res, next) => {
   try {
-    // Get Spotify access token (or render loading page if token is missing/expired)
-    const token = await getTokenOrRenderLoadingPage(res);
-    if (!token) return; // stop if no token is available
+    const token = getTokenOrThrowNewAppError();
 
     // Read the search query from the request body
     const query = req.body.query;

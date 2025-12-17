@@ -56,19 +56,18 @@ const getToken = async (clientId, clientSecret) => {
 ------------------------------------------------------------ */
 const getCurrentToken = () => TOKEN;
 
-/* --------- Function: getTokenOrRenderLoadingPage ----------
-   Checks if a token is available. If not, renders a temporary loading page.
-   This is useful when the server starts and token is not ready yet.
+/* --------- Function: getTokenOrThrowNewAppError ----------
+   Checks if the Spotify access token is available in the service.
+   If the token is missing, it throws an AppError with a 503 status,
+   triggering the global error handler to notify the user.
 ------------------------------------------------------------ */
-export const getTokenOrRenderLoadingPage = (res) => {
+export const getTokenOrThrowNewAppError = () => {
   const token = getCurrentToken();
   if (!token) {
-    // Render a loading page with auto-refresh every 2 seconds
-    res.render('loading', {
-      title: 'Please wait...',
-      headExtra: '<meta http-equiv="refresh" content="2;url=/" />',
-    });
-    return null;
+    throw new AppError(
+      'Spotify token is being fetched. Please wait a moment and try again.',
+      503
+    );
   }
   return token;
 };

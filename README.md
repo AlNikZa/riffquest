@@ -94,21 +94,21 @@ View artist details
 ```
 RiffQuest/
 │
-├── config
+├── config/
 │   ├── db.js
 │   ├── env.js
 │   ├── helmet.js
 │   ├── rateLimit.js
 │   └── session.js
 │
-├── controllers
+├── controllers/
 │   ├── artistController.js
 │   ├── devController.js
 │   ├── homeController.js
 │   ├── loginController.js
 │   └── logoutController.js
 │
-├── middleware
+├── middleware/
 │   ├── csrf.js
 │   ├── devMiddleware.js
 │   ├── errorHandler.js
@@ -117,10 +117,10 @@ RiffQuest/
 │   ├── userSession.js
 │   └── validationHandler.js
 │
-├── models
+├── models/
 │   └── User.js
 │
-├── public
+├── public/
 │   ├── authModals.js
 │   ├── autocomplete.js
 │   ├── custom.css
@@ -128,14 +128,14 @@ RiffQuest/
 │   ├── formModals.js
 │   └── logo.png
 │
-├── routes
+├── routes/
 │   ├── artist.js
 │   ├── dev.js
 │   ├── home.js
 │   ├── login.js
 │   └── logout.js
 │
-├── services
+├── services/
 │   ├── artistService.js
 │   ├── cryptoService.js
 │   ├── devService.js
@@ -144,33 +144,33 @@ RiffQuest/
 │   ├── userService.js
 │   └── userTokenService.js
 │
-├── validators
+├── validators/
 │   ├── loginValidator.js
 │   └── searchValidator.js
 │
-├── views
-│   ├── partials
+├── views/
+│   ├── partials/
 │   │   ├── bootstrapModals.ejs
 │   │   ├── bootstrapScriptTag.ejs
 │   │   ├── footer.ejs
 │   │   ├── head.ejs
 │   │   └── navbar.ejs
+│   │
 │   ├── artistAlbums.ejs
 │   ├── artistInfo.ejs
 │   ├── artistTopTracks.ejs
 │   ├── cookiePolicy.ejs
 │   ├── error.ejs
 │   ├── index.ejs
-│   ├── loading.ejs
 │   └── noResultsFound.ejs
 │
-├─ .env.example
-├─ app.js
-├─ package.json
-├─ Procfile
-└─ server.js
+├── .env.example
+├── app.js
+├── package.json
+├── Procfile
+└── server.js
 
-10 directories, 56 files
+10 directories, 55 files
 ```
 
 ## Error Handling
