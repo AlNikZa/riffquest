@@ -1,10 +1,11 @@
-import listRoutes from 'express-list-routes';
-import directoryTree from 'directory-tree';
 import mongoose from 'mongoose';
 
 import { generateFileTreeString, countNodes } from '../services/devService.js';
 
-export const getAllRoutesListController = (req, res) => {
+export const getAllRoutesListController = async (req, res) => {
+  // Dynamic import prevents production crashes as this package is in devDependencies
+  const { default: listRoutes } = await import('express-list-routes');
+
   const routes = listRoutes(req.app, { logger: false });
 
   const byMethod = routes.reduce((acc, route) => {
@@ -24,8 +25,12 @@ export const getAllRoutesListController = (req, res) => {
   });
 };
 
-export const getFileTreeController = (req, res) => {
+export const getFileTreeController = async (req, res) => {
+  // Dynamic import prevents production crashes as this package is in devDependencies
+  const { default: directoryTree } = await import('directory-tree');
+
   const showDates = req.query.showDates === 'true';
+
   const treeObject = directoryTree(process.cwd(), {
     attributes: ['type'],
     exclude: [
