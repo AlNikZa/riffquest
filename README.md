@@ -126,6 +126,7 @@ RiffQuest/
 │   ├── custom.css
 │   ├── favicon.ico
 │   ├── formModals.js
+│   ├── Full_Logo_Green_CMYK.svg
 │   └── logo.png
 │
 ├── routes/
@@ -170,7 +171,7 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-10 directories, 55 files
+10 directories, 56 files
 ```
 
 ## Error Handling
