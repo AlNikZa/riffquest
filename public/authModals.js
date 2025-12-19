@@ -1,3 +1,5 @@
+// public/authModals.js
+
 document.addEventListener('DOMContentLoaded', function () {
   // === Spotify login button ===
   // Select all elements with class 'spotify-login-btn' and add a click listener

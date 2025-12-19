@@ -1,3 +1,5 @@
+// middleware/artistMiddleware.js
+
 import { getArtistId } from '../services/artistService.js';
 import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
 import { AppError } from '../middleware/errorHandler.js';

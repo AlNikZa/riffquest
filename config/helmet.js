@@ -1,3 +1,5 @@
+// config/helmet.js
+
 /**
  * Helmet configuration for RiffQuest.
  *

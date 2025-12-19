@@ -1,4 +1,5 @@
 // /middleware/validationHandler.js
+
 import { validationResult } from 'express-validator';
 import { AppError } from './errorHandler.js';
 

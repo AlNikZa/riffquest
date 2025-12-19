@@ -1,3 +1,5 @@
+// public/autocomplete.js
+
 function debounce(fn, wait) {
   let timeout;
   return function (...args) {

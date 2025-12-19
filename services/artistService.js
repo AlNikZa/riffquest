@@ -1,3 +1,5 @@
+// services/artistService.js
+
 /* -------------------- getArtistId --------------------
    Search for an artist by name and return the Spotify artist ID.
    Returns null if no matching artist is found.

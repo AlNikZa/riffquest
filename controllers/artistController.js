@@ -1,3 +1,5 @@
+// controllers/artistController.js
+
 import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
 import {
   getArtistTopTracks,

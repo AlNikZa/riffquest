@@ -1,3 +1,5 @@
+// config/db.js
+
 import mongoose from 'mongoose';
 
 // Construct MongoDB SRV connection string using environment variables

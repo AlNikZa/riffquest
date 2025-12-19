@@ -1,3 +1,5 @@
+// controllers/logoutController.js
+
 import { removeTokensForUser } from '../services/userTokenService.js';
 import { getReturnToCookie } from '../services/loginService.js';
 import { AppError } from '../middleware/errorHandler.js';

@@ -1,3 +1,5 @@
+// middleware/errorHandler.js
+
 // appError class to create operational errors
 export class AppError extends Error {
   constructor(message, statusCode) {

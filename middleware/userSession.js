@@ -1,4 +1,5 @@
 // middleware/userSession.js
+
 export function userSessionMiddleware(req, res, next) {
   res.locals.isLoggedIn = Boolean(req.session.spotify_user_id);
   res.locals.justLoggedIn = req.session.justLoggedIn;

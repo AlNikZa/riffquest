@@ -1,3 +1,5 @@
+// validators/searchValidator.js
+
 import { query, body } from 'express-validator';
 import { AppError } from '../middleware/errorHandler.js';
 

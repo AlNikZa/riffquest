@@ -1,3 +1,5 @@
+// public/formModals.js
+
 // Get references to form elements (might not exist everywhere)
 const artistForm = document.getElementById('artist-form');
 const artistNavbarForm = document.getElementById('artist-navbar-form');

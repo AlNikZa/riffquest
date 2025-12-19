@@ -1,3 +1,5 @@
+// config/session.js
+
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import mongoose from './db.js';

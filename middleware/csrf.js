@@ -1,3 +1,5 @@
+// middleware/csrf.js
+
 import crypto from 'crypto';
 
 export const createCsrfToken = (req, res, next) => {

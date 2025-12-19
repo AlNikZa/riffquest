@@ -1,3 +1,5 @@
+// controllers/homeController.js
+
 export const homePageController = (req, res) => {
   // Render the home page with a title
   res.status(200).render('index', { title: 'Riff Quest' });

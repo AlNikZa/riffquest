@@ -1,3 +1,5 @@
+// services/globalTokenService.js
+
 // Get Spotify API credentials from environment variables
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;

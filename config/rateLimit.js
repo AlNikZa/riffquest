@@ -1,4 +1,5 @@
 // config/rateLimit.js
+
 // -------------------------------------------------------------
 // Rate Limiting Configuration
 // - Defines middleware to limit repeated requests

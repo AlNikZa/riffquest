@@ -1,3 +1,5 @@
+// validators/loginValidator.js
+
 import { query } from 'express-validator';
 
 export const loginCallbackValidator = [

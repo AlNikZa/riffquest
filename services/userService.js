@@ -1,3 +1,5 @@
+// services/userService.js
+
 import User from '../models/User.js';
 import { encrypt } from '../services/cryptoService.js';
 

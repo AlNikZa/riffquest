@@ -1,3 +1,5 @@
+// middleware/noCacheMiddleware.js
+
 export const noCacheMiddleware = (req, res, next) => {
   // Regex pattern to match static file extensions (images, CSS, JS, fonts, sourcemaps)
   const staticFileRegex =
