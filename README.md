@@ -109,6 +109,7 @@ RiffQuest/
 │   └── logoutController.js
 │
 ├── middleware/
+│   ├── artistMiddleware.js
 │   ├── csrf.js
 │   ├── devMiddleware.js
 │   ├── errorHandler.js
@@ -171,7 +172,7 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-10 directories, 56 files
+10 directories, 57 files
 ```
 
 ## Error Handling

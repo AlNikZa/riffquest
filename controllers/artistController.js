@@ -1,6 +1,5 @@
 import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
 import {
-  getArtistId,
   getArtistTopTracks,
   getArtistAlbums,
   getArtistInfo,
@@ -11,34 +10,23 @@ import { AppError } from '../middleware/errorHandler.js';
 
 export const artistTopTracksController = async (req, res, next) => {
   try {
-    const token = getTokenOrThrowNewAppError();
-
-    const artist = req.query.artist;
-
-    if (!artist) {
-      return next(new AppError('Please provide an artist name.', 400));
-    }
-
-    // Get artist ID from Spotify API
-    const artistId = await getArtistId(artist, token);
-    if (!artistId) {
-      return next(new AppError(`Artist "${artist}" not found.`, 404));
-    }
+    const artistName = req.query.artist;
+    const { token, artistId } = req;
 
     // Fetch top tracks for the artist
     const topTracks = await getArtistTopTracks(artistId, token);
     if (!topTracks || topTracks.length === 0) {
       return next(
-        new AppError(`No top tracks found for artist "${artist}".`, 404)
+        new AppError(`No top tracks found for artist "${artistName}".`, 404)
       );
     }
 
     // Render the top tracks page with dynamic title
     res.status(200).render('artistTopTracks', {
       topTracks,
-      artist: topTracks[0]?.artist || artist || 'Unknown Artist',
+      artist: topTracks[0]?.artist || artistName || 'Unknown Artist',
       title: `The Best Of ${
-        topTracks[0]?.artist || artist || 'Unknown Artist'
+        topTracks[0]?.artist || artistName || 'Unknown Artist'
       }`,
     });
   } catch (err) {
@@ -48,31 +36,24 @@ export const artistTopTracksController = async (req, res, next) => {
 
 export const artistAlbumsController = async (req, res, next) => {
   try {
-    const token = getTokenOrThrowNewAppError();
-
-    const artist = req.query.artist;
-
-    if (!artist) {
-      return next(new AppError('Please provide an artist name.', 400));
-    }
-
-    // Get artist ID from Spotify API
-    const artistId = await getArtistId(artist, token);
-    if (!artistId) {
-      return next(new AppError(`Artist "${artist}" not found.`, 404));
-    }
+    const artistName = req.query.artist;
+    const { token, artistId } = req;
 
     // Fetch all albums for the artist
     const albums = await getArtistAlbums(artistId, token);
     if (!albums || albums.length === 0) {
-      return next(new AppError(`No albums found for artist "${artist}".`, 404));
+      return next(
+        new AppError(`No albums found for artist "${artistName}".`, 404)
+      );
     }
 
     // Render the albums page with dynamic title and artist info
     res.status(200).render('artistAlbums', {
       albums,
-      artist: albums[0]?.artist || artist || 'Unknown Artist',
-      title: `All albums of ${albums[0]?.artist || artist || 'Unknown Artist'}`,
+      artist: albums[0]?.artist || artistName || 'Unknown Artist',
+      title: `All albums of ${
+        albums[0]?.artist || artistName || 'Unknown Artist'
+      }`,
     });
   } catch (err) {
     next(err); //  Forward error to global error handler
@@ -81,31 +62,22 @@ export const artistAlbumsController = async (req, res, next) => {
 
 export const artistProfileController = async (req, res, next) => {
   try {
-    const token = getTokenOrThrowNewAppError();
-
-    const artist = req.query.artist;
-
-    if (!artist) {
-      return next(new AppError('Please provide an artist name.', 400));
-    }
-
-    // Get artist ID from Spotify API
-    const artistId = await getArtistId(artist, token);
-    if (!artistId) {
-      return next(new AppError(`Artist "${artist}" not found.`, 404));
-    }
+    const artistName = req.query.artist;
+    const { token, artistId } = req;
 
     // Fetch full artist information
     const artistData = await getArtistInfo(artistId, token);
     if (!artistData) {
-      return next(new AppError(`No data found for artist "${artist}".`, 404));
+      return next(
+        new AppError(`No data found for artist "${artistName}".`, 404)
+      );
     }
 
     // Render the artist profile page with dynamic title
     res.status(200).render('artistInfo', {
       artistData,
       title: `${
-        artistData?.name || artist || 'Unknown Artist'
+        artistData?.name || artistName || 'Unknown Artist'
       } - Artist Profile`,
     });
   } catch (err) {

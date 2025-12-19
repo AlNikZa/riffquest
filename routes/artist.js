@@ -7,6 +7,7 @@ import {
 } from '../validators/searchValidator.js';
 import { handleValidationErrors } from '../middleware/validationHandler.js';
 import { checkCsrfToken } from '../middleware/csrf.js';
+import { getTokenAndArtistIdMiddleware } from '../middleware/artistMiddleware.js';
 import {
   artistTopTracksController,
   artistAlbumsController,
@@ -24,6 +25,7 @@ router.get(
   '/artists/top-tracks',
   artistQueryValidator,
   handleValidationErrors,
+  getTokenAndArtistIdMiddleware,
   artistTopTracksController
 );
 
@@ -34,6 +36,7 @@ router.get(
   '/artists/albums',
   artistQueryValidator,
   handleValidationErrors,
+  getTokenAndArtistIdMiddleware,
   artistAlbumsController
 );
 
@@ -44,6 +47,7 @@ router.get(
   '/artists/profile',
   artistQueryValidator,
   handleValidationErrors,
+  getTokenAndArtistIdMiddleware,
   artistProfileController
 );
 
