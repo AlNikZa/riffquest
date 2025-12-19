@@ -42,19 +42,15 @@ export const loginCallbackController = async (req, res, next) => {
 
   // Validate state parameter (protects against OAuth CSRF)
   if (!state || state !== req.session.oauthState) {
-    console.error('OAuth state mismatch:', {
-      expected: req.session.oauthState,
-      received: state,
-    });
-
     return next(
       new AppError('Invalid OAuth state. Please try logging in again.', 403)
     );
   }
 
-  // If no authorization code is provided, return a 400 Bad Request
   if (!code) {
-    return next(new AppError('Authorization code missing', 400));
+    return res
+      .status(302)
+      .redirect(getReturnToCookie(req) || req.get('Referer') || baseUrl || '/');
   }
 
   try {

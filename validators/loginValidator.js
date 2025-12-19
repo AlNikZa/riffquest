@@ -2,8 +2,7 @@ import { query } from 'express-validator';
 
 export const loginCallbackValidator = [
   query('code')
-    .exists()
-    .withMessage('Authorization code is missing')
+    .optional()
     .isString()
     .withMessage('Authorization code must be a string')
     .trim(),
