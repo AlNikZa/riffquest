@@ -1,5 +1,7 @@
 // controllers/devController.js
 
+import { exec } from 'child_process';
+
 import mongoose from 'mongoose';
 
 import { generateFileTreeString, countNodes } from '../services/devService.js';
@@ -106,10 +108,22 @@ export const getCommitsController = async (req, res, next) => {
 
       if (data.length === 0) break;
 
-      const filteredData = data.map((commit) => ({
-        date: commit.commit.committer.date,
-        message: commit.commit.message,
-      }));
+      const filteredData = data.map((item) => {
+        const lines = item.commit.message.split('\n');
+
+        const subject = lines[0].trim();
+
+        const bodyArray = lines
+          .slice(1)
+          .map((line) => line.trim().replace(/^[-*]\s*/, ''))
+          .filter((line) => line.length > 0);
+
+        return {
+          date: item.commit.committer.date,
+          subject: subject,
+          body: bodyArray,
+        };
+      });
 
       commits.push(...filteredData);
 
@@ -146,5 +160,58 @@ export const getCommitsController = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+const getWorkingDiff = () => {
+  return new Promise((resolve, reject) => {
+    exec('git diff', (error, stdout, stderr) => {
+      if (error) {
+        return reject(`❌ Greška: ${stderr || error.message}`);
+      }
+      resolve(stdout); // stdout sadrži diff kao string
+    });
+  });
+};
+
+export const getDiffController = async (req, res, next) => {
+  try {
+    const diffText = await getWorkingDiff();
+
+    // Ako želite čist tekst u browseru:
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(`
+      <html>
+        <head>
+          <style>
+            body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 20px; }
+            pre { white-space: pre-wrap; word-wrap: break-word; }
+            .addition { color: #3fb950; }
+            .deletion { color: #f85149; }
+            .header { color: #58a6ff; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h3>RiffQuest Working Directory Diff</h3>
+          <pre>${diffText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;') // escape HTML
+            .split('\n')
+            .map((line) => {
+              if (line.startsWith('+') && !line.startsWith('+++'))
+                return `<span class="addition">${line}</span>`;
+              if (line.startsWith('-') && !line.startsWith('---'))
+                return `<span class="deletion">${line}</span>`;
+              if (line.startsWith('diff') || line.startsWith('@@'))
+                return `<span class="header">${line}</span>`;
+              return line;
+            })
+            .join('\n')}</pre>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    res.status(500).send(`❌ Greška: ${err.toString()}`);
   }
 };

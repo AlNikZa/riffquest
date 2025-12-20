@@ -10,6 +10,7 @@ import {
   getFileTreeController,
   getDatabaseCollectionController,
   getCommitsController,
+  getDiffController,
 } from '../controllers/devController.js';
 
 const router = express.Router();
@@ -36,10 +37,16 @@ router.get(
 );
 
 router.get(
-  '/dev/commits',
+  '/dev/git/commits',
   isDevelopment,
   checkAdminPassword,
   getCommitsController
+);
+router.get(
+  '/dev/git/diff',
+  isDevelopment,
+  checkAdminPassword,
+  getDiffController
 );
 
 // ====================================================================
