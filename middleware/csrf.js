@@ -2,11 +2,17 @@
 
 import crypto from 'crypto';
 
+import { AppError } from './errorHandler.js';
+
 export const createCsrfToken = (req, res, next) => {
   if (req.method !== 'GET') return next();
   if (!req.session) {
-    console.error('❌ Session not initialized for CSRF token generation');
-    return res.status(500).send('Session not initialized');
+    return next(
+      new AppError(
+        'Security initialization failed. Please refresh the page.',
+        500
+      )
+    );
   }
 
   if (!req.session.csrfToken) {
@@ -20,8 +26,12 @@ export const createCsrfToken = (req, res, next) => {
 
 export const checkCsrfToken = (req, res, next) => {
   if (!req.session) {
-    console.error('❌ Session not initialized for CSRF token validation');
-    return res.status(500).send('Session not initialized');
+    return next(
+      new AppError(
+        'Security initialization failed. Please refresh the page.',
+        500
+      )
+    );
   }
 
   const tokenFromClient =
@@ -30,8 +40,12 @@ export const checkCsrfToken = (req, res, next) => {
   const tokenFromSession = req.session.csrfToken;
 
   if (!tokenFromClient || tokenFromClient !== tokenFromSession) {
-    console.error('❌ CSRF token validation failed');
-    return res.status(403).send('Invalid CSRF token');
+    return next(
+      new AppError(
+        'Your request could not be verified. Please refresh the page and try again.',
+        403
+      )
+    );
   }
 
   next();
