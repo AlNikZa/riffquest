@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = '/';
           } catch (err) {
             console.error('❌ Logout failed: ', err);
+            alert('Logout failed. Please try again.'); // temporary solution, replace with modal or toast.
           }
         },
         { once: true }

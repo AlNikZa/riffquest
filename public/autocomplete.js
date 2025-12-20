@@ -44,6 +44,7 @@ function initAutocomplete(inputSelector, datalistSelector) {
       });
     } catch (err) {
       console.error('❌ Autocomplete fetch failed:', err);
+      // TODO: Notify the user that suggestions could not be loaded (e.g., toast or inline message)
     }
   };
 
