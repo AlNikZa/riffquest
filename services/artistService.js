@@ -1,77 +1,105 @@
 // services/artistService.js
 
+import { AppError } from '../middleware/errorHandler.js';
+
+/* ----------------- checkSpotifyResponse -----------------
+   Helper function to handle Spotify API responses.
+   Throws AppError for common Spotify-level errors (401, 429, other failures).
+   Successful responses (response.ok) simply pass through.
+   Errors are intentionally thrown to be caught by the global error handler.
+---------------------------------------------------------- */
+
+const checkSpotifyResponse = (response) => {
+  if (response.ok) return;
+
+  if (response.status === 401)
+    throw new AppError('Spotify authorization failed.', 401);
+
+  if (response.status === 429)
+    throw new AppError(
+      'Spotify rate limit exceeded. Please try again later.',
+      429
+    );
+
+  throw new AppError('Failed to fetch data from Spotify.', response.status);
+};
+
 /* -------------------- getArtistId --------------------
    Search for an artist by name and return the Spotify artist ID.
    Returns null if no matching artist is found.
------------------------------------------------------- */
+   Errors are intentionally not caught here so they can propagate to the global error handler; 
+   only valid "not found" cases return null.
+   ------------------------------------------------------ */
 export const getArtistId = async (artist, TOKEN) => {
-  try {
-    // Make a search request to Spotify API for the artist
-    const response = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-        artist
-      )}&type=artist&limit=1`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } }
-    );
-    const data = await response.json();
+  // Make a search request to Spotify API for the artist
+  const response = await fetch(
+    `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+      artist
+    )}&type=artist&limit=1`,
+    { headers: { Authorization: `Bearer ${TOKEN}` } }
+  );
 
-    if (!data.artists.items.length) return null; // no artist found
+  checkSpotifyResponse(response);
 
-    const foundArtist = data.artists.items[0];
+  const data = await response.json();
 
-    // Function to normalize names for comparison (remove accents, lowercase, remove non-alphanumeric chars)
-    const normalize = (str) =>
-      str
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '')
-        .replace(/^(the|a|an)/, '');
+  if (!data.artists?.items?.length) return null; // no artist found
 
-    // Check if the normalized artist name includes the search term
-    if (!normalize(foundArtist.name).includes(normalize(artist))) return null;
+  const foundArtist = data.artists.items[0];
 
-    return foundArtist.id; // return Spotify artist ID
-  } catch (err) {
-    console.error('❌ Error in getArtistId function: ', err);
-    return null;
-  }
+  // Function to normalize names for comparison (remove accents, lowercase, remove non-alphanumeric chars)
+  const normalize = (str) =>
+    str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/^(the|a|an)/, '');
+
+  // Check if the normalized artist name includes the search term
+  if (!normalize(foundArtist.name).includes(normalize(artist))) return null;
+
+  return foundArtist.id; // return Spotify artist ID
 };
 
 /* ----------------- getArtistTopTracks -----------------
    Fetch top tracks for an artist by artist ID.
    Returns an array of simplified track objects.
+   Errors are intentionally not caught here so they can propagate to the global error handler; 
+   only valid "not found" cases return [].
 ------------------------------------------------------ */
 export const getArtistTopTracks = async (artistId, TOKEN) => {
-  try {
-    const response = await fetch(
-      `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } }
-    );
-    const data = await response.json();
+  const response = await fetch(
+    `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`,
+    { headers: { Authorization: `Bearer ${TOKEN}` } }
+  );
 
-    const songsAllData = data.tracks;
+  checkSpotifyResponse(response);
 
-    // Extract only the relevant info for each track
-    const extractedSongsData = songsAllData.map((song) => {
-      return {
-        artist: song.artists[0].name,
-        album: song.album.name,
-        name: song.name,
-        year: song.album.release_date.slice(0, 4),
-        image: song.album.images[2]?.url || song.album.images[0]?.url || null,
-        url: song.external_urls.spotify,
-        href: song.href,
-        id: song.id,
-        popularity: song.popularity,
-      };
-    });
+  const data = await response.json();
 
-    return extractedSongsData;
-  } catch (err) {
-    console.error('❌ Error in getArtistTopTracks function: ', err);
-    throw err;
+  if (!data?.tracks?.length) {
+    return [];
   }
+
+  const songsAllData = data.tracks;
+
+  // Extract only the relevant info for each track
+  const extractedSongsData = songsAllData.map((song) => {
+    return {
+      artist: song.artists[0].name || 'Unknown Artist',
+      album: song.album.name || 'Unknown Album',
+      name: song.name,
+      year: song.album.release_date.slice(0, 4) || null,
+      image: song.album.images[2]?.url || song.album.images[0]?.url || null,
+      url: song.external_urls.spotify,
+      href: song.href,
+      id: song.id,
+      popularity: song.popularity,
+    };
+  });
+
+  return extractedSongsData;
 };
 
 /* ------------------ getAlbumDuration ------------------
@@ -90,6 +118,16 @@ const getAlbumDuration = async (albumId, TOKEN) => {
         `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=${limit}&offset=${offset}`,
         { headers: { Authorization: `Bearer ${TOKEN}` } }
       );
+
+      if (!response.ok) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn(
+            `Could not fetch album tracks for ${albumId}: ${response.status}`
+          );
+        }
+        return 'Unknown'; // fail quietly
+      }
+
       const data = await response.json();
       allTracks = allTracks.concat(data.items);
 
@@ -114,7 +152,6 @@ const getAlbumDuration = async (albumId, TOKEN) => {
       ? `${hours}:${minutesStr}:${secondsStr}`
       : `${minutesStr}:${secondsStr}`;
   } catch (err) {
-    console.error('❌ Error in getAlbumDuration function: ', err);
     return 'Unknown'; // fallback duration
   }
 };
@@ -122,73 +159,80 @@ const getAlbumDuration = async (albumId, TOKEN) => {
 /* ------------------ getArtistAlbums -------------------
    Fetch all albums for an artist by artist ID.
    Returns an array of album objects with additional info including duration.
+   Errors are intentionally not caught here so they can propagate to the global error handler;
+   only valid "not found" cases (artist has no albums) return an empty array.
 ------------------------------------------------------ */
 export const getArtistAlbums = async (artistId, TOKEN) => {
-  try {
-    let albums = [];
-    let offset = 0;
-    const limit = 50;
-    let hasMore = true;
+  let albums = [];
+  let offset = 0;
+  const limit = 50;
+  let hasMore = true;
 
-    while (hasMore) {
-      const response = await fetch(
-        `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album&limit=${limit}&offset=${offset}`,
-        { headers: { Authorization: `Bearer ${TOKEN}` } }
-      );
-      const data = await response.json();
-
-      if (!data.items || data.items.length === 0) {
-        hasMore = false;
-      } else {
-        // For each album, calculate its total duration
-        const extractedAlbumsData = await Promise.all(
-          data.items.map(async (album) => {
-            const albumDuration = await getAlbumDuration(album.id, TOKEN);
-            return {
-              artist: album.artists[0].name,
-              album: album.name,
-              year: album.release_date.slice(0, 4),
-              image: album.images[1]?.url,
-              id: album.id,
-              popularity: album.popularity,
-              url: album.external_urls.spotify,
-              duration: albumDuration,
-            };
-          })
-        );
-
-        albums = albums.concat(extractedAlbumsData);
-        offset += limit;
-      }
-    }
-
-    // Sort albums chronologically
-    albums.sort((a, b) => Number(a.year) - Number(b.year));
-
-    return albums;
-  } catch (err) {
-    console.error('❌ Error in getArtistAlbums function: ', err);
-    throw err;
-  }
-};
-
-export const getArtistInfo = async (artistId, TOKEN) => {
-  try {
+  while (hasMore) {
     const response = await fetch(
-      `https://api.spotify.com/v1/artists/${artistId}`,
+      `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album&limit=${limit}&offset=${offset}`,
       { headers: { Authorization: `Bearer ${TOKEN}` } }
     );
+
+    checkSpotifyResponse(response);
+
     const data = await response.json();
 
-    return data;
-  } catch (err) {
-    console.error('❌ Error in getArtistInfo function: ', err);
-    throw err;
+    if (!data.items || data.items.length === 0) {
+      hasMore = false;
+    } else {
+      // For each album, calculate its total duration
+      const extractedAlbumsData = await Promise.all(
+        data.items.map(async (album) => {
+          const albumDuration = await getAlbumDuration(album.id, TOKEN);
+          return {
+            artist: album.artists[0].name,
+            album: album.name,
+            year: album.release_date.slice(0, 4),
+            image: album.images[1]?.url,
+            id: album.id,
+            popularity: album.popularity,
+            url: album.external_urls.spotify,
+            duration: albumDuration,
+          };
+        })
+      );
+
+      albums = albums.concat(extractedAlbumsData);
+      offset += limit;
+    }
   }
+
+  // Sort albums chronologically
+  albums.sort((a, b) => Number(a.year) - Number(b.year));
+
+  return albums;
 };
+
+/* ------------------- getArtistInfo --------------------
+   Fetch full artist information (genres, followers, images, etc.) by artist ID.
+   Returns the full Spotify artist object or null if no data is returned.
+   Errors propagate to the global error handler for central management.
+------------------------------------------------------ */
+export const getArtistInfo = async (artistId, TOKEN) => {
+  const response = await fetch(
+    `https://api.spotify.com/v1/artists/${artistId}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` } }
+  );
+
+  checkSpotifyResponse(response);
+
+  const data = await response.json();
+
+  if (!data) return null;
+
+  return data;
+};
+
 /* ------------------- getArtistsList --------------------
    Fetch a list of artists from Spotify matching the search query.
    Returns an array of artist names (or full artist objects if needed).
+   Fail quietly: network or API errors return an empty array.
 -------------------------------------------------------- */
 export const getArtistsList = async (query, TOKEN) => {
   try {
@@ -198,11 +242,15 @@ export const getArtistsList = async (query, TOKEN) => {
       )}&type=artist&limit=5`,
       { headers: { Authorization: `Bearer ${TOKEN}` } }
     );
+
+    if (!response.ok) {
+      return [];
+    }
+
     const data = await response.json();
 
     return data.artists?.items?.map((artist) => artist.name) || [];
-  } catch (err) {
-    console.error('❌ Error in getArtistsList function: ', err);
-    throw err;
+  } catch (error) {
+    return [];
   }
 };
