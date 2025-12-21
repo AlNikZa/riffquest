@@ -124,8 +124,8 @@ export const artistAutocompleteController = async (req, res, next) => {
   try {
     const token = getTokenOrThrowNewAppError();
 
-    // Read the search query from the request body
-    const query = req.body.query?.trim();
+    // Read the search query from the request query
+    const query = req.query.query?.trim();
     if (!query) return res.status(200).json([]); // return empty array if no query provided
 
     // Call helper function to fetch artist list from Spotify API

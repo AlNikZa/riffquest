@@ -23,14 +23,15 @@ function initAutocomplete(inputSelector, datalistSelector) {
     if (!query) return; // Do nothing if input is empty
 
     try {
-      const response = await fetch('/artists/autocomplete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-csrf-token': window.csrfToken,
-        },
-        body: JSON.stringify({ query }),
-      });
+      const response = await fetch(
+        `/artists/autocomplete?query=${encodeURIComponent(query)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       const artists = await response.json(); // parse JSON array
       // Clear previous options

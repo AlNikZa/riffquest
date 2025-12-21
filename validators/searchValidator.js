@@ -1,6 +1,6 @@
 // validators/searchValidator.js
 
-import { query, body } from 'express-validator';
+import { query } from 'express-validator';
 import { AppError } from '../middleware/errorHandler.js';
 
 const REGEX = /^[\p{L}\d\s\-.,!?'"()&:/+]+$/u;
@@ -46,8 +46,8 @@ export const trackQueryValidator = validate('track');
 /* ---------------- Autocomplete Validator ------------------ */
 /* ----------------------------------------------------------- */
 // Validates the request body for POST /artists/autocomplete
-export const autocompleteBodyValidator = [
-  body('query')
+export const autocompleteQueryValidator = [
+  query('query')
     .trim() // remove leading/trailing whitespace
     .notEmpty()
     .withMessage('Search query is required.')

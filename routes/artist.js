@@ -4,7 +4,7 @@ import express from 'express';
 
 import {
   artistQueryValidator,
-  autocompleteBodyValidator,
+  autocompleteQueryValidator,
   redirectQueryValidator,
 } from '../validators/searchValidator.js';
 import { handleValidationErrors } from '../middleware/validationHandler.js';
@@ -65,10 +65,9 @@ router.get(
 /* -------------------------------------------------------------------- */
 /* ------------------- Artist Input Suggestions -------------------- */
 /* -------------------------------------------------------------------- */
-router.post(
+router.get(
   '/artists/autocomplete',
-  checkCsrfToken,
-  autocompleteBodyValidator,
+  autocompleteQueryValidator,
   handleValidationErrors,
   artistAutocompleteController
 );
