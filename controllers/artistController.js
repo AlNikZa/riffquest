@@ -122,7 +122,7 @@ export const artistRedirectController = (req, res, next) => {
 
 export const artistAutocompleteController = async (req, res, next) => {
   try {
-    const token = getTokenOrThrowNewAppError();
+    const token = await getTokenOrThrowNewAppError();
 
     // Read the search query from the request query
     const query = req.query.query?.trim();

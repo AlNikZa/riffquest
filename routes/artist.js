@@ -8,7 +8,6 @@ import {
   redirectQueryValidator,
 } from '../validators/searchValidator.js';
 import { handleValidationErrors } from '../middleware/validationHandler.js';
-import { checkCsrfToken } from '../middleware/csrf.js';
 import { getTokenAndArtistIdMiddleware } from '../middleware/artistMiddleware.js';
 import {
   artistTopTracksController,

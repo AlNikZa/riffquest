@@ -6,7 +6,7 @@ import { AppError } from '../middleware/errorHandler.js';
 
 export const getTokenAndArtistIdMiddleware = async (req, res, next) => {
   try {
-    const token = getTokenOrThrowNewAppError();
+    const token = await getTokenOrThrowNewAppError();
     const artistName = req.query.artist;
 
     if (!artistName) {
