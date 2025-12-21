@@ -1,10 +1,12 @@
 // controllers/devController.js
 
-import { exec } from 'child_process';
-
 import mongoose from 'mongoose';
 
-import { generateFileTreeString, countNodes } from '../services/devService.js';
+import {
+  generateFileTreeString,
+  countNodes,
+  getWorkingDiff,
+} from '../services/devService.js';
 
 export const getAllRoutesListController = async (req, res) => {
   // Dynamic import prevents production crashes as this package is in devDependencies
@@ -163,28 +165,16 @@ export const getCommitsController = async (req, res, next) => {
   }
 };
 
-const getWorkingDiff = () => {
-  return new Promise((resolve, reject) => {
-    exec('git diff', (error, stdout, stderr) => {
-      if (error) {
-        return reject(`❌ Greška: ${stderr || error.message}`);
-      }
-      resolve(stdout); // stdout sadrži diff kao string
-    });
-  });
-};
-
 export const getDiffController = async (req, res, next) => {
   try {
     const diffText = await getWorkingDiff();
 
-    // Ako želite čist tekst u browseru:
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(`
       <html>
         <head>
           <style>
-            body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 20px; }
+            body { background: #edeff3ff; color: #1b1c1dff; font-family: monospace; padding: 20px; }
             pre { white-space: pre-wrap; word-wrap: break-word; }
             .addition { color: #3fb950; }
             .deletion { color: #f85149; }
@@ -212,6 +202,6 @@ export const getDiffController = async (req, res, next) => {
       </html>
     `);
   } catch (err) {
-    res.status(500).send(`❌ Greška: ${err.toString()}`);
+    res.status(500).send(`❌ Error: ${err.toString()}`);
   }
 };

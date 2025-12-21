@@ -1,7 +1,7 @@
 // services/devService.js
 
 import fs from 'fs';
-import { execSync } from 'child_process';
+import { exec, execSync } from 'child_process';
 
 const getFileDates = (filePath) => {
   try {
@@ -154,4 +154,15 @@ export const generateFileTreeString = (treeObject, showDates = true) => {
   });
 
   return output;
+};
+
+export const getWorkingDiff = () => {
+  return new Promise((resolve, reject) => {
+    exec('git diff', (error, stdout, stderr) => {
+      if (error) {
+        return reject(`❌ Error: ${stderr || error.message}`);
+      }
+      resolve(stdout);
+    });
+  });
 };
