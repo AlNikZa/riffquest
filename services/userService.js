@@ -3,6 +3,8 @@
 import User from '../models/User.js';
 import { encrypt } from '../services/cryptoService.js';
 
+import { AppError } from '../middleware/errorHandler.js';
+
 export const getUserData = async (userAccessToken) => {
   try {
     const response = await fetch('https://api.spotify.com/v1/me', {
@@ -10,11 +12,16 @@ export const getUserData = async (userAccessToken) => {
         Authorization: `Bearer ${userAccessToken}`,
       },
     });
+
+    if (!response.ok) {
+      throw new AppError('Failed to fetch user data', response.status);
+    }
+
     const data = await response.json();
     return data;
   } catch (err) {
-    console.error('❌ Error in getUserData function: ', err);
-    throw err;
+    if (err instanceof AppError) throw err;
+    throw new AppError('Internal error fetching user data', 500);
   }
 };
 
@@ -25,7 +32,6 @@ export const upsertSpotifyUser = async (userDoc) => {
       access_token: userDoc.access_token, // Update access token
       refresh_token: userDoc.refresh_token, // Update refresh token
       token_expires_in: userDoc.token_expires_in, // Update token expiry
-      // token_created_timestamp: userDoc.token_created_timestamp, // Update token creation time
       display_name: userDoc.display_name, // Update display name
       profile_img: userDoc.profileImg,
       followers: userDoc.followers, // Update followers count
@@ -49,7 +55,7 @@ export const upsertSpotifyUser = async (userDoc) => {
       }
     );
   } catch (err) {
-    console.error('❌ Error in upsertSpotifyUser function: ', err); // Log any errors
+    throw new AppError('Database error during user upsert', 500);
   }
 };
 //
@@ -67,7 +73,7 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
       }
     );
   } catch (err) {
-    console.error('❌ Error in updateSpotifyUser function: ', err); // Log any errors
+    throw new AppError('Database error during token update', 500);
   }
 };
 
