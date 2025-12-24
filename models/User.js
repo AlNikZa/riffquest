@@ -34,8 +34,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    // Using Number instead of Date to store Unix timestamp in milliseconds.
+    // This allows for direct mathematical operations (addition/comparison)
+    // during token expiration checks in the middleware without object conversion overhead.
     token_created_timestamp: {
-      type: Date,
+      type: Number,
       default: null,
     },
   },

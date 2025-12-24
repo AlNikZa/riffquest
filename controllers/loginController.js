@@ -10,8 +10,8 @@ import {
   upsertSpotifyUser,
   getUserDocObject,
 } from '../services/userService.js';
-import { decrypt } from '../services/cryptoService.js';
-import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
+// import { decrypt } from '../services/cryptoService.js';
+// import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
 
 import { AppError } from '../middleware/errorHandler.js';
 
@@ -35,14 +35,14 @@ export const loginCallbackController = async (req, res, next) => {
       ? process.env.BASE_URL_PROD
       : process.env.BASE_URL_DEV;
 
-  // If user canceled Spotify login, redirect back to previous page or home
+  // 1. Handle user cancellation
   if (error === 'access_denied') {
     return res
       .status(302)
       .redirect(getReturnToCookie(req) || req.get('Referer') || baseUrl || '/');
   }
 
-  // Validate state parameter (protects against OAuth CSRF)
+  // 2. Security Check: Validate state parameter
   if (!state || state !== req.session.oauthState) {
     return next(
       new AppError('Invalid OAuth state. Please try logging in again.', 403)
@@ -56,34 +56,32 @@ export const loginCallbackController = async (req, res, next) => {
   }
 
   try {
-    // Exchange the authorization code for access and refresh tokens
+    // 3. Exchange the authorization code for access and refresh tokens
     // The function handles both production and development redirect URIs
     const userTokens = await exchangeCodeForToken(
       code,
       process.env.NODE_ENV === 'production'
     );
 
+    // 4. Get user profile from Spotify
     const userData = await getUserData(userTokens.access_token);
 
+    // 5. Prepare document for database
     const userDoc = getUserDocObject(userTokens, userData);
 
-    try {
-      await upsertSpotifyUser(userDoc);
-      scheduleUserTokenRefresh(
-        userDoc.spotify_user_id,
-        decrypt(userDoc.refresh_token)
-      );
-    } catch (err) {
-      return next(err);
-    }
+    // 6. Persist user and tokens to MongoDB
+    await upsertSpotifyUser(userDoc);
 
+    // 7. Establish application session
     req.session.spotify_user_id = userDoc.spotify_user_id;
     req.session.username = userDoc.display_name;
     req.session.userImg = userDoc.profileImg;
     req.session.justLoggedIn = true;
 
+    // Cleanup sensitive state
     delete req.session.oauthState;
 
+    // 8. Finalize session and redirect
     req.session.save((err) => {
       if (err) {
         return next(err);

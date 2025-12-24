@@ -5,6 +5,15 @@ import { encrypt } from '../services/cryptoService.js';
 
 import { AppError } from '../middleware/errorHandler.js';
 
+export const getUserById = async (spotify_user_id) => {
+  try {
+    const user = await User.findOne({ spotify_user_id });
+    return user;
+  } catch (err) {
+    throw new AppError('Database error while fetching user', 500);
+  }
+};
+
 export const getUserData = async (userAccessToken) => {
   try {
     const response = await fetch('https://api.spotify.com/v1/me', {
@@ -44,7 +53,6 @@ export const upsertSpotifyUser = async (userDoc) => {
         $set: updateFields,
         $setOnInsert: {
           spotify_user_id: userDoc.spotify_user_id,
-          // user_created_timestamp: userDoc.user_created_timestamp,
         },
       },
 

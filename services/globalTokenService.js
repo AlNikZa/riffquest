@@ -30,7 +30,9 @@ const fetchNewToken = async (clientId, clientSecret) => {
 
     if (!result.ok) {
       const errorResponse = await result.json();
-      console.error('❌ Spotify Auth Error:', errorResponse);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('❌ Spotify Auth Error:', errorResponse);
+      }
 
       throw new AppError(
         `Spotify Auth failed: ${

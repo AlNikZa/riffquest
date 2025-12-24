@@ -29,6 +29,7 @@ import {
   globalErrorHandler,
 } from './middleware/errorHandler.js';
 import { noCacheMiddleware } from './middleware/noCacheMiddleware.js';
+import { ensureValidUserToken } from './middleware/userTokenMiddleware.js';
 
 // Import services needed before handling any requests
 import { initToken } from './services/globalTokenService.js';
@@ -66,6 +67,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmetConfig);
 // Session management
 app.use(sessionInit());
+// Ensures that the user's Spotify access token is valid and refreshed
+app.use(ensureValidUserToken);
 // Global rate limiting
 app.use(generalLimiter);
 // Prevent caching of dynamic pages (skip static files automatically)

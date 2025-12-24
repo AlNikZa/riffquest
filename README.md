@@ -116,6 +116,7 @@ RiffQuest/
 │   ├── noCacheMiddleware.js
 │   ├── returnTo.js
 │   ├── userSession.js
+│   ├── userTokenMiddleware.js
 │   └── validationHandler.js
 │
 ├── models/
@@ -172,7 +173,7 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-10 directories, 57 files
+10 directories, 58 files
 ```
 
 ## Error Handling
