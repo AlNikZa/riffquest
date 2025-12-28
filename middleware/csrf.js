@@ -2,7 +2,7 @@
 
 import crypto from 'crypto';
 
-import { AppError } from './errorHandler.js';
+import { AppError } from '../AppError.js';
 
 export const createCsrfToken = (req, res, next) => {
   if (req.method !== 'GET') return next();

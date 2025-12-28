@@ -2,7 +2,7 @@
 
 import { getArtistId } from '../services/artistService.js';
 import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 export const getTokenAndArtistIdMiddleware = async (req, res, next) => {
   try {

@@ -2,8 +2,9 @@
 
 import User from '../models/User.js';
 import { encrypt } from '../services/cryptoService.js';
+import { checkSpotifyResponse } from './foreignApiHelpers.js';
 
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 export const getUserById = async (spotify_user_id) => {
   try {
@@ -22,9 +23,7 @@ export const getUserData = async (userAccessToken) => {
       },
     });
 
-    if (!response.ok) {
-      throw new AppError('Failed to fetch user data', response.status);
-    }
+    checkSpotifyResponse(response);
 
     const data = await response.json();
     return data;

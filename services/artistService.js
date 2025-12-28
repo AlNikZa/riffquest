@@ -1,28 +1,12 @@
 // services/artistService.js
 
-import { AppError } from '../middleware/errorHandler.js';
-
+import { checkSpotifyResponse } from './foreignApiHelpers.js';
 /* ----------------- checkSpotifyResponse -----------------
    Helper function to handle Spotify API responses.
    Throws AppError for common Spotify-level errors (401, 429, other failures).
    Successful responses (response.ok) simply pass through.
    Errors are intentionally thrown to be caught by the global error handler.
 ---------------------------------------------------------- */
-
-const checkSpotifyResponse = (response) => {
-  if (response.ok) return;
-
-  if (response.status === 401)
-    throw new AppError('Spotify authorization failed.', 401);
-
-  if (response.status === 429)
-    throw new AppError(
-      'Spotify rate limit exceeded. Please try again later.',
-      429
-    );
-
-  throw new AppError('Failed to fetch data from Spotify.', response.status);
-};
 
 /* -------------------- getArtistId --------------------
    Search for an artist by name and return the Spotify artist ID.

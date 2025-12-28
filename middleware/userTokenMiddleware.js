@@ -27,8 +27,8 @@ export const ensureValidUserToken = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // If refresh fails, the user will likely receive a 401 on the API call,
-    // which is preferable to crashing the entire application here
-    next();
+    // If token refresh fails, the error handler will destroy the session
+    // and prompt the user to log in again.
+    next(error);
   }
 };

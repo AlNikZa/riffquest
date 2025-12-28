@@ -13,7 +13,7 @@ import {
 // import { decrypt } from '../services/cryptoService.js';
 // import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
 
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 export const loginController = (req, res, next) => {
   try {

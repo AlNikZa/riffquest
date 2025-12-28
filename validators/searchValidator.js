@@ -1,7 +1,7 @@
 // validators/searchValidator.js
 
 import { query } from 'express-validator';
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 const REGEX = /^[\p{L}\d\s\-.,!?'"()&:/+]+$/u;
 

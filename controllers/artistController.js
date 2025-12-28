@@ -8,7 +8,7 @@ import {
   getArtistsList,
 } from '../services/artistService.js';
 
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 export const artistTopTracksController = async (req, res, next) => {
   try {

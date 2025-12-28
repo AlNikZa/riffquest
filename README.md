@@ -142,6 +142,7 @@ RiffQuest/
 │   ├── artistService.js
 │   ├── cryptoService.js
 │   ├── devService.js
+│   ├── foreignApiHelpers.js
 │   ├── globalTokenService.js
 │   ├── loginService.js
 │   ├── userService.js
@@ -169,11 +170,12 @@ RiffQuest/
 │
 ├── .env.example
 ├── app.js
+├── AppError.js
 ├── package.json
 ├── Procfile
 └── server.js
 
-10 directories, 58 files
+10 directories, 60 files
 ```
 
 ## Error Handling

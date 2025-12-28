@@ -1,17 +1,7 @@
 // middleware/errorHandler.js
 
-// appError class to create operational errors
-export class AppError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-
-    this.statusCode = statusCode;
-    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-    this.isOperational = true;
-
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+import { AppError } from '../AppError.js';
+import { removeTokensForUser } from '../services/userTokenService.js';
 
 // 404 handler
 // This middleware is executed if no route above matches the request
@@ -29,8 +19,13 @@ const getViewContext = (req, res) => ({
 
 // Global error handler
 // This middleware will catch errors thrown in async routes or anywhere else
-export const globalErrorHandler = (err, req, res, next) => {
+export const globalErrorHandler = async (err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
   err.statusCode = err.statusCode || 500;
+
   console.error(
     `❌ ${err.status || 'error'}: ${err.statusCode} Global error handler: ${
       err.message
@@ -40,6 +35,45 @@ export const globalErrorHandler = (err, req, res, next) => {
   const isProd = process.env.NODE_ENV === 'production';
   if (!isProd) {
     console.error(err.stack);
+  }
+
+  // Handle 401 errors by removing tokens and destroying session
+  if (err.statusCode === 401) {
+    try {
+      const userId = req.session?.spotify_user_id;
+
+      if (userId) await removeTokensForUser(userId);
+
+      if (req.session) {
+        await new Promise((resolve) => {
+          req.session.destroy(() => {
+            const isLocal = process.env.NODE_ENV !== 'production';
+            res.clearCookie('riffQuestSessionId', {
+              path: '/',
+              secure: !isLocal,
+              sameSite: isLocal ? 'lax' : 'none',
+              httpOnly: true,
+            });
+            resolve();
+          });
+        });
+      }
+
+      return res.status(401).render('error', {
+        title: 'Session Expired',
+        message:
+          'Your Spotify session has expired. Please log in again to continue.',
+        statusCode: 401,
+        ...getViewContext(req, res),
+      });
+    } catch (error) {
+      return res.status(500).render('error', {
+        title: 'Error',
+        message: 'An error occurred while processing your request.',
+        statusCode: 500,
+        ...getViewContext(req, res),
+      });
+    }
   }
 
   // If it is 404 → render noResultsFound.ejs

@@ -1,6 +1,6 @@
 // services/globalTokenService.js
 
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 // Get Spotify API credentials from environment variables
 const clientId = process.env.CLIENT_ID;

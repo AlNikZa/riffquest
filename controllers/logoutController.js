@@ -2,7 +2,7 @@
 
 import { removeTokensForUser } from '../services/userTokenService.js';
 import { getReturnToCookie } from '../services/loginService.js';
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
 
 export const logoutController = async (req, res, next) => {
   if (!req.session?.spotify_user_id) {

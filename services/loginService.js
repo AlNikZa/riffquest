@@ -2,7 +2,8 @@
 
 import crypto from 'crypto';
 
-import { AppError } from '../middleware/errorHandler.js';
+import { AppError } from '../AppError.js';
+import { checkSpotifyResponse } from './foreignApiHelpers.js';
 
 export function buildSpotifyAuthUrl(req) {
   // const scope = 'user-read-private user-read-email';
@@ -71,12 +72,7 @@ export async function exchangeCodeForToken(code, isProduction) {
     body: params.toString(), // send parameters in URL-encoded format
   });
 
-  if (!response.ok) {
-    throw new AppError(
-      'Failed to log in with Spotify. Please try again.',
-      Number(response.status) || 500
-    );
-  }
+  checkSpotifyResponse(response);
 
   // Parse the JSON response containing the tokens
   const data = await response.json();
