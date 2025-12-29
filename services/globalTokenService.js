@@ -111,7 +111,6 @@ export const getTokenOrThrowNewAppError = async () => {
 export const initToken = async () => {
   try {
     await fetchNewToken(clientId, clientSecret);
-    console.log('✅ Token fetched successfully at startup');
   } catch (err) {
     console.warn(
       '⚠️ Initial token fetch failed. Will retry on first user request.'

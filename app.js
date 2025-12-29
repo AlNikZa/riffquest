@@ -31,9 +31,6 @@ import {
 import { noCacheMiddleware } from './middleware/noCacheMiddleware.js';
 import { ensureValidUserToken } from './middleware/userTokenMiddleware.js';
 
-// Import services needed before handling any requests
-import { initToken } from './services/globalTokenService.js';
-
 // Application routes
 import homeRoutes from './routes/home.js';
 import artistRoutes from './routes/artist.js';
@@ -79,10 +76,6 @@ app.use(setReturnToCookie);
 app.use(userSessionMiddleware);
 // CSRF token generator for GET routes
 app.use(createCsrfToken);
-
-// Initialize the global Spotify API token before handling any requests
-// This ensures the token is available for all routes and services
-await initToken();
 
 // Register application routes
 app.use(homeRoutes);
