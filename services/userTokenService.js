@@ -34,19 +34,15 @@ export const refreshUserToken = async (refresh_token) => {
 };
 
 export const removeTokensForUser = async (spotify_user_id) => {
-  try {
-    await User.updateOne(
-      { spotify_user_id: spotify_user_id },
-      {
-        $unset: {
-          access_token: '',
-          refresh_token: '',
-          token_expires_in: '',
-          token_created_timestamp: '',
-        },
-      }
-    );
-  } catch (err) {
-    throw err;
-  }
+  await User.updateOne(
+    { spotify_user_id: spotify_user_id },
+    {
+      $unset: {
+        access_token: '',
+        refresh_token: '',
+        token_expires_in: '',
+        token_created_timestamp: '',
+      },
+    }
+  );
 };

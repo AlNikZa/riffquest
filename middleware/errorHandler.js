@@ -38,7 +38,7 @@ export const globalErrorHandler = async (err, req, res, next) => {
   }
 
   // Handle 401 errors by removing tokens and destroying session
-  if (err.statusCode === 401) {
+  if (err.statusCode === 401 && err.isOperational) {
     try {
       const userId = req.session?.spotify_user_id;
 
