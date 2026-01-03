@@ -98,9 +98,9 @@ export const getCommitsController = async (req, res, next) => {
 
     let page = 1;
     let commits = [];
+    const perPage = 100;
 
     while (commits.length < limit) {
-      const perPage = Math.min(100, limit - commits.length);
       const apiUrl =
         `https://api.github.com/repos/${username}/${repo}/commits` +
         `?sha=${branchName}&per_page=${perPage}&page=${page}`;
