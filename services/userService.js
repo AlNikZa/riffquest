@@ -36,6 +36,7 @@ export const getUserData = async (userAccessToken) => {
 export const upsertSpotifyUser = async (userDoc) => {
   try {
     // Prepare only the fields to update for an existing user
+    // NOTE: access_token and refresh_token are expected to be already encrypted
     const updateFields = {
       access_token: userDoc.access_token, // Update access token
       refresh_token: userDoc.refresh_token, // Update refresh token
@@ -62,6 +63,7 @@ export const upsertSpotifyUser = async (userDoc) => {
       }
     );
   } catch (err) {
+    if (err instanceof AppError) throw err;
     throw new AppError('Database error during user upsert', 500);
   }
 };
@@ -80,23 +82,28 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
       }
     );
   } catch (err) {
+    if (err instanceof AppError) throw err;
     throw new AppError('Database error during token update', 500);
   }
 };
 
 export const getUserDocObject = (userTokens, userData) => {
-  const encryptedAccessToken = encrypt(userTokens.access_token);
-  const encryptedRefreshToken = encrypt(userTokens.refresh_token);
+  try {
+    const encryptedAccessToken = encrypt(userTokens.access_token);
+    const encryptedRefreshToken = encrypt(userTokens.refresh_token);
 
-  const userDoc = {
-    access_token: encryptedAccessToken,
-    refresh_token: encryptedRefreshToken,
-    token_expires_in: userTokens.expires_in,
-    display_name: userData.display_name,
-    profileImg: userData.images?.[0]?.url || null,
-    followers: userData.followers?.total || 0,
-    spotify_user_id: userData.id,
-  };
+    const userDoc = {
+      access_token: encryptedAccessToken,
+      refresh_token: encryptedRefreshToken,
+      token_expires_in: userTokens.expires_in,
+      display_name: userData.display_name,
+      profileImg: userData.images?.[0]?.url || null,
+      followers: userData.followers?.total || 0,
+      spotify_user_id: userData.id,
+    };
 
-  return userDoc;
+    return userDoc;
+  } catch (error) {
+    throw new AppError('Failed to prepare secure user data object', 500);
+  }
 };

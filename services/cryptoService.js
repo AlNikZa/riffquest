@@ -1,28 +1,35 @@
 // services/cryptoService.js
 
 import crypto from 'crypto';
+import { AppError } from '../AppError.js';
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 const IV_LENGTH = 16;
 
-if (!ENCRYPTION_KEY || Buffer.from(ENCRYPTION_KEY).length !== 32) {
+if (!ENCRYPTION_KEY) {
+  throw new Error('FATAL: ENCRYPTION_KEY environment variable is missing.');
+}
+if (Buffer.byteLength(ENCRYPTION_KEY, 'utf8') !== 32) {
   throw new Error(
-    'FATAL: ENCRYPTION_KEY environment variable must be exactly 32 characters long.'
+    `FATAL: ENCRYPTION_KEY must be 32 bytes (currently ${Buffer.byteLength(
+      ENCRYPTION_KEY,
+      'utf8'
+    )} bytes).`
   );
 }
 
 // --- Encrypting ---
 
 export const encrypt = (stringToBeEncrypted) => {
-  try {
-    if (typeof stringToBeEncrypted !== 'string') {
-      throw new Error('Data to be encrypted must be a string.');
-    }
+  if (typeof stringToBeEncrypted !== 'string') {
+    throw new AppError('Encryption failed: input must be a string.', 500);
+  }
 
+  try {
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv(
       'aes-256-cbc',
-      Buffer.from(ENCRYPTION_KEY),
+      Buffer.from(ENCRYPTION_KEY, 'utf8'),
       iv
     );
 
@@ -35,24 +42,21 @@ export const encrypt = (stringToBeEncrypted) => {
 
     return result;
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Encryption failed:', error.message);
-    }
-    throw error;
+    throw new AppError('Failed to encrypt sensitive data.', 500);
   }
 };
 
 // --- Decrypting ---
 
 export const decrypt = (stringToBeDecrypted) => {
-  try {
-    if (!stringToBeDecrypted || typeof stringToBeDecrypted !== 'string') {
-      return null;
-    }
+  if (!stringToBeDecrypted || typeof stringToBeDecrypted !== 'string') {
+    return null;
+  }
 
+  try {
     const encryptedData = Buffer.from(stringToBeDecrypted, 'base64');
     if (encryptedData.length < IV_LENGTH) {
-      throw new Error('Invalid encrypted data format.');
+      throw new AppError('Decryption failed: invalid data.', 500);
     }
 
     const ivFromResult = encryptedData.slice(0, IV_LENGTH);
@@ -60,7 +64,7 @@ export const decrypt = (stringToBeDecrypted) => {
 
     const decipher = crypto.createDecipheriv(
       'aes-256-cbc',
-      Buffer.from(ENCRYPTION_KEY),
+      Buffer.from(ENCRYPTION_KEY, 'utf8'),
       ivFromResult
     );
 
@@ -69,12 +73,18 @@ export const decrypt = (stringToBeDecrypted) => {
       decipher.final(),
     ]);
 
-    const result = decrypted.toString();
+    const result = decrypted.toString('utf8');
     return result;
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Decryption failed:', error.message);
-    }
-    return null;
+    throw new AppError('Failed to decrypt sensitive data.', 500);
   }
 };
+
+/**
+ * NOTE:
+ * Currently using AES-256-CBC for server-side token encryption.
+ * This is acceptable because ciphertext is never user-controlled.
+ *
+ * Migration to AES-256-GCM (AEAD) is planned during
+ * TypeScript + API-only refactor to gain integrity guarantees.
+ */

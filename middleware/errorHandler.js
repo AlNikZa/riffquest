@@ -9,13 +9,21 @@ export const notFoundHandler = (req, res, next) => {
   next(new AppError('Page Not Found.', 404));
 };
 
-const getViewContext = (req, res) => ({
-  artist: req.query.artist || null,
-  album: req.query.album || null,
-  track: req.query.track || null,
-  csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
-  nonce: res.locals.nonce || req.nonce || null,
-});
+const getViewContext = (req, res) => {
+  let csrf;
+  try {
+    csrf = typeof req.csrfToken === 'function' ? req.csrfToken() : null;
+  } catch (e) {
+    csrf = null;
+  }
+  return {
+    artist: req.query.artist || null,
+    album: req.query.album || null,
+    track: req.query.track || null,
+    csrfToken: csrf,
+    nonce: res.locals.nonce || req.nonce || null,
+  };
+};
 
 // Global error handler
 // This middleware will catch errors thrown in async routes or anywhere else

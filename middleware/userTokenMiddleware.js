@@ -19,6 +19,8 @@ export const ensureValidUserToken = async (req, res, next) => {
 
     if (isNearlyExpired) {
       const decryptedRefresh = decrypt(user.refresh_token);
+      if (!decryptedRefresh) throw new Error('Failed to decrypt refresh token');
+
       const newTokens = await refreshUserToken(decryptedRefresh);
 
       // 3. Update the database (this replaces the previous setTimeout logic)
@@ -27,8 +29,10 @@ export const ensureValidUserToken = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // If token refresh fails, the error handler will destroy the session
-    // and prompt the user to log in again.
+    if (error.message.includes('decrypt')) {
+      error.statusCode = 401;
+      error.isOperational = true;
+    }
     next(error);
   }
 };
