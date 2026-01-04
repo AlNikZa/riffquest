@@ -50,13 +50,13 @@ export const encrypt = (stringToBeEncrypted) => {
 
 export const decrypt = (stringToBeDecrypted) => {
   if (!stringToBeDecrypted || typeof stringToBeDecrypted !== 'string') {
-    return null;
+    throw new AppError('Invalid session data: No token provided.', 401);
   }
 
   try {
     const encryptedData = Buffer.from(stringToBeDecrypted, 'base64');
     if (encryptedData.length < IV_LENGTH) {
-      throw new AppError('Decryption failed: invalid data.', 500);
+      throw new AppError('Decryption failed: invalid token format.', 401);
     }
 
     const ivFromResult = encryptedData.slice(0, IV_LENGTH);
@@ -76,7 +76,7 @@ export const decrypt = (stringToBeDecrypted) => {
     const result = decrypted.toString('utf8');
     return result;
   } catch (error) {
-    throw new AppError('Failed to decrypt sensitive data.', 500);
+    throw new AppError('Session decryption failed. Please log in again.', 401);
   }
 };
 

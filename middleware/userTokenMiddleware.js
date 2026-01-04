@@ -19,7 +19,6 @@ export const ensureValidUserToken = async (req, res, next) => {
 
     if (isNearlyExpired) {
       const decryptedRefresh = decrypt(user.refresh_token);
-      if (!decryptedRefresh) throw new Error('Failed to decrypt refresh token');
 
       const newTokens = await refreshUserToken(decryptedRefresh);
 
@@ -29,10 +28,6 @@ export const ensureValidUserToken = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (error.message.includes('decrypt')) {
-      error.statusCode = 401;
-      error.isOperational = true;
-    }
     next(error);
   }
 };

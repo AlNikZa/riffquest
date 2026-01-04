@@ -10,8 +10,6 @@ import {
   upsertSpotifyUser,
   getUserDocObject,
 } from '../services/userService.js';
-// import { decrypt } from '../services/cryptoService.js';
-// import { scheduleUserTokenRefresh } from '../services/userTokenService.js';
 
 import { AppError } from '../AppError.js';
 
