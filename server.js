@@ -16,8 +16,11 @@ import './config/env.js';
 // Import the pre-configured Express application
 import app from './app.js';
 
-// Import MongoDB connection configuration
-import mongoose from './config/db.js';
+// Import mongoose to manage MongoDB connection during shutdown
+import mongoose from 'mongoose';
+
+// Import connectDB to establish MongoDB connection
+import connectDB from './config/db.js';
 
 // Import services that must be ready before the server starts
 import { initToken } from './services/globalTokenService.js';
@@ -30,7 +33,7 @@ import { initToken } from './services/globalTokenService.js';
 async function startServer() {
   try {
     // 1. Ensure MongoDB connection is fully established before starting the server
-    await mongoose.connection.asPromise();
+    await connectDB();
     console.log('📦 DB Connected');
 
     // 2. Service Initialization: Fetch initial Spotify Client Credentials token
@@ -47,7 +50,7 @@ async function startServer() {
         process.env.NODE_ENV = 'development';
       console.log(
         emoji,
-        `Running in ${process.env.NODE_ENV.toUpperCase()} MODE.`
+        ` Running in ${process.env.NODE_ENV.toUpperCase()} MODE.`
       );
     });
 
