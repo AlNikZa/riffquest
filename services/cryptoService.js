@@ -1,22 +1,12 @@
 // services/cryptoService.js
 
+import { config } from '../config/env.js';
+
 import crypto from 'crypto';
 import { AppError } from '../AppError.js';
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+const ENCRYPTION_KEY = config.encryptionKey; // Must be 32 bytes for aes-256
 const IV_LENGTH = 16;
-
-if (!ENCRYPTION_KEY) {
-  throw new Error('FATAL: ENCRYPTION_KEY environment variable is missing.');
-}
-if (Buffer.byteLength(ENCRYPTION_KEY, 'utf8') !== 32) {
-  throw new Error(
-    `FATAL: ENCRYPTION_KEY must be 32 bytes (currently ${Buffer.byteLength(
-      ENCRYPTION_KEY,
-      'utf8'
-    )} bytes).`
-  );
-}
 
 // --- Encrypting ---
 
