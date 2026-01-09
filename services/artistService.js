@@ -1,5 +1,7 @@
 // services/artistService.js
 
+import { config } from '../config/env.js';
+
 import { checkSpotifyResponse } from './foreignApiHelpers.js';
 /* ----------------- checkSpotifyResponse -----------------
    Helper function to handle Spotify API responses.
@@ -104,7 +106,7 @@ const getAlbumDuration = async (albumId, TOKEN) => {
       );
 
       if (!response.ok) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (!config.isProd) {
           console.warn(
             `Could not fetch album tracks for ${albumId}: ${response.status}`
           );

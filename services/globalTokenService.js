@@ -1,10 +1,12 @@
 // services/globalTokenService.js
 
+import { config } from '../config/env.js';
+
 import { AppError } from '../AppError.js';
 
-// Get Spotify API credentials from environment variables
-const clientId = process.env.CLIENT_ID;
-const clientSecret = process.env.CLIENT_SECRET;
+// Get Spotify API credentials from configuration object
+const clientId = config.spotify.clientId;
+const clientSecret = config.spotify.clientSecret;
 
 let TOKEN = null;
 let TOKEN_EXPIRES_AT = 0; // timestamp in MS
@@ -30,7 +32,7 @@ const fetchNewToken = async (clientId, clientSecret) => {
 
     if (!result.ok) {
       const errorResponse = await result.json();
-      if (process.env.NODE_ENV !== 'production') {
+      if (!config.isProd) {
         console.error('❌ Spotify Auth Error:', errorResponse);
       }
 
@@ -50,7 +52,7 @@ const fetchNewToken = async (clientId, clientSecret) => {
 
     return TOKEN;
   } catch (err) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (!config.isProd) {
       console.error('❌ Spotify Token Service Error:', err);
     }
 

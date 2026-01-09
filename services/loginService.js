@@ -1,5 +1,7 @@
 // services/loginService.js
 
+import { config } from '../config/env.js';
+
 import crypto from 'crypto';
 
 import { AppError } from '../AppError.js';
@@ -10,11 +12,6 @@ export function buildSpotifyAuthUrl(req) {
   const scope =
     'playlist-read-private playlist-read-collaborative user-top-read user-library-read';
 
-  const redirect_uri =
-    process.env.NODE_ENV === 'production'
-      ? process.env.REDIRECT_URI_PROD
-      : process.env.REDIRECT_URI_DEV;
-
   // Generate a secure random state token
   const state = crypto.randomBytes(16).toString('hex');
 
@@ -24,10 +21,10 @@ export function buildSpotifyAuthUrl(req) {
   // Build query string using URLSearchParams (modern alternative to querystring)
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: process.env.CLIENT_ID,
+    client_id: config.spotify.clientId,
     scope: scope,
     state: state,
-    redirect_uri: redirect_uri,
+    redirect_uri: config.spotify.redirectUri,
     show_dialog: true, // Ensures user can choose a different Spotify account
   });
 
@@ -42,19 +39,11 @@ export async function exchangeCodeForToken(code, isProduction) {
   if (!code)
     throw new AppError('Failed to log in with Spotify. Please try again.', 400);
 
-  // Determine redirect URI based on environment
-  // Must match the redirect URI used in /auth/login route
-  // Use environment-specific redirect URI
-  // Use environment-specific redirect URI
-  const redirect_uri = isProduction
-    ? process.env.REDIRECT_URI_PROD
-    : process.env.REDIRECT_URI_DEV;
-
   // Build POST parameters for the token exchange request
   const params = new URLSearchParams({
     grant_type: 'authorization_code', // required by Spotify
     code: code, // the code received from Spotify login
-    redirect_uri: redirect_uri, // must match /auth/login
+    redirect_uri: config.spotify.redirectUri, // must match /auth/login
   });
 
   // Make a POST request to Spotify Accounts API to exchange code for tokens
@@ -66,7 +55,7 @@ export async function exchangeCodeForToken(code, isProduction) {
       Authorization:
         'Basic ' +
         Buffer.from(
-          `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
+          `${config.spotify.clientId}:${config.spotify.clientSecret}`
         ).toString('base64'),
     },
     body: params.toString(), // send parameters in URL-encoded format

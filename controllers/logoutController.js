@@ -1,5 +1,7 @@
 // controllers/logoutController.js
 
+import { config } from '../config/env.js';
+
 import { removeTokensForUser } from '../services/userTokenService.js';
 import { getReturnToCookie } from '../services/loginService.js';
 import { AppError } from '../AppError.js';
@@ -23,11 +25,10 @@ export const logoutController = async (req, res, next) => {
       return next(new AppError('Error destroying session', 500));
     } else {
       //   Clear the session cookie from the browser
-      const isLocal = process.env.BASE_URL_DEV === 'http://127.0.0.1:3000';
       res.clearCookie('riffQuestSessionId', {
         path: '/',
-        secure: !isLocal,
-        sameSite: isLocal ? 'lax' : 'none',
+        secure: config.isProd,
+        sameSite: config.isProd ? 'none' : 'lax',
         httpOnly: true,
       });
 

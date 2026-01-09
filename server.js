@@ -11,7 +11,7 @@
 // -----------------------------------------------------------------------------
 
 // // Load environment variables
-import './config/env.js';
+import { config } from './config/env.js';
 
 // Import the pre-configured Express application
 import app from './app.js';
@@ -41,16 +41,15 @@ async function startServer() {
     console.log('🔑 Spotify Global Token Initialized');
 
     // 3. Start Listening: Launch the HTTP server
-    const PORT = process.env.PORT || 3000;
-    const server = app.listen(PORT, () => {
-      console.log(`📡 Server started on port ${PORT}`);
 
-      const emoji = process.env.NODE_ENV === 'production' ? '🚀' : '🛠️';
-      if (process.env.NODE_ENV !== 'production')
-        process.env.NODE_ENV = 'development';
+    const server = app.listen(config.port, () => {
+      console.log(`📡 Server started on port ${config.port}`);
+
+      const emoji = config.isProd ? '🚀' : '🛠️';
+
       console.log(
         emoji,
-        ` Running in ${process.env.NODE_ENV.toUpperCase()} MODE.`
+        ` Running in ${config.environment.toUpperCase()} MODE.`
       );
     });
 
@@ -66,7 +65,7 @@ async function startServer() {
       const forceExit = setTimeout(() => {
         console.error('⌛  Forcefully shutting down due to timeout');
         process.exit(1);
-      }, 10000);
+      }, 1000 * 10);
 
       // Close the HTTP server
       server.close(async () => {

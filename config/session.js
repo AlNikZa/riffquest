@@ -8,14 +8,14 @@
  * Action: Add 'proxy: !isLocal' to the session config object.
  */
 
+import { config } from './env.js';
+
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 
-const isLocal = process.env.NODE_ENV !== 'production';
-
 export const sessionInit = () => {
   const store = MongoStore.create({
-    mongoUrl: `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_CLUSTER}.${process.env.MONGO_HOST}.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`,
+    mongoUrl: config.mongo.uri,
     collectionName: 'sessions',
     ttl: 24 * 60 * 60, // = 86400 seconds = 1 day
     autoRemove: 'native',
@@ -27,15 +27,15 @@ export const sessionInit = () => {
 
   return session({
     name: 'riffQuestSessionId',
-    secret: process.env.SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: store,
     cookie: {
       path: '/',
       maxAge: 1000 * 60 * 60 * 24,
-      secure: !isLocal, // true on Render, false locally
-      sameSite: isLocal ? 'lax' : 'none',
+      secure: config.isProd, // true on Render, false locally
+      sameSite: config.isProd ? 'none' : 'lax',
       httpOnly: true,
     },
     rolling: true,

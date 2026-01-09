@@ -1,5 +1,7 @@
 // middleware/errorHandler.js
 
+import { config } from '../config/env.js';
+
 import { AppError } from '../AppError.js';
 import { removeTokensForUser } from '../services/userTokenService.js';
 
@@ -40,8 +42,7 @@ export const globalErrorHandler = async (err, req, res, next) => {
     }`
   );
 
-  const isProd = process.env.NODE_ENV === 'production';
-  if (!isProd) {
+  if (!config.isProd) {
     console.error(err.stack);
   }
 
@@ -55,11 +56,10 @@ export const globalErrorHandler = async (err, req, res, next) => {
       if (req.session) {
         await new Promise((resolve) => {
           req.session.destroy(() => {
-            const isLocal = process.env.NODE_ENV !== 'production';
             res.clearCookie('riffQuestSessionId', {
               path: '/',
-              secure: !isLocal,
-              sameSite: isLocal ? 'lax' : 'none',
+              secure: config.isProd,
+              sameSite: config.isProd ? 'none' : 'lax',
               httpOnly: true,
             });
             resolve();

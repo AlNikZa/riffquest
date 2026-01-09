@@ -1,5 +1,7 @@
 // middleware/returnTo.js
 
+import { config } from '../config/env.js';
+
 export const setReturnToCookie = (req, res, next) => {
   if (
     req.method === 'GET' &&
@@ -33,13 +35,11 @@ export const setReturnToCookie = (req, res, next) => {
     }
     const currentURL = req.protocol + '://' + host + req.originalUrl;
 
-    const isProd = process.env.NODE_ENV === 'production';
-
     res.cookie('returnTo', currentURL, {
       httpOnly: true,
-      maxAge: 6000 * 1000,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
+      maxAge: 60 * 60 * 1000,
+      secure: config.isProd,
+      sameSite: config.isProd ? 'none' : 'lax',
     });
   }
   next();

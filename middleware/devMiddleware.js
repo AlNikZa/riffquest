@@ -1,16 +1,18 @@
 // middleware/devMiddleware.js
 
+import { config } from '../config/env.js';
+
 import { notFoundHandler } from '../middleware/errorHandler.js';
 
 export const isDevelopment = (req, res, next) => {
-  if (process.env.NODE_ENV === 'production') {
+  if (config.isProd) {
     return notFoundHandler(req, res, next);
   }
   next();
 };
 
 export const checkAdminPassword = (req, res, next) => {
-  const expectedPassword = process.env.ADMIN_PASSWORD;
+  const expectedPassword = config.adminPassword;
 
   const submittedPassword = req.header('x-admin-pass');
 

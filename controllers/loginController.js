@@ -1,5 +1,7 @@
 // controllers/loginController.js
 
+import { config } from '../config/env.js';
+
 import {
   buildSpotifyAuthUrl,
   exchangeCodeForToken,
@@ -27,17 +29,13 @@ export const loginCallbackController = async (req, res, next) => {
   // Extract authorization code and error from Spotify's redirect query parameters
   const { code, error, state } = req.query;
 
-  // Determine base URL based on environment (production or development)
-  const baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? process.env.BASE_URL_PROD
-      : process.env.BASE_URL_DEV;
-
   // 1. Handle user cancellation
   if (error === 'access_denied') {
     return res
       .status(302)
-      .redirect(getReturnToCookie(req) || req.get('Referer') || baseUrl || '/');
+      .redirect(
+        getReturnToCookie(req) || req.get('Referer') || config.appBaseUrl || '/'
+      );
   }
 
   // 2. Security Check: Validate state parameter
@@ -50,16 +48,15 @@ export const loginCallbackController = async (req, res, next) => {
   if (!code) {
     return res
       .status(302)
-      .redirect(getReturnToCookie(req) || req.get('Referer') || baseUrl || '/');
+      .redirect(
+        getReturnToCookie(req) || req.get('Referer') || config.appBaseUrl || '/'
+      );
   }
 
   try {
     // 3. Exchange the authorization code for access and refresh tokens
     // The function handles both production and development redirect URIs
-    const userTokens = await exchangeCodeForToken(
-      code,
-      process.env.NODE_ENV === 'production'
-    );
+    const userTokens = await exchangeCodeForToken(code, config.isProd);
 
     // 4. Get user profile from Spotify
     const userData = await getUserData(userTokens.access_token);
@@ -86,14 +83,17 @@ export const loginCallbackController = async (req, res, next) => {
       }
       res.clearCookie('returnTo', {
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: config.isProd,
+        sameSite: config.isProd ? 'none' : 'lax',
       });
 
       res
         .status(302)
         .redirect(
-          getReturnToCookie(req) || req.get('Referer') || baseUrl || '/'
+          getReturnToCookie(req) ||
+            req.get('Referer') ||
+            config.appBaseUrl ||
+            '/'
         );
     });
   } catch (error) {

@@ -1,20 +1,21 @@
 // services/userTokenService.js
 
+import { config } from '../config/env.js';
+
 import User from '../models/User.js';
 
 import { checkSpotifyResponse } from '../services/foreignApiHelpers.js';
 
 export const refreshUserToken = async (refresh_token) => {
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       Authorization:
         'Basic ' +
-        Buffer.from(`${clientId}:${clientSecret}`).toString('base64'),
+        Buffer.from(
+          `${config.spotify.clientId}:${config.spotify.clientSecret}`
+        ).toString('base64'),
     },
     body: new URLSearchParams({
       grant_type: 'refresh_token',
