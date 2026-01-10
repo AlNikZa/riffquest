@@ -20,49 +20,93 @@ export const helmetConfig = (req, res, next) => {
   helmet({
     contentSecurityPolicy: {
       directives: {
-        // Allow same-origin requests by default
+        // default-src: Fallback for all other fetch directives.
+        // 'self' restricts content to the same origin as the application.
         defaultSrc: ["'self'"],
 
-        // Scripts: own domain, inline scripts (for EJS templates), Bootstrap JS CDN
+        // script-src: Specifies valid sources for JavaScript.
+        // - 'self': Fallback for older browsers; ignored by modern browsers when 'strict-dynamic' is supported.
+        // - nonce: Allows specific inline <script> tags that match the generated nonce.
+        // - 'strict-dynamic': Allows scripts loaded by trusted scripts (with nonce) to load other scripts.
+        // - jsdelivr: Explicitly allows the Bootstrap JS CDN.
         scriptSrc: [
           "'self'",
-          `'nonce-${nonce}'`, // Allow inline scripts with this nonce
-          'https://cdn.jsdelivr.net', // Bootstrap JS CDN
+          `'nonce-${nonce}'`,
+          "'strict-dynamic'",
+          'https://cdn.jsdelivr.net',
         ],
 
-        // Styles: own domain, inline styles, Bootstrap CSS, Google Fonts
+        // frame-ancestors: Restricts which origins can embed this site in an iframe.
+        frameAncestors: ["'self'"],
+
+        // style-src: Specifies valid sources for CSS stylesheets.
+        // - 'self': Own stylesheets (e.g., custom.css).
+        // - nonce: Inline styles with matching nonce.
+        // - jsdelivr: Bootstrap CSS CDN.
+        // - googleapis: External Google Fonts CSS.
         styleSrc: [
           "'self'",
-          `'nonce-${nonce}'`, // inline style nonce
-          'https://cdn.jsdelivr.net', // Bootstrap CSS CDN
-          'https://fonts.googleapis.com', // Google Fonts CSS
+          `'nonce-${nonce}'`,
+          'https://cdn.jsdelivr.net',
+          'https://fonts.googleapis.com',
         ],
 
-        // Fonts: own domain, Bootstrap CDN, Google Fonts
+        // font-src: Specifies valid sources for web fonts.
+        // - fonts.gstatic.com: Actual font files served by Google.
         fontSrc: [
           "'self'",
           'https://cdn.jsdelivr.net',
-          'https://fonts.gstatic.com', // Google Fonts font files
+          'https://fonts.gstatic.com',
         ],
 
-        // Images: own domain, base64 images, Spotify images
-        imgSrc: [
-          "'self'",
-          'data:',
-          'https://i.scdn.co', // Spotify images
-        ],
+        // img-src: Specifies valid sources for images.
+        // - data:: Allows Base64 encoded images (often used for icons).
+        // - i.scdn.co: Spotify's Content Delivery Network (CDN) for artist/album art.
+        imgSrc: ["'self'", 'data:', 'https://i.scdn.co'],
 
-        // Frames / iframes: Spotify embeds
+        // frame-src: Specifies valid sources for nested browsing contexts (iframes).
+        // - spotify.com: Necessary to allow the Spotify Embedded Player to load.
         frameSrc: ["'self'", 'https://open.spotify.com'],
 
-        // AJAX / fetch / WebSocket connections: own domain, CDN, Spotify API
+        // connect-src: Limits the origins to which you can send AJAX requests (Fetch/XHR).
+        // - spotify.com: Allows frontend interaction with Spotify's API if needed.
         connectSrc: [
           "'self'",
           'https://cdn.jsdelivr.net',
-          'https://api.spotify.com', // Spotify API calls
+          'https://api.spotify.com',
         ],
+        // object-src: Disables plugins like Flash, Java, or Silverlight to reduce attack surface.
+        objectSrc: ["'none'"],
+        // base-uri: Restricts the URLs which can be used in a document's <base> element.
+        // This prevents 'Base Tag Hijacking' where an attacker redirects relative links.
+        baseUri: ["'self'"],
+        // upgrade-insecure-requests: Instructs browsers to treat all HTTP URLs as HTTPS.
+        // Essential for production environments on platforms like Render.
+        upgradeInsecureRequests: [],
       },
     },
+    // Permissions-Policy: Restricts use of browser features/APIs.
+    // Setting these to 'none' ensures that even if an XSS occurs, the attacker
+    // cannot access hardware like the camera or microphone.
+    permissionsPolicy: {
+      features: {
+        camera: ["'none'"],
+        microphone: ["'none'"],
+        geolocation: ["'none'"],
+        payment: ["'none'"],
+        usb: ["'none'"],
+      },
+    },
+    // Referrer-Policy: Controls how much referrer information is included with requests.
+    // 'strict-origin-when-cross-origin' protects user privacy by only sending the domain,
+    // not the full URL path, when moving from your site to another.
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    // x-xss-protection: Legacy header for older browsers to stop pages from loading when
+    // reflected XSS attacks are detected.
+    xssFilter: true,
+    // x-content-type-options: Prevents 'MIME-type sniffing', forcing the browser to
+    // respect the Content-Type header sent by the server.
+    noSniff: true,
   })(req, res, next);
 };
 
@@ -71,5 +115,4 @@ export const helmetConfig = (req, res, next) => {
  * - Adding a CSP reporting endpoint (`report-to` / `report-uri`) to monitor policy violations.
  * - Extending `frameSrc` or `connectSrc` if new external APIs or iframes are added.
  * - Optionally, centralizing nonce generation and CSP configuration for easier maintenance.
- * - Considering additional security HTTP headers that Helmet provides (e.g., `Referrer-Policy`, `Permissions-Policy`).
  */
