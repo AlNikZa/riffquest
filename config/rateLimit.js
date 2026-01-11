@@ -13,7 +13,7 @@ function renderRateLimitError(req, res, title, message) {
 
   res.status(429);
   res.render('error', {
-    status: 429,
+    statusCode: 429,
     title,
     message,
     isLoggedIn,
@@ -22,6 +22,8 @@ function renderRateLimitError(req, res, title, message) {
     artist: null,
     track: null,
     album: null,
+    nonce: res.locals.nonce || null,
+    csrfToken: typeof req.csrfToken === 'function' ? req.csrfToken() : null,
   });
 }
 
