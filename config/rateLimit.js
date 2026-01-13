@@ -58,3 +58,18 @@ export const loginLimiter = rateLimit({
     );
   },
 });
+
+export const devLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 60 minutes
+  max: 10, // max 10 requests per IP
+  standardHeaders: false,
+  legacyHeaders: false,
+  handler: (req, res, next) => {
+    renderRateLimitError(
+      req,
+      res,
+      'Development Rate Limit Exceeded',
+      '🚫 You have made too many requests to the development endpoints. Please wait a while and try again.'
+    );
+  },
+});

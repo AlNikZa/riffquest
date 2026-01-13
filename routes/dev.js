@@ -4,6 +4,7 @@ import express from 'express';
 
 import { isDevelopment } from '../middleware/devMiddleware.js';
 import { checkAdminPassword } from '../middleware/devMiddleware.js';
+import { devLimiter } from '../config/rateLimit.js';
 
 import {
   getAllRoutesListController,
@@ -15,39 +16,15 @@ import {
 
 const router = express.Router();
 
-router.get(
-  '/dev/routes',
-  isDevelopment,
-  checkAdminPassword,
-  getAllRoutesListController
-);
+router.use(isDevelopment);
+router.use(devLimiter);
+router.use(checkAdminPassword);
 
-router.get(
-  '/dev/filetree',
-  isDevelopment,
-  checkAdminPassword,
-  getFileTreeController
-);
-
-router.get(
-  '/dev/db/:collection',
-  isDevelopment,
-  checkAdminPassword,
-  getDatabaseCollectionController
-);
-
-router.get(
-  '/dev/git/commits',
-  isDevelopment,
-  checkAdminPassword,
-  getCommitsController
-);
-router.get(
-  '/dev/git/diff',
-  isDevelopment,
-  checkAdminPassword,
-  getDiffController
-);
+router.get('/dev/routes', getAllRoutesListController);
+router.get('/dev/filetree', getFileTreeController);
+router.get('/dev/db/:collection', getDatabaseCollectionController);
+router.get('/dev/git/commits', getCommitsController);
+router.get('/dev/git/diff', getDiffController);
 
 // ====================================================================
 // SUGGESTIONS FOR FUTURE DEV ROUTES (Prioritized)
