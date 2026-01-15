@@ -58,8 +58,8 @@ app.set('view engine', 'ejs');
 
 // Serve static assets and parse incoming requests
 app.use(express.static(join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Security headers (Helmet)
 app.use(helmetConfig);
