@@ -19,7 +19,7 @@ const getViewContext = (req, res) => {
     csrf = null;
   }
   return {
-    isLoggedIn: !!req.session && req.session.userId,
+    isLoggedIn: !!req.session && req.session.spotify_user_id,
     username: req.session ? req.session.username : null,
     userImg: req.session ? req.session.userImg : null,
     artist: req.query.artist || null,
