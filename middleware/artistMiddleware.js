@@ -6,12 +6,27 @@ import { AppError } from '../AppError.js';
 
 export const getTokenAndArtistIdMiddleware = async (req, res, next) => {
   try {
-    const token = await getTokenOrThrowNewAppError();
-    const artistName = req.query.artist;
+    const rawArtist = req.query.artist;
 
-    if (!artistName) {
+    if (!rawArtist) {
       return next(new AppError('Please provide an artist name.', 400));
     }
+
+    if (typeof rawArtist !== 'string') {
+      return next(
+        new AppError(
+          'Invalid artist format. Only a single search term is allowed.',
+          400,
+        ),
+      );
+    }
+
+    const artistName = rawArtist.trim();
+    if (artistName.length === 0) {
+      return next(new AppError('Artist name cannot be empty.', 400));
+    }
+
+    const token = await getTokenOrThrowNewAppError();
 
     const artistId = await getArtistId(artistName, token);
     if (!artistId) {
