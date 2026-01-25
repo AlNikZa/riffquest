@@ -19,7 +19,7 @@ export const artistTopTracksController = async (req, res, next) => {
     const topTracks = await getArtistTopTracks(artistId, token);
     if (!topTracks || topTracks.length === 0) {
       return next(
-        new AppError(`No top tracks found for artist "${artistName}".`, 404)
+        new AppError(`No top tracks found for artist "${artistName}".`, 404),
       );
     }
 
@@ -42,10 +42,10 @@ export const artistAlbumsController = async (req, res, next) => {
     const { token, artistId } = req;
 
     // Fetch all albums for the artist
-    const albums = await getArtistAlbums(artistId, token);
+    const albums = await getArtistAlbums(artistId, artistName, token);
     if (!albums || albums.length === 0) {
       return next(
-        new AppError(`No albums found for artist "${artistName}".`, 404)
+        new AppError(`No albums found for artist "${artistName}".`, 404),
       );
     }
 
@@ -71,7 +71,7 @@ export const artistProfileController = async (req, res, next) => {
     const artistData = await getArtistInfo(artistId, token);
     if (!artistData) {
       return next(
-        new AppError(`No data found for artist "${artistName}".`, 404)
+        new AppError(`No data found for artist "${artistName}".`, 404),
       );
     }
 
@@ -96,7 +96,7 @@ export const artistRedirectController = (req, res, next) => {
 
   if (!option) {
     return next(
-      new AppError('Please provide an option to be redirected to.', 400)
+      new AppError('Please provide an option to be redirected to.', 400),
     );
   }
 
