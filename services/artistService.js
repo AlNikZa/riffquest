@@ -163,15 +163,12 @@ const getAlbumDuration = async (albumId, TOKEN) => {
    - Conditional fallback duration calculation
 ======================================================= */
 export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
-  console.time(`⏱️ Total time for artist ${artistName}`);
-
   let albumStubs = [];
   let offset = 0;
   const limit = 50;
   let hasMore = true;
 
   // Phase 1: Fetch all album IDs (paginated)
-  console.time('  ↳ Phase 1: Fetching album IDs');
   while (hasMore) {
     const response = await fetch(
       `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album&limit=${limit}&offset=${offset}`,
@@ -188,21 +185,13 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
     else offset += limit;
   }
 
-  console.log(`  ℹ️ Processing artist: ${artistName}`);
-
-  console.timeEnd('  ↳ Phase 1: Fetching album IDs');
-
   // De-duplicate albums by ID
   const originalCount = albumStubs.length;
   albumStubs = Array.from(new Map(albumStubs.map((a) => [a.id, a])).values());
-  console.log(
-    `  ℹ️ Found ${originalCount} items, reduced to ${albumStubs.length} unique albums.`,
-  );
 
   if (albumStubs.length === 0) return [];
 
   // Phase 2: Parallel batch processing
-  console.time('  ↳ Phase 2: Parallel Batch Processing');
 
   // Split albumStubs into chunks of 20 (Spotify API limit)
   const chunks = [];
@@ -230,9 +219,6 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
         if (fullAlbum.tracks.total > fullAlbum.tracks.limit) {
           const startFallback = Date.now();
           duration = await getAlbumDuration(fullAlbum.id, TOKEN);
-          console.log(
-            `    ⚠️ Fallback for "${fullAlbum.name}" took ${Date.now() - startFallback}ms`,
-          );
         } else {
           const totalMs = fullAlbum.tracks.items.reduce(
             (sum, t) => sum + (t.duration_ms || 0),
@@ -265,14 +251,8 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
   // Flattening array of arrays into single albums array
   const allDetailedAlbums = nestedResults.flat();
 
-  console.timeEnd('  ↳ Phase 2: Parallel Batch Processing');
-
   const result = allDetailedAlbums.sort(
     (a, b) => Number(a.year) - Number(b.year),
-  );
-  console.timeEnd(`⏱️ Total time for artist ${artistName}`);
-  console.log(
-    `Number of albums for artist: ${artistName} : ` + allDetailedAlbums.length,
   );
 
   return result;

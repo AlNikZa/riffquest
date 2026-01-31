@@ -42,11 +42,15 @@ export const globalErrorHandler = async (err, req, res, next) => {
   console.error(
     `❌ ${err.status || 'error'}: ${err.statusCode} Global error handler: ${
       err.message
-    }`
+    }`,
   );
 
   if (!config.isProd) {
     console.error(err.stack);
+  }
+
+  if (err.logOnly) {
+    return next();
   }
 
   // Handle 401 errors by removing tokens and destroying session

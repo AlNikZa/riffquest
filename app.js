@@ -65,12 +65,12 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(helmetConfig);
 // Session management
 app.use(sessionInit());
-// Ensures that the user's Spotify access token is valid and refreshed
-app.use(ensureValidUserToken);
-// Global rate limiting
-app.use(generalLimiter);
 // Prevent caching of dynamic pages (skip static files automatically)
 app.use(noCacheMiddleware);
+// Global rate limiting
+app.use(generalLimiter);
+// Ensures that the user's Spotify access token is valid and refreshed
+app.use(ensureValidUserToken);
 // Store current URL for post-login redirect
 app.use(setReturnToCookie);
 // Expose user session data to all views
