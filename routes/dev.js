@@ -16,9 +16,9 @@ import {
 
 const router = express.Router();
 
-router.use(isDevelopment);
-router.use(devLimiter);
-router.use(checkAdminPassword);
+router.use('/dev', isDevelopment);
+router.use('/dev', devLimiter);
+router.use('/dev', checkAdminPassword);
 
 router.get('/dev/routes', getAllRoutesListController);
 router.get('/dev/filetree', getFileTreeController);
