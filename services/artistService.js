@@ -1,8 +1,59 @@
 // services/artistService.js
 
-import { config } from '../config/env.js';
+import axios from 'axios';
 
+import { config } from '../config/env.js';
 import { checkSpotifyResponse } from './foreignApiHelpers.js';
+
+const spotifyFetch = async (
+  url,
+  token,
+  timeout = 8000,
+  retries = 3,
+  retryDelay = 500,
+) => {
+  if (!token) throw new Error('Spotify token is missing');
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout,
+      });
+      const { status, statusText, data, headers } = response;
+
+      return {
+        ok: status >= 200 && status < 300,
+        status,
+        statusText,
+        data,
+        headers: {
+          get: (key) => headers[key.toLowerCase()],
+        },
+      };
+    } catch (err) {
+      // Timeout or network problem
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, retryDelay));
+        continue;
+      }
+
+      // HTTP error
+      if (err.response) {
+        throw new Error(
+          `Spotify API error: ${err.response.status} ${err.response.statusText}`,
+        );
+      }
+
+      // Timeout or network problem
+      if (err.code === 'ECONNABORTED') {
+        throw new Error(`Request timed out after ${timeout}ms: ${url}`);
+      }
+
+      throw new Error(`Spotify fetch failed: ${err.message}`);
+    }
+  }
+};
 
 /* ==================== getArtistId ====================
    Searches Spotify for an artist by name and returns
@@ -16,23 +67,21 @@ import { checkSpotifyResponse } from './foreignApiHelpers.js';
 
 export const getArtistId = async (artist, TOKEN) => {
   // Make a search request to Spotify API for the artist
-  const response = await fetch(
-    `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-      artist,
-    )}&type=artist&limit=1`,
-    { headers: { Authorization: `Bearer ${TOKEN}` } },
+  const response = await spotifyFetch(
+    `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}&type=artist&limit=1`,
+    TOKEN,
   );
 
   checkSpotifyResponse(response);
 
-  const data = await response.json();
+  const data = response.data;
 
   if (!data.artists?.items?.length) return null; // no artist found
 
   const foundArtist = data.artists.items[0];
 
   // Normalize artist names for reliable comparison  (remove accents, lowercase, remove non-alphanumeric chars, remove leading articles (the, a, an))
-  const normalize = (str) =>
+  const normalize = (str = '') =>
     str
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -53,14 +102,14 @@ export const getArtistId = async (artist, TOKEN) => {
    only valid "not found" cases return [].
 ------------------------------------------------------ */
 export const getArtistTopTracks = async (artistId, TOKEN) => {
-  const response = await fetch(
+  const response = await spotifyFetch(
     `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`,
-    { headers: { Authorization: `Bearer ${TOKEN}` } },
+    TOKEN,
   );
 
   checkSpotifyResponse(response);
 
-  const data = await response.json();
+  const data = response.data;
 
   if (!data?.tracks?.length) {
     return [];
@@ -74,7 +123,7 @@ export const getArtistTopTracks = async (artistId, TOKEN) => {
       artist: song.artists[0].name || 'Unknown Artist',
       album: song.album.name || 'Unknown Album',
       name: song.name,
-      year: song.album.release_date.slice(0, 4) || null,
+      year: song.album.release_date?.slice(0, 4) || null,
       image: song.album.images[2]?.url || song.album.images[0]?.url || null,
       url: song.external_urls.spotify,
       href: song.href,
@@ -119,9 +168,10 @@ const getAlbumDuration = async (albumId, TOKEN) => {
     let hasMore = true;
 
     while (hasMore) {
-      const response = await fetch(
+      const response = await spotifyFetch(
         `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=${limit}&offset=${offset}`,
-        { headers: { Authorization: `Bearer ${TOKEN}` } },
+        TOKEN,
+        20000,
       );
 
       if (!response.ok) {
@@ -133,7 +183,7 @@ const getAlbumDuration = async (albumId, TOKEN) => {
         return 'Unknown'; // fail quietly
       }
 
-      const data = await response.json();
+      const data = response.data;
       allTracks = allTracks.concat(data.items);
 
       if (!data.items || data.items.length < limit) hasMore = false;
@@ -162,7 +212,7 @@ const getAlbumDuration = async (albumId, TOKEN) => {
    - Parallel batch fetching (Spotify max 20 IDs)
    - Conditional fallback duration calculation
 ======================================================= */
-export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
+export const getArtistAlbums = async (artistId, TOKEN) => {
   let albumStubs = [];
   let offset = 0;
   const limit = 50;
@@ -170,13 +220,13 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
 
   // Phase 1: Fetch all album IDs (paginated)
   while (hasMore) {
-    const response = await fetch(
+    const response = await spotifyFetch(
       `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album&limit=${limit}&offset=${offset}`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } },
+      TOKEN,
     );
 
     checkSpotifyResponse(response);
-    const data = await response.json();
+    const data = response.data;
 
     if (!data.items?.length) break;
 
@@ -186,7 +236,6 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
   }
 
   // De-duplicate albums by ID
-  const originalCount = albumStubs.length;
   albumStubs = Array.from(new Map(albumStubs.map((a) => [a.id, a])).values());
 
   if (albumStubs.length === 0) return [];
@@ -201,44 +250,50 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
 
   // Map every chunk into Promise (asynchronous operation)
   const batchPromises = chunks.map(async (chunk) => {
-    const ids = chunk.map((a) => a.id).join(',');
+    try {
+      const ids = chunk.map((a) => a.id).join(',');
 
-    const response = await fetch(
-      `https://api.spotify.com/v1/albums?ids=${ids}`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } },
-    );
+      const response = await spotifyFetch(
+        `https://api.spotify.com/v1/albums?ids=${ids}`,
+        TOKEN,
+      );
 
-    checkSpotifyResponse(response);
-    const { albums: detailedChunk } = await response.json();
+      checkSpotifyResponse(response);
+      const { albums: detailedChunk } = response.data;
 
-    // For every album inside detailed batch process data and duration
-    return Promise.all(
-      detailedChunk.filter(Boolean).map(async (fullAlbum) => {
-        let duration;
+      // For every album inside detailed batch process data and duration
+      return Promise.all(
+        detailedChunk.filter(Boolean).map(async (fullAlbum) => {
+          let duration;
 
-        if (fullAlbum.tracks.total > fullAlbum.tracks.limit) {
-          const startFallback = Date.now();
-          duration = await getAlbumDuration(fullAlbum.id, TOKEN);
-        } else {
-          const totalMs = fullAlbum.tracks.items.reduce(
-            (sum, t) => sum + (t.duration_ms || 0),
-            0,
-          );
-          duration = formatAlbumDuration(totalMs);
-        }
+          if (fullAlbum.tracks.total > fullAlbum.tracks.limit) {
+            duration = await getAlbumDuration(fullAlbum.id, TOKEN);
+          } else {
+            const totalMs = fullAlbum.tracks.items.reduce(
+              (sum, t) => sum + (t.duration_ms || 0),
+              0,
+            );
+            duration = formatAlbumDuration(totalMs);
+          }
 
-        return {
-          artist: fullAlbum.artists[0].name,
-          album: fullAlbum.name,
-          year: fullAlbum.release_date.slice(0, 4),
-          image: fullAlbum.images[1]?.url || fullAlbum.images[0]?.url || null,
-          id: fullAlbum.id,
-          popularity: fullAlbum.popularity,
-          url: fullAlbum.external_urls.spotify,
-          duration: duration,
-        };
-      }),
-    );
+          return {
+            artist: fullAlbum.artists[0].name,
+            album: fullAlbum.name,
+            year: fullAlbum.release_date?.slice(0, 4) || null,
+            image: fullAlbum.images[1]?.url || fullAlbum.images[0]?.url || null,
+            id: fullAlbum.id,
+            popularity: fullAlbum.popularity,
+            url: fullAlbum.external_urls.spotify,
+            duration: duration,
+          };
+        }),
+      );
+    } catch (err) {
+      if (!config.isProd) {
+        console.warn('Album batch failed:', err.message);
+      }
+      return [];
+    }
   });
 
   // Waiting for all batches, and their inner processes to finish
@@ -264,14 +319,14 @@ export const getArtistAlbums = async (artistId, artistName, TOKEN) => {
    Errors propagate to the global error handler for central management.
 ------------------------------------------------------ */
 export const getArtistInfo = async (artistId, TOKEN) => {
-  const response = await fetch(
+  const response = await spotifyFetch(
     `https://api.spotify.com/v1/artists/${artistId}`,
-    { headers: { Authorization: `Bearer ${TOKEN}` } },
+    TOKEN,
   );
 
   checkSpotifyResponse(response);
 
-  const data = await response.json();
+  const data = response.data;
 
   if (!data) return null;
 
@@ -285,18 +340,16 @@ export const getArtistInfo = async (artistId, TOKEN) => {
 -------------------------------------------------------- */
 export const getArtistsList = async (query, TOKEN) => {
   try {
-    const response = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-        query,
-      )}&type=artist&limit=5`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } },
+    const response = await spotifyFetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=5`,
+      TOKEN,
     );
 
     if (!response.ok) {
       return [];
     }
 
-    const data = await response.json();
+    const data = response.data;
 
     return data.artists?.items?.map((artist) => artist.name) || [];
   } catch (error) {

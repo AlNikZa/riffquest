@@ -42,7 +42,7 @@ export const artistAlbumsController = async (req, res, next) => {
     const { token, artistId } = req;
 
     // Fetch all albums for the artist
-    const albums = await getArtistAlbums(artistId, artistName, token);
+    const albums = await getArtistAlbums(artistId, token);
     if (!albums || albums.length === 0) {
       return next(
         new AppError(`No albums found for artist "${artistName}".`, 404),

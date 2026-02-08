@@ -28,6 +28,7 @@
   "license": "ISC",
   "description": "A Spotify-powered music discovery app to explore genres, artists, albums, and tracks.",
   "dependencies": {
+    "axios": "^1.13.5",
     "connect-mongo": "^5.1.0",
     "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
