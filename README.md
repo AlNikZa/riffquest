@@ -95,6 +95,7 @@ View artist details
 RiffQuest/
 │
 ├── config/
+│   ├── axios.js
 │   ├── db.js
 │   ├── env.js
 │   ├── helmet.js
@@ -175,7 +176,7 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-10 directories, 60 files
+10 directories, 61 files
 ```
 
 ## Error Handling
