@@ -2,7 +2,7 @@
 
 import User from '../models/User.js';
 import { encrypt } from '../services/cryptoService.js';
-import { checkSpotifyResponse } from './foreignApiHelpers.js';
+import { spotifyApi } from '../config/axios.js';
 
 import { AppError } from '../AppError.js';
 
@@ -16,21 +16,15 @@ export const getUserById = async (spotify_user_id) => {
 };
 
 export const getUserData = async (userAccessToken) => {
-  try {
-    const response = await fetch('https://api.spotify.com/v1/me', {
-      headers: {
-        Authorization: `Bearer ${userAccessToken}`,
-      },
-    });
+  // Error handling managed by spotifyApi interceptor
+  const response = await spotifyApi.get('/me', {
+    headers: {
+      Authorization: `Bearer ${userAccessToken}`,
+    },
+  });
 
-    checkSpotifyResponse(response);
-
-    const data = await response.json();
-    return data;
-  } catch (err) {
-    if (err instanceof AppError) throw err;
-    throw new AppError('Internal error fetching user data', 500);
-  }
+  const data = response.data;
+  return data;
 };
 
 export const upsertSpotifyUser = async (userDoc) => {
@@ -60,7 +54,7 @@ export const upsertSpotifyUser = async (userDoc) => {
         upsert: true, // If the user doesn't exist, create a new document
         new: true, // Return the updated or newly created document
         setDefaultsOnInsert: true, // Apply default values (like user_created_timestamp) if inserting
-      }
+      },
     );
   } catch (err) {
     if (err instanceof AppError) throw err;
@@ -79,7 +73,7 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
           token_expires_in: updatedUserTokens.expiresIn,
           token_created_timestamp: Date.now(),
         },
-      }
+      },
     );
   } catch (err) {
     if (err instanceof AppError) throw err;
