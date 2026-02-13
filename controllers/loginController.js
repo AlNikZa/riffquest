@@ -34,14 +34,17 @@ export const loginCallbackController = async (req, res, next) => {
     return res
       .status(302)
       .redirect(
-        getReturnToCookie(req) || req.get('Referer') || config.appBaseUrl || '/'
+        getReturnToCookie(req) ||
+          req.get('Referer') ||
+          config.appBaseUrl ||
+          '/',
       );
   }
 
   // 2. Security Check: Validate state parameter
   if (!state || state !== req.session.oauthState) {
     return next(
-      new AppError('Invalid OAuth state. Please try logging in again.', 403)
+      new AppError('Invalid OAuth state. Please try logging in again.', 403),
     );
   }
 
@@ -49,14 +52,16 @@ export const loginCallbackController = async (req, res, next) => {
     return res
       .status(302)
       .redirect(
-        getReturnToCookie(req) || req.get('Referer') || config.appBaseUrl || '/'
+        getReturnToCookie(req) ||
+          req.get('Referer') ||
+          config.appBaseUrl ||
+          '/',
       );
   }
 
   try {
     // 3. Exchange the authorization code for access and refresh tokens
-    // The function handles both production and development redirect URIs
-    const userTokens = await exchangeCodeForToken(code, config.isProd);
+    const userTokens = await exchangeCodeForToken(code);
 
     // 4. Get user profile from Spotify
     const userData = await getUserData(userTokens.access_token);
@@ -93,7 +98,7 @@ export const loginCallbackController = async (req, res, next) => {
           getReturnToCookie(req) ||
             req.get('Referer') ||
             config.appBaseUrl ||
-            '/'
+            '/',
         );
     });
   } catch (error) {

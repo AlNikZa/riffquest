@@ -5,10 +5,9 @@ import { config } from '../config/env.js';
 import crypto from 'crypto';
 
 import { AppError } from '../AppError.js';
-import { checkSpotifyResponse } from './foreignApiHelpers.js';
+import { spotifyAuthApi } from '../config/axios.js';
 
 export function buildSpotifyAuthUrl(req) {
-  // const scope = 'user-read-private user-read-email';
   const scope =
     'playlist-read-private playlist-read-collaborative user-top-read user-library-read';
 
@@ -34,7 +33,7 @@ export function buildSpotifyAuthUrl(req) {
   return authUrl;
 }
 
-export async function exchangeCodeForToken(code, isProduction) {
+export async function exchangeCodeForToken(code) {
   // Throw an error if no code is provided
   if (!code)
     throw new AppError('Failed to log in with Spotify. Please try again.', 400);
@@ -47,34 +46,21 @@ export async function exchangeCodeForToken(code, isProduction) {
   });
 
   // Make a POST request to Spotify Accounts API to exchange code for tokens
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
+  const response = await spotifyAuthApi.post('/token', params, {
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
       // Spotify requires Basic Auth with Base64 encoded client_id:client_secret
       Authorization:
         'Basic ' +
         Buffer.from(
-          `${config.spotify.clientId}:${config.spotify.clientSecret}`
+          `${config.spotify.clientId}:${config.spotify.clientSecret}`,
         ).toString('base64'),
     },
-    body: params.toString(), // send parameters in URL-encoded format
   });
 
-  checkSpotifyResponse(response);
-
   // Parse the JSON response containing the tokens
-  const data = await response.json();
+  const data = response.data;
 
-  // Handle any errors returned by Spotify
-  if (data.error) {
-    throw new AppError(
-      'Failed to log in with Spotify. Please try again.',
-      Number(data.status) || 502
-    );
-  }
-
-  return data;
+  return data; // token
 }
 
 export function getReturnToCookie(req) {
@@ -83,7 +69,7 @@ export function getReturnToCookie(req) {
     raw.split('; ').map((c) => {
       const [key, value] = c.split('=');
       return [key, decodeURIComponent(value)];
-    })
+    }),
   );
   return cookies.returnTo || null;
 }
