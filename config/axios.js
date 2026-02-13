@@ -1,7 +1,7 @@
 // config/axios.js
 
 import axios from 'axios';
-import { handleSpotifyError } from '../services/foreignApiHelpers.js';
+import { mapSpotifyError } from '../utils/externalApiErrorMapper.js';
 
 // Spotify API instance (for data)
 export const spotifyApi = axios.create({
@@ -12,7 +12,7 @@ export const spotifyApi = axios.create({
 spotifyApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    throw handleSpotifyError(error, 'Spotify API');
+    throw mapSpotifyError(error, 'Spotify API');
   },
 );
 
@@ -26,6 +26,6 @@ export const spotifyAuthApi = axios.create({
 spotifyAuthApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    throw handleSpotifyError(error, 'Spotify Auth');
+    throw mapSpotifyError(error, 'Spotify Auth');
   },
 );

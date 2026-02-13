@@ -1,31 +1,27 @@
 // services/userTokenService.js
 
 import { config } from '../config/env.js';
+import { spotifyAuthApi } from '../config/axios.js';
 
 import User from '../models/User.js';
 
-import { checkSpotifyResponse } from '../services/foreignApiHelpers.js';
-
 export const refreshUserToken = async (refresh_token) => {
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
+  const params = new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token,
+  });
+
+  const response = await spotifyAuthApi.post('/token', params, {
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
       Authorization:
         'Basic ' +
         Buffer.from(
-          `${config.spotify.clientId}:${config.spotify.clientSecret}`
+          `${config.spotify.clientId}:${config.spotify.clientSecret}`,
         ).toString('base64'),
     },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token,
-    }),
   });
 
-  checkSpotifyResponse(response);
-
-  const data = await response.json();
+  const data = response.data;
 
   return {
     accessToken: data.access_token,
@@ -44,6 +40,6 @@ export const removeTokensForUser = async (spotify_user_id) => {
         token_expires_in: '',
         token_created_timestamp: '',
       },
-    }
+    },
   );
 };
