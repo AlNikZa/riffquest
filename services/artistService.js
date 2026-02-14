@@ -3,18 +3,29 @@
 import { config } from '../config/env.js';
 import { spotifyApi } from '../config/axios.js';
 
-/* ==================== getArtistId ====================
-   Searches Spotify for an artist by name and returns
-   the Spotify artist ID.
+import {
+  chunkArray,
+  uniqueBy,
+  sortByNumericProperty,
+} from '../utils/arrayUtils.js';
+import { normalizeString } from '../utils/stringUtils.js';
+import {
+  formatAlbumDuration,
+  calculateTotalDuration,
+} from '../utils/timeUtils.js';
+import { mapSpotifyTrack, mapSpotifyAlbum } from '../utils/spotifyMapper.js';
 
-   - Returns null if no suitable match is found
-   - Legitimate "not found" cases return null
-   - All other errors are propagated to the global
-     error handler
-====================================================== */
+// Internal helper to check if the found artist name matches the search query.
+const isArtistMatch = (foundName = '', searchName = '') => {
+  const normalizedFound = normalizeString(foundName);
+  const normalizedSearch = normalizeString(searchName);
 
+  return normalizedFound.includes(normalizedSearch);
+};
+
+// Searches Spotify for an artist by name and returns their Spotify artist ID.
+// Returns null if no suitable match is found.
 export const getArtistId = async (artist, TOKEN) => {
-  // Make a search request to Spotify API for the artist
   const response = await spotifyApi.get('/search', {
     params: {
       q: artist,
@@ -25,32 +36,16 @@ export const getArtistId = async (artist, TOKEN) => {
   });
 
   const data = response.data;
-
   if (!data.artists?.items?.length) return null; // no artist found
 
   const foundArtist = data.artists.items[0];
-
-  // Normalize artist names for reliable comparison  (remove accents, lowercase, remove non-alphanumeric chars, remove leading articles (the, a, an))
-  const normalize = (str = '') =>
-    str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '')
-      .replace(/^(the|a|an)/, '');
-
-  // Check if the normalized artist name includes the search term
-  if (!normalize(foundArtist.name).includes(normalize(artist))) return null;
+  // Validate the result using string normalization to prevent false positives
+  if (!isArtistMatch(foundArtist.name, artist)) return null;
 
   return foundArtist.id; // return Spotify artist ID
 };
 
-/* ----------------- getArtistTopTracks -----------------
-   Fetch top tracks for an artist by artist ID.
-   Returns an array of simplified track objects.
-   Errors are intentionally not caught here so they can propagate to the global error handler; 
-   only valid "not found" cases return [].
------------------------------------------------------- */
+// Fetches top tracks for an artist and maps them to a simplified format.
 export const getArtistTopTracks = async (artistId, TOKEN) => {
   const response = await spotifyApi.get(`/artists/${artistId}/top-tracks`, {
     params: {
@@ -59,57 +54,19 @@ export const getArtistTopTracks = async (artistId, TOKEN) => {
     headers: { Authorization: `Bearer ${TOKEN}` },
   });
 
-  const data = response.data;
+  const tracks = response.data?.tracks;
 
-  if (!data?.tracks?.length) {
+  // If no tracks are found or data is missing, return an empty array
+  if (!tracks || !Array.isArray(tracks)) {
     return [];
   }
 
-  const songsAllData = data.tracks;
-
-  // Extract only the relevant info for each track
-  const extractedSongsData = songsAllData.map((song) => {
-    return {
-      artist: song.artists[0].name || 'Unknown Artist',
-      album: song.album.name || 'Unknown Album',
-      name: song.name,
-      year: song.album.release_date?.slice(0, 4) || null,
-      image: song.album.images[2]?.url || song.album.images[0]?.url || null,
-      url: song.external_urls.spotify,
-      href: song.href,
-      id: song.id,
-      popularity: song.popularity,
-    };
-  });
-
-  return extractedSongsData;
+  // Map each track to our simplified application format
+  return tracks.map(mapSpotifyTrack);
 };
 
-/* ================= formatAlbumDuration =================
-   Converts total milliseconds into:
-   - "H:MM:SS" if duration >= 1 hour
-   - "MM:SS" otherwise
-======================================================= */
-
-const formatAlbumDuration = (total_ms) => {
-  const hours = Math.floor(total_ms / 3600000);
-  const minutes = Math.floor((total_ms % 3600000) / 60000);
-  const seconds = Math.floor((total_ms % 60000) / 1000);
-
-  const minutesStr = minutes.toString().padStart(2, '0');
-  const secondsStr = seconds.toString().padStart(2, '0');
-
-  return hours >= 1
-    ? `${hours}:${minutesStr}:${secondsStr}`
-    : `${minutesStr}:${secondsStr}`;
-};
-
-/* ------------------ getAlbumDuration ------------------
-   Fetch all tracks of an album and calculate total duration.
-   - Handles pagination internally
-   - Returns formatted duration string
-   - Fails quietly and returns "Unknown" on errors
-   ------------------------------------------------------ */
+// Fetches all tracks for an album (handles pagination) and calculates total duration.
+// Returns formatted string "H:MM:SS" or "MM:SS", or "Unknown" on failure.
 const getAlbumDuration = async (albumId, TOKEN) => {
   try {
     let allTracks = [];
@@ -135,10 +92,7 @@ const getAlbumDuration = async (albumId, TOKEN) => {
     }
 
     // Safe sum of durations
-    let total_ms = allTracks.reduce(
-      (sum, song) => sum + (song?.duration_ms || 0),
-      0,
-    );
+    const total_ms = calculateTotalDuration(allTracks);
 
     return formatAlbumDuration(total_ms);
   } catch (err) {
@@ -149,23 +103,15 @@ const getAlbumDuration = async (albumId, TOKEN) => {
   }
 };
 
-/* =================== getArtistAlbums ===================
-   Fetches all albums for an artist and enriches them
-   with detailed metadata and total duration.
-
-   Optimizations:
-   - Pagination for album IDs
-   - De-duplication by album ID
-   - Parallel batch fetching (Spotify max 20 IDs)
-   - Conditional fallback duration calculation
-======================================================= */
+// Fetches all albums for an artist, enriches them with detailed metadata and duration.
+// Includes pagination, de-duplication, and parallel batch processing.
 export const getArtistAlbums = async (artistId, TOKEN) => {
   let albumStubs = [];
   let offset = 0;
   const limit = 50;
   let hasMore = true;
 
-  // Phase 1: Fetch all album IDs (paginated)
+  // 1. Fetch all basic album data (stubs) using pagination
   while (hasMore) {
     const response = await spotifyApi.get(`/artists/${artistId}/albums`, {
       params: {
@@ -177,7 +123,6 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
     });
 
     const data = response.data;
-
     if (!data.items?.length) break;
 
     albumStubs = albumStubs.concat(data.items);
@@ -185,24 +130,17 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
     else offset += limit;
   }
 
-  // De-duplicate albums by ID
-  albumStubs = Array.from(new Map(albumStubs.map((a) => [a.id, a])).values());
-
+  // De-duplicate albums by ID to avoid repeats from different regions
+  albumStubs = uniqueBy(albumStubs, 'id');
   if (albumStubs.length === 0) return [];
 
-  // Phase 2: Parallel batch processing
-
-  // Split albumStubs into chunks of 20 (Spotify API limit)
-  const chunks = [];
-  for (let i = 0; i < albumStubs.length; i += 20) {
-    chunks.push(albumStubs.slice(i, i + 20));
-  }
+  // 2. Process detailed data in batches (Spotify API limit is 20 IDs per request)
+  const chunks = chunkArray(albumStubs, 20);
 
   // Map every chunk into Promise (asynchronous operation)
   const batchPromises = chunks.map(async (chunk) => {
     try {
       const ids = chunk.map((a) => a.id).join(',');
-
       const response = await spotifyApi.get('/albums', {
         params: {
           ids,
@@ -212,7 +150,7 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
 
       const { albums: detailedChunk } = response.data;
 
-      // For every album inside detailed batch process data and duration
+      // Map each album and calculate duration (conditional fetch if tracks exceed limit)
       return Promise.all(
         detailedChunk.filter(Boolean).map(async (fullAlbum) => {
           let duration;
@@ -220,23 +158,11 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
           if (fullAlbum.tracks.total > fullAlbum.tracks.limit) {
             duration = await getAlbumDuration(fullAlbum.id, TOKEN);
           } else {
-            const totalMs = fullAlbum.tracks.items.reduce(
-              (sum, t) => sum + (t.duration_ms || 0),
-              0,
-            );
+            const totalMs = calculateTotalDuration(fullAlbum.tracks.items);
             duration = formatAlbumDuration(totalMs);
           }
 
-          return {
-            artist: fullAlbum.artists[0].name,
-            album: fullAlbum.name,
-            year: fullAlbum.release_date?.slice(0, 4) || null,
-            image: fullAlbum.images[1]?.url || fullAlbum.images[0]?.url || null,
-            id: fullAlbum.id,
-            popularity: fullAlbum.popularity,
-            url: fullAlbum.external_urls.spotify,
-            duration: duration,
-          };
+          return mapSpotifyAlbum(fullAlbum, duration);
         }),
       );
     } catch (err) {
@@ -247,45 +173,31 @@ export const getArtistAlbums = async (artistId, TOKEN) => {
     }
   });
 
-  // Waiting for all batches, and their inner processes to finish
+  // 3. Resolve batches sequentially with a small delay to respect rate limits
   const nestedResults = [];
   for (const batch of batchPromises) {
     nestedResults.push(await batch);
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
 
-  // Flattening array of arrays into single albums array
+  // Flatten nested arrays and sort the final list by release year
   const allDetailedAlbums = nestedResults.flat();
-
-  const result = allDetailedAlbums.sort(
-    (a, b) => Number(a.year) - Number(b.year),
-  );
-
-  return result;
+  return sortByNumericProperty(allDetailedAlbums, 'year');
 };
 
-/* ------------------- getArtistInfo --------------------
-   Fetch full artist information (genres, followers, images, etc.) by artist ID.
-   Returns the full Spotify artist object or null if no data is returned.
-   Errors propagate to the global error handler for central management.
------------------------------------------------------- */
+// Fetch full artist information (genres, followers, images, etc.) by artist ID.
 export const getArtistInfo = async (artistId, TOKEN) => {
   const response = await spotifyApi.get(`/artists/${artistId}`, {
     headers: { Authorization: `Bearer ${TOKEN}` },
   });
 
   const data = response.data;
-
   if (!data) return null;
-
   return data;
 };
 
-/* ------------------- getArtistsList --------------------
-   Fetch a list of artists from Spotify matching the search query.
-   Returns an array of artist names (or full artist objects if needed).
-   Fail quietly: network or API errors return an empty array.
--------------------------------------------------------- */
+// Fetch a list of artist names from Spotify matching the search query.
+// Returns an empty array on network or API errors.
 export const getArtistsList = async (query, TOKEN) => {
   try {
     const response = await spotifyApi.get('/search', {
