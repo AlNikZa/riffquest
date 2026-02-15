@@ -13,7 +13,7 @@ import {
   formatAlbumDuration,
   calculateTotalDuration,
 } from '../utils/timeUtils.js';
-import { mapSpotifyTrack, mapSpotifyAlbum } from '../utils/spotifyMapper.js';
+import { mapSpotifyTrack, mapSpotifyAlbum } from '../mappers/spotifyMapper.js';
 
 // Internal helper to check if the found artist name matches the search query.
 const isArtistMatch = (foundName = '', searchName = '') => {

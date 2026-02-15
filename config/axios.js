@@ -1,7 +1,7 @@
 // config/axios.js
 
 import axios from 'axios';
-import { mapSpotifyError } from '../utils/externalApiErrorMapper.js';
+import { mapSpotifyError } from '../mappers/externalApiErrorMapper.js';
 
 // Spotify API instance (for data)
 export const spotifyApi = axios.create({

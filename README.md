@@ -109,6 +109,10 @@ RiffQuest/
 │   ├── loginController.js
 │   └── logoutController.js
 │
+├── mappers/
+│   ├── externalApiErrorMapper.js
+│   └── spotifyMapper.js
+│
 ├── middleware/
 │   ├── artistMiddleware.js
 │   ├── csrf.js
@@ -149,7 +153,9 @@ RiffQuest/
 │   └── userTokenService.js
 │
 ├── utils/
-│   └── externalApiErrorMapper.js
+│   ├── arrayUtils.js
+│   ├── stringUtils.js
+│   └── timeUtils.js
 │
 ├── validators/
 │   ├── loginValidator.js
@@ -178,7 +184,7 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-11 directories, 61 files
+12 directories, 65 files
 ```
 
 ## Error Handling

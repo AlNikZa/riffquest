@@ -1,4 +1,4 @@
-// utils/spotifyMapper.js
+// mappers/spotifyMapper.js
 
 export const mapSpotifyTrack = (song = {}) => ({
 	artist: song.artists?.[0]?.name || 'Unknown Artist',

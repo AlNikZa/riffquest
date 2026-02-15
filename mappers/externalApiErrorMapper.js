@@ -1,4 +1,4 @@
-// utils/externalApiErrorMapper.js
+// mappers/externalApiErrorMapper.js
 
 import { AppError } from '../AppError.js';
 
