@@ -9,83 +9,66 @@ import {
 } from '../services/artistService.js';
 
 import { AppError } from '../AppError.js';
+import { catchAsync } from '../middleware/errorHandler.js';
 
-export const artistTopTracksController = async (req, res, next) => {
-  try {
-    const artistName = req.query.artist;
-    const { token, artistId } = req;
+export const artistTopTracksController = catchAsync(async (req, res, next) => {
+  const artistName = req.query.artist;
+  const { token, artistId } = req;
 
-    // Fetch top tracks for the artist
-    const topTracks = await getArtistTopTracks(artistId, token);
-    if (!topTracks || topTracks.length === 0) {
-      return next(
-        new AppError(`No top tracks found for artist "${artistName}".`, 404),
-      );
-    }
-
-    // Render the top tracks page with dynamic title
-    res.status(200).render('artistTopTracks', {
-      topTracks,
-      artist: topTracks[0]?.artist || artistName || 'Unknown Artist',
-      title: `The Best Of ${
-        topTracks[0]?.artist || artistName || 'Unknown Artist'
-      }`,
-    });
-  } catch (err) {
-    next(err); //  Forward error to global error handler
+  // Fetch top tracks for the artist
+  const topTracks = await getArtistTopTracks(artistId, token);
+  if (!topTracks || topTracks.length === 0) {
+    throw new AppError(`No top tracks found for artist "${artistName}".`, 404);
   }
-};
 
-export const artistAlbumsController = async (req, res, next) => {
-  try {
-    const artistName = req.query.artist;
-    const { token, artistId } = req;
+  // Render the top tracks page with dynamic title
+  res.status(200).render('artistTopTracks', {
+    topTracks,
+    artist: topTracks[0]?.artist || artistName || 'Unknown Artist',
+    title: `The Best Of ${
+      topTracks[0]?.artist || artistName || 'Unknown Artist'
+    }`,
+  });
+});
 
-    // Fetch all albums for the artist
-    const albums = await getArtistAlbums(artistId, token);
-    if (!albums || albums.length === 0) {
-      return next(
-        new AppError(`No albums found for artist "${artistName}".`, 404),
-      );
-    }
+export const artistAlbumsController = catchAsync(async (req, res, next) => {
+  const artistName = req.query.artist;
+  const { token, artistId } = req;
 
-    // Render the albums page with dynamic title and artist info
-    res.status(200).render('artistAlbums', {
-      albums,
-      artist: albums[0]?.artist || artistName || 'Unknown Artist',
-      title: `All albums of ${
-        albums[0]?.artist || artistName || 'Unknown Artist'
-      }`,
-    });
-  } catch (err) {
-    next(err); //  Forward error to global error handler
+  // Fetch all albums for the artist
+  const albums = await getArtistAlbums(artistId, token);
+  if (!albums || albums.length === 0) {
+    throw new AppError(`No albums found for artist "${artistName}".`, 404);
   }
-};
 
-export const artistProfileController = async (req, res, next) => {
-  try {
-    const artistName = req.query.artist;
-    const { token, artistId } = req;
+  // Render the albums page with dynamic title and artist info
+  res.status(200).render('artistAlbums', {
+    albums,
+    artist: albums[0]?.artist || artistName || 'Unknown Artist',
+    title: `All albums of ${
+      albums[0]?.artist || artistName || 'Unknown Artist'
+    }`,
+  });
+});
 
-    // Fetch full artist information
-    const artistData = await getArtistInfo(artistId, token);
-    if (!artistData) {
-      return next(
-        new AppError(`No data found for artist "${artistName}".`, 404),
-      );
-    }
+export const artistProfileController = catchAsync(async (req, res, next) => {
+  const artistName = req.query.artist;
+  const { token, artistId } = req;
 
-    // Render the artist profile page with dynamic title
-    res.status(200).render('artistInfo', {
-      artistData,
-      title: `${
-        artistData?.name || artistName || 'Unknown Artist'
-      } - Artist Profile`,
-    });
-  } catch (err) {
-    next(err); //  Forward error to global error handler
+  // Fetch full artist information
+  const artistData = await getArtistInfo(artistId, token);
+  if (!artistData) {
+    throw new AppError(`No data found for artist "${artistName}".`, 404);
   }
-};
+
+  // Render the artist profile page with dynamic title
+  res.status(200).render('artistInfo', {
+    artistData,
+    title: `${
+      artistData?.name || artistName || 'Unknown Artist'
+    } - Artist Profile`,
+  });
+});
 
 export const artistRedirectController = (req, res, next) => {
   const { artist, option } = req.query;
@@ -120,8 +103,8 @@ export const artistRedirectController = (req, res, next) => {
   }
 };
 
-export const artistAutocompleteController = async (req, res, next) => {
-  try {
+export const artistAutocompleteController = catchAsync(
+  async (req, res, next) => {
     const token = await getTokenOrThrowNewAppError();
 
     // Read the search query from the request query
@@ -133,8 +116,5 @@ export const artistAutocompleteController = async (req, res, next) => {
 
     // Send the array of artist names back to the frontend as JSON
     res.status(200).json(artistsList || []);
-  } catch (err) {
-    // Forward any errors to the global error handler
-    next(err);
-  }
-};
+  },
+);

@@ -5,6 +5,14 @@ import { config } from '../config/env.js';
 import { AppError } from '../AppError.js';
 import { removeTokensForUser } from '../services/userTokenService.js';
 
+// Wrap async route handlers to automatically catch errors
+// and forward them to globalErrorHandler
+export const catchAsync = (fn) => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
+};
+
 // 404 handler
 // This middleware is executed if no route above matches the request
 export const notFoundHandler = (req, res, next) => {

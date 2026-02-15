@@ -14,6 +14,7 @@ import {
 } from '../services/userService.js';
 
 import { AppError } from '../AppError.js';
+import { catchAsync } from '../middleware/errorHandler.js';
 
 export const loginController = (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ export const loginController = (req, res, next) => {
   }
 };
 
-export const loginCallbackController = async (req, res, next) => {
+export const loginCallbackController = catchAsync(async (req, res, next) => {
   // Extract authorization code and error from Spotify's redirect query parameters
   const { code, error, state } = req.query;
 
@@ -43,8 +44,9 @@ export const loginCallbackController = async (req, res, next) => {
 
   // 2. Security Check: Validate state parameter
   if (!state || state !== req.session.oauthState) {
-    return next(
-      new AppError('Invalid OAuth state. Please try logging in again.', 403),
+    throw new AppError(
+      'Invalid OAuth state. Please try logging in again.',
+      403,
     );
   }
 
@@ -59,52 +61,49 @@ export const loginCallbackController = async (req, res, next) => {
       );
   }
 
-  try {
-    // 3. Exchange the authorization code for access and refresh tokens
-    const userTokens = await exchangeCodeForToken(code);
+  // 3. Exchange the authorization code for access and refresh tokens
+  const userTokens = await exchangeCodeForToken(code);
 
-    // 4. Get user profile from Spotify
-    const userData = await getUserData(userTokens.access_token);
+  // 4. Get user profile from Spotify
+  const userData = await getUserData(userTokens.access_token);
 
-    // 5. Prepare document for database
-    const userDoc = getUserDocObject(userTokens, userData);
+  // 5. Prepare document for database
+  const userDoc = getUserDocObject(userTokens, userData);
 
-    // 6. Persist user and tokens to MongoDB
-    await upsertSpotifyUser(userDoc);
+  // 6. Persist user and tokens to MongoDB
+  await upsertSpotifyUser(userDoc);
 
-    // 7. Establish application session
-    req.session.spotify_user_id = userDoc.spotify_user_id;
-    req.session.username = userDoc.display_name;
-    req.session.userImg = userDoc.profileImg;
-    req.session.justLoggedIn = true;
+  // 7. Establish application session
+  req.session.spotify_user_id = userDoc.spotify_user_id;
+  req.session.username = userDoc.display_name;
+  req.session.userImg = userDoc.profileImg;
+  req.session.justLoggedIn = true;
 
-    // Cleanup sensitive state
-    delete req.session.oauthState;
+  // Cleanup sensitive state
+  delete req.session.oauthState;
 
-    // 8. Finalize session and redirect
-    req.session.save((err) => {
-      if (err) {
-        return next(err);
-      }
-      res.clearCookie('returnTo', {
-        path: '/',
-        secure: config.isProd,
-        sameSite: config.isProd ? 'none' : 'lax',
-      });
-
-      res
-        .status(302)
-        .redirect(
-          getReturnToCookie(req) ||
-            req.get('Referer') ||
-            config.appBaseUrl ||
-            '/',
-        );
+  // 8. Finalize session and redirect
+  req.session.save((err) => {
+    if (err) {
+      // Manual next(err) is required here because catchAsync doesn't capture errors inside nested callbacks.
+      return next(err);
+    }
+    res.clearCookie('returnTo', {
+      path: '/',
+      secure: config.isProd,
+      sameSite: config.isProd ? 'none' : 'lax',
     });
-  } catch (error) {
-    next(error);
-  }
-};
+
+    res
+      .status(302)
+      .redirect(
+        getReturnToCookie(req) ||
+          req.get('Referer') ||
+          config.appBaseUrl ||
+          '/',
+      );
+  });
+});
 
 export const resetLoginFlagController = (req, res) => {
   req.session.justLoggedIn = false;
