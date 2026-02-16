@@ -180,11 +180,12 @@ RiffQuest/
 ├── .env.example
 ├── app.js
 ├── AppError.js
+├── lifecycle.js
 ├── package.json
 ├── Procfile
 └── server.js
 
-12 directories, 65 files
+12 directories, 66 files
 ```
 
 ## Error Handling
