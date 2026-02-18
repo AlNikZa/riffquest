@@ -8,7 +8,16 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "production-simulation": "NODE_ENV=production nodemon server.js",
-    "debug": "nodemon --inspect-brk server.js"
+    "debug": "nodemon --inspect-brk server.js",
+    "scripts:list": "node -e 'import fs from \"fs\"; const pkg = JSON.parse(fs.readFileSync(\"./package.json\")); const descs = pkg.scriptsDescriptions || {}; const maxName = Math.max(...Object.keys(pkg.scripts).map(k=>k.length)); const maxDesc = Math.max(...Object.keys(pkg.scripts).map(k=>descs[k]?.length||0)); Object.keys(pkg.scripts).forEach(k=>{ const namePadded = k.padEnd(maxName); const descPadded = (descs[k]||\"(no description)\").padEnd(maxDesc); console.log(`${namePadded} -> ${descPadded} -> ${pkg.scripts[k]}`); });'"
+  },
+  "scriptsDescriptions": {
+    "test": "Run tests (currently none)",
+    "start": "Start server normally",
+    "dev": "Start server with nodemon",
+    "production-simulation": "Run server in production mode",
+    "debug": "Start server in debug mode",
+    "scripts:list": "Show all npm scripts with description and full command"
   },
   "keywords": [
     "spotify",
@@ -42,6 +51,7 @@
   "devDependencies": {
     "directory-tree": "^3.5.2",
     "express-list-routes": "^1.3.2",
+    "kill-port": "^2.0.1",
     "nodemon": "^3.1.0"
   }
 }

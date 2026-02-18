@@ -2,7 +2,11 @@
 
 import { config } from './config/env.js';
 import mongoose from 'mongoose';
-import { registerShutdownHandlers, registerCleanupTask } from './lifecycle.js';
+import {
+  registerShutdownHandlers,
+  registerCleanupTask,
+  freePortBeforeServerStart,
+} from './lifecycle.js';
 import connectDB from './config/db.js';
 import app from './app.js';
 import { initToken } from './services/globalTokenService.js';
@@ -54,5 +58,19 @@ async function startServer() {
   }
 }
 
-// Start the Express server and listen for incoming requests
-startServer();
+(async () => {
+  try {
+    // 1. Pre-flight check: In development, we clear the port to prevent
+    // 'EADDRINUSE' errors if a previous instance didn't exit cleanly.
+    if (!config.isProd) {
+      await freePortBeforeServerStart(config.port);
+    }
+
+    // 2. Initialize the core application services (DB, Auth, Listeners)
+    await startServer();
+  } catch (error) {
+    // Top-level catch to handle any failure during the startup phase
+    console.error('💥 Application failed to bootstrap:', error);
+    process.exit(1);
+  }
+})();

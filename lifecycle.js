@@ -82,6 +82,29 @@ export const registerCleanupTask = (name, task) => {
 	cleanupTasks.push({ name, task });
 };
 
+// Only used in development to prevent EADDRINUSE errors during Nodemon restarts.
+export const freePortBeforeServerStart = async (port) => {
+	try {
+		// Dynamic import to avoid loading development dependencies in production
+		const kill = (await import('kill-port')).default;
+		await kill(port);
+		console.log(`✅ Port ${port} was busy and has been freed.`);
+	} catch (err) {
+		// We ignore errors indicating the port is already free or no process was found
+		const isAlreadyFree =
+			err.message.includes('not found') ||
+			err.message.includes('No process running on port') ||
+			err.code === 'ESRCH'; // Error: No such process
+		if (isAlreadyFree) {
+			console.log(`✅ Port ${port} is free and ready for listening.`);
+		} else {
+			// We log other errors as warnings, but don't stop the process
+			// because the server might still manage to bind to the port.
+			console.error(`⚠️ Could not free port ${port}:`, err.message);
+		}
+	}
+};
+
 // Sets up listeners for system signals and unhandled process-level errors.
 export const registerShutdownHandlers = () => {
 	// Capture unhandled promise rejections (e.g., failed async calls without .catch)
