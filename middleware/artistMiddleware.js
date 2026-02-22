@@ -10,26 +10,32 @@ export const getTokenAndArtistIdMiddleware = catchAsync(
     const rawArtist = req.query.artist;
 
     if (!rawArtist) {
-      throw new AppError('Please provide an artist name.', 400);
+      throw new AppError(
+        'Bad request: Please enter an artist name to start the search.',
+        400,
+      );
     }
 
     if (typeof rawArtist !== 'string') {
       throw new AppError(
-        'Invalid artist format. Only a single search term is allowed.',
+        'Bad request. Please provide a single artist name as text.',
         400,
       );
     }
 
     const artistName = rawArtist.trim();
     if (artistName.length === 0) {
-      throw new AppError('Artist name cannot be empty.', 400);
+      throw new AppError('Bad request. Artist name cannot be empty.', 400);
     }
 
     const token = await getTokenOrThrowNewAppError();
 
     const artistId = await getArtistId(artistName, token);
     if (!artistId) {
-      throw new AppError(`Artist "${artistName}" not found.`, 404);
+      throw new AppError(
+        `Sorry, we couldn't find an artist named "${artistName}".`,
+        404,
+      );
     }
 
     req.artistId = artistId;

@@ -11,9 +11,12 @@
 
     <!-- Page header showing the error status -->
     <h1 class="text-center text-danger mt-5"><%= statusCode || 500 %> Error</h1>
-    <h2 class="text-center text-muted fs-5">
+    <h2 class="text-center fs-5">
       <%= message || 'Something went wrong.' %>
     </h2>
+    
+    <!-- Display validation or other detailed error messages (if any exist) -->
+    <%- include('partials/displayErrors') %>
 
     <!-- Back to home button -->
     <div class="d-flex justify-content-center my-5">

@@ -165,6 +165,7 @@ RiffQuest/
 │   ├── partials/
 │   │   ├── bootstrapModals.ejs
 │   │   ├── bootstrapScriptTag.ejs
+│   │   ├── displayErrors.ejs
 │   │   ├── footer.ejs
 │   │   ├── head.ejs
 │   │   └── navbar.ejs
@@ -185,7 +186,7 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-12 directories, 66 files
+12 directories, 68 files
 ```
 
 ## Error Handling

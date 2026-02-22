@@ -17,13 +17,17 @@ const validate = (fieldName) => {
     query(fieldName)
       .trim()
       .notEmpty()
-      .withMessage(`${capitalizedFieldName} is required.`)
+      .withMessage(
+        `Please enter ${fieldName === 'track' ? 'a' : 'an'} ${fieldName} name.`,
+      )
       .isLength({ min: MIN, max: MAX })
       .withMessage(
-        `${capitalizedFieldName} must be ${MIN}–${MAX} characters long.`
+        `${capitalizedFieldName} name must be between ${MIN} and ${MAX} characters.`,
       )
       .matches(REGEX)
-      .withMessage(`${capitalizedFieldName} contains invalid characters.`),
+      .withMessage(
+        `${capitalizedFieldName} name can only contain letters, numbers, and basic punctuation.`,
+      ),
   ];
 };
 
@@ -50,11 +54,13 @@ export const autocompleteQueryValidator = [
   query('query')
     .trim() // remove leading/trailing whitespace
     .notEmpty()
-    .withMessage('Search query is required.')
+    .withMessage('Please enter a search query.')
     .isLength({ min: MIN, max: MAX })
-    .withMessage(`Search query must be ${MIN}–${MAX} characters long.`)
+    .withMessage(`Search query must be between ${MIN} and ${MAX} characters.`)
     .matches(REGEX)
-    .withMessage('Search query contains invalid characters.'),
+    .withMessage(
+      'Search query can only contain letters, numbers, and basic punctuation.',
+    ),
 ];
 
 /* ----------------------------------------------------------- */
@@ -69,10 +75,12 @@ const validateOptionalQuery = (fieldName) => {
     .trim()
     .isLength({ min: MIN, max: MAX })
     .withMessage(
-      `${capitalizedFieldName} must be ${MIN}–${MAX} characters long.`
+      `${capitalizedFieldName} must be between ${MIN} and ${MAX} characters.`,
     )
     .matches(REGEX)
-    .withMessage(`${capitalizedFieldName} contains invalid characters.`);
+    .withMessage(
+      `${capitalizedFieldName} can only contain letters, numbers, and basic punctuation.`,
+    );
 };
 
 export const redirectQueryValidator = [
@@ -85,9 +93,9 @@ export const redirectQueryValidator = [
     if (!req.query.artist && !req.query.album && !req.query.track) {
       return next(
         new AppError(
-          'At least one of artist, album or track must be provided.',
-          400
-        )
+          'Please provide at least one of the following: artist, album, or track.',
+          400,
+        ),
       );
     }
     next();
@@ -95,5 +103,7 @@ export const redirectQueryValidator = [
 
   query('option')
     .isIn(['allAlbums', 'topTracks', 'details'])
-    .withMessage('Invalid redirect option.'),
+    .withMessage(
+      "Invalid redirect option. Please choose 'All Albums', 'Top Tracks', or 'Details'.",
+    ),
 ];

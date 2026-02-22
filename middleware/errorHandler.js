@@ -13,13 +13,7 @@ export const catchAsync = (fn) => {
   };
 };
 
-// 404 handler
-// This middleware is executed if no route above matches the request
-export const notFoundHandler = (req, res, next) => {
-  next(new AppError('Page Not Found.', 404));
-};
-
-const getViewContext = (req, res) => {
+const getViewContext = (req, res, err) => {
   let csrf;
   try {
     csrf = typeof req.csrfToken === 'function' ? req.csrfToken() : null;
@@ -35,7 +29,14 @@ const getViewContext = (req, res) => {
     track: req.query.track || null,
     csrfToken: csrf,
     nonce: res.locals.nonce || req.nonce || null,
+    errors: err.errors || null,
   };
+};
+
+// 404 handler
+// This middleware is executed if no route above matches the request
+export const notFoundHandler = (req, res, next) => {
+  next(new AppError('We couldn’t find the page you’re looking for.', 404));
 };
 
 // Global error handler
@@ -55,6 +56,16 @@ export const globalErrorHandler = async (err, req, res, next) => {
 
   if (!config.isProd) {
     console.error(err.stack);
+  }
+
+  if (err.errors && Array.isArray(err.errors)) {
+    err.errors.forEach((e, index) => {
+      if (err.errors.length > 1) console.error(`--- Error #${index + 1} ---`);
+      Object.entries(e).forEach(([key, value]) => {
+        console.error(`${key}: ${value}`);
+      });
+      if (err.errors.length > 1) console.error(`---------------`);
+    });
   }
 
   if (err.logOnly) {
@@ -87,14 +98,15 @@ export const globalErrorHandler = async (err, req, res, next) => {
         message:
           'Your Spotify session has expired. Please log in again to continue.',
         statusCode: 401,
-        ...getViewContext(req, res),
+        ...getViewContext(req, res, err),
       });
     } catch (error) {
       return res.status(500).render('error', {
         title: 'Error',
-        message: 'An error occurred while processing your request.',
+        message:
+          'An error occurred while processing your request. Please refresh the page or try again later.',
         statusCode: 500,
-        ...getViewContext(req, res),
+        ...getViewContext(req, res, err),
       });
     }
   }
@@ -104,7 +116,7 @@ export const globalErrorHandler = async (err, req, res, next) => {
     return res.status(404).render('noResultsFound', {
       title: 'Nothing found',
       message: err.message || 'Page Not Found.',
-      ...getViewContext(req, res),
+      ...getViewContext(req, res, err),
     });
   }
 
@@ -113,6 +125,6 @@ export const globalErrorHandler = async (err, req, res, next) => {
     title: 'Error',
     message: err.isOperational ? err.message : 'Something went wrong',
     statusCode: err.statusCode,
-    ...getViewContext(req, res),
+    ...getViewContext(req, res, err),
   });
 };

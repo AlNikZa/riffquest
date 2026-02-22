@@ -1,0 +1,17 @@
+<!-- views/partials/displayErrors.ejs -->
+
+<% if (errors && Array.isArray(errors) && errors.length > 0) { %>
+  <% let title = errors.length > 1 ? 'Fix the following errors:' : 'Fix the error:'; %>
+    
+  <div class="mt-3 mx-auto text-center">
+    <h3 class="my-2 text-danger"><%= title %></h3>
+    <ul class="list-unstyled d-inline-block text-start">
+      <% errors.forEach(error => { %>
+        <li class="mb-1 text-center"> 
+           <%= error.msg %>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+
+<% } %>

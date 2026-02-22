@@ -9,7 +9,7 @@ export const createCsrfToken = (req, res, next) => {
   if (!req.session) {
     return next(
       new AppError(
-        'Security initialization failed. Please refresh the page.',
+        'Something went wrong while loading the page. Please refresh and try again.',
         500,
       ),
     );
@@ -28,8 +28,8 @@ export const checkCsrfToken = (req, res, next) => {
   if (!req.session || !req.session.csrfToken) {
     return next(
       new AppError(
-        'Security initialization failed. Please refresh the page and try again.',
-        500,
+        'Your session may have expired. Please refresh the page and try again.',
+        403,
       ),
     );
   }
@@ -40,12 +40,15 @@ export const checkCsrfToken = (req, res, next) => {
 
   if (!tokenFromClient) {
     return next(
-      new AppError('Request verification failed. Missing token.', 403),
+      new AppError(
+        'Your session has timed out. Please refresh the page before submitting.',
+        403,
+      ),
     );
   }
 
-  const clientBuffer = Buffer.from(tokenFromClient);
-  const sessionBuffer = Buffer.from(tokenFromSession);
+  const clientBuffer = Buffer.from(String(tokenFromClient || ''));
+  const sessionBuffer = Buffer.from(String(tokenFromSession || ''));
 
   if (
     clientBuffer.length !== sessionBuffer.length ||
@@ -53,7 +56,7 @@ export const checkCsrfToken = (req, res, next) => {
   ) {
     return next(
       new AppError(
-        'Your request could not be verified. Please refresh the page and try again.',
+        'We couldn’t verify your request. This usually happens if the page was open too long—please refresh and try again.',
         403,
       ),
     );

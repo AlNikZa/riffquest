@@ -21,7 +21,12 @@ export const logoutController = catchAsync(async (req, res, next) => {
   req.session.destroy((err) => {
     if (err) {
       // Manual next(err) is required here because catchAsync doesn't capture errors inside nested callbacks.
-      return next(new AppError('Error destroying session', 500));
+      return next(
+        new AppError(
+          'Something went wrong during logout. Please try again.',
+          500,
+        ),
+      );
     } else {
       //   Clear the session cookie from the browser
       res.clearCookie('riffQuestSessionId', {

@@ -1,5 +1,4 @@
 // controllers/loginController.js
-
 import { config } from '../config/env.js';
 
 import {
@@ -29,36 +28,24 @@ export const loginController = (req, res, next) => {
 export const loginCallbackController = catchAsync(async (req, res, next) => {
   // Extract authorization code and error from Spotify's redirect query parameters
   const { code, error, state } = req.query;
+  const safeRedirectUrl =
+    getReturnToCookie(req) || req.get('Referer') || config.appBaseUrl || '/';
 
   // 1. Handle user cancellation
   if (error === 'access_denied') {
-    return res
-      .status(302)
-      .redirect(
-        getReturnToCookie(req) ||
-          req.get('Referer') ||
-          config.appBaseUrl ||
-          '/',
-      );
+    return res.status(302).redirect(safeRedirectUrl);
   }
 
   // 2. Security Check: Validate state parameter
   if (!state || state !== req.session.oauthState) {
     throw new AppError(
-      'Invalid OAuth state. Please try logging in again.',
+      'Login process failed. Please start the login process again.',
       403,
     );
   }
 
   if (!code) {
-    return res
-      .status(302)
-      .redirect(
-        getReturnToCookie(req) ||
-          req.get('Referer') ||
-          config.appBaseUrl ||
-          '/',
-      );
+    return res.status(302).redirect(safeRedirectUrl);
   }
 
   // 3. Exchange the authorization code for access and refresh tokens
@@ -94,14 +81,7 @@ export const loginCallbackController = catchAsync(async (req, res, next) => {
       sameSite: config.isProd ? 'none' : 'lax',
     });
 
-    res
-      .status(302)
-      .redirect(
-        getReturnToCookie(req) ||
-          req.get('Referer') ||
-          config.appBaseUrl ||
-          '/',
-      );
+    res.status(302).redirect(safeRedirectUrl);
   });
 });
 

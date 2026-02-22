@@ -71,16 +71,10 @@ export const artistProfileController = catchAsync(async (req, res, next) => {
 });
 
 export const artistRedirectController = (req, res, next) => {
-  const { artist, option } = req.query;
+  const { artist, option = 'details' } = req.query;
 
   if (!artist) {
     return next(new AppError('Please provide an artist name.', 400));
-  }
-
-  if (!option) {
-    return next(
-      new AppError('Please provide an option to be redirected to.', 400),
-    );
   }
 
   switch (option) {
