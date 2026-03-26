@@ -1,6 +1,6 @@
 // middleware/noCacheMiddleware.js
 
-import { AppError } from '../AppError.js';
+import { AppError } from '../utils/AppError.js';
 
 export const noCacheMiddleware = (req, res, next) => {
   try {
@@ -31,11 +31,10 @@ export const noCacheMiddleware = (req, res, next) => {
     }
     next();
   } catch (error) {
-    const cacheError = new AppError(
-      `Cache Header Error: ${error.message}`,
-      500,
-    );
-    cacheError.logOnly = true;
-    next(cacheError);
+    const msg =
+      error?.message ||
+      (typeof error === 'string' ? error : 'Internal Cache Middleware Error');
+    console.error(`❌ NoCacheMiddleware Error: ${msg}`);
+    next();
   }
 };

@@ -1,9 +1,13 @@
 // services/cryptoService.js
+// consider to remove to ../utils/cryptoUtils.js
 
 import { config } from '../config/env.js';
 
 import crypto from 'crypto';
-import { AppError } from '../AppError.js';
+
+import { AppError } from '../utils/AppError.js';
+import { createSystemError } from '../mappers/errorRegistry/systemErrors.js';
+import { createAuthError } from '../mappers/errorRegistry/authErrors.js';
 
 const ENCRYPTION_KEY = config.encryptionKey; // Must be 32 bytes for aes-256
 const IV_LENGTH = 16;
@@ -12,7 +16,9 @@ const IV_LENGTH = 16;
 
 export const encrypt = (stringToBeEncrypted) => {
   if (typeof stringToBeEncrypted !== 'string') {
-    throw new AppError('Encryption failed: input must be a string.', 500);
+    throw createSystemError('invalidEncryptionInput', {
+      encryptionInputType: typeof stringToBeEncrypted,
+    });
   }
 
   try {
@@ -20,7 +26,7 @@ export const encrypt = (stringToBeEncrypted) => {
     const cipher = crypto.createCipheriv(
       'aes-256-cbc',
       Buffer.from(ENCRYPTION_KEY, 'utf8'),
-      iv
+      iv,
     );
 
     const encrypted = Buffer.concat([
@@ -32,7 +38,13 @@ export const encrypt = (stringToBeEncrypted) => {
 
     return result;
   } catch (error) {
-    throw new AppError('Failed to encrypt sensitive data.', 500);
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw createSystemError('encryptionFailed', {
+      cause: error,
+    });
   }
 };
 
@@ -40,13 +52,17 @@ export const encrypt = (stringToBeEncrypted) => {
 
 export const decrypt = (stringToBeDecrypted) => {
   if (!stringToBeDecrypted || typeof stringToBeDecrypted !== 'string') {
-    throw new AppError('Invalid session data: No token provided.', 401);
+    throw createAuthError('invalidDecryptionInput', {
+      decryptionInputType: typeof stringToBeDecrypted,
+    });
   }
 
   try {
     const encryptedData = Buffer.from(stringToBeDecrypted, 'base64');
     if (encryptedData.length < IV_LENGTH) {
-      throw new AppError('Decryption failed: invalid token format.', 401);
+      throw createAuthError('decryptionFailed', {
+        inputLength: encryptedData.length,
+      });
     }
 
     const ivFromResult = encryptedData.slice(0, IV_LENGTH);
@@ -55,7 +71,7 @@ export const decrypt = (stringToBeDecrypted) => {
     const decipher = crypto.createDecipheriv(
       'aes-256-cbc',
       Buffer.from(ENCRYPTION_KEY, 'utf8'),
-      ivFromResult
+      ivFromResult,
     );
 
     const decrypted = Buffer.concat([
@@ -66,7 +82,9 @@ export const decrypt = (stringToBeDecrypted) => {
     const result = decrypted.toString('utf8');
     return result;
   } catch (error) {
-    throw new AppError('Session decryption failed. Please log in again.', 401);
+    throw createAuthError('decryptionFailed', {
+      cause: error,
+    });
   }
 };
 

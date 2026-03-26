@@ -1,41 +1,37 @@
 // middleware/artistMiddleware.js
 
 import { getArtistId } from '../services/artistService.js';
-import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
-import { AppError } from '../AppError.js';
-import { catchAsync } from './errorHandler.js';
+import { getOrRefreshSpotifyToken } from '../services/globalTokenService.js';
+
+import { createValidationError } from '../mappers/errorRegistry/validationErrors.js';
+import { createArtistError } from '../mappers/errorRegistry/artistErrors.js';
+
+import { catchAsync } from '../utils/catchAsync.js';
 
 export const getTokenAndArtistIdMiddleware = catchAsync(
   async (req, res, next) => {
     const rawArtist = req.query.artist;
 
     if (!rawArtist) {
-      throw new AppError(
-        'Bad request: Please enter an artist name to start the search.',
-        400,
-      );
+      throw createValidationError('artistNameRequired');
+      // also used in ../controllers/artistController.js
+      //consider remove one
     }
 
     if (typeof rawArtist !== 'string') {
-      throw new AppError(
-        'Bad request. Please provide a single artist name as text.',
-        400,
-      );
+      throw createValidationError('invalidArtistFormat');
     }
 
     const artistName = rawArtist.trim();
     if (artistName.length === 0) {
-      throw new AppError('Bad request. Artist name cannot be empty.', 400);
+      throw createValidationError('artistNameEmpty');
     }
 
-    const token = await getTokenOrThrowNewAppError();
+    const token = await getOrRefreshSpotifyToken();
 
     const artistId = await getArtistId(artistName, token);
     if (!artistId) {
-      throw new AppError(
-        `Sorry, we couldn't find an artist named "${artistName}".`,
-        404,
-      );
+      throw createArtistError('noArtistIdFound', { artistName });
     }
 
     req.artistId = artistId;

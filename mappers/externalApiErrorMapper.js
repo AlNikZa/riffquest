@@ -1,9 +1,11 @@
 // mappers/externalApiErrorMapper.js
 
-import { AppError } from '../AppError.js';
+import { parseCode } from '../utils/httpUtils.js';
 import { secondsToReadableTime } from '../utils/timeUtils.js';
 
-export const mapSpotifyError = (err, context = 'Spotify') => {
+import { createExternalApiError } from './errorRegistry/externalApiErrors.js';
+
+export const mapExternalApiError = (err, context) => {
   let statusCode;
   const retryAfter = err.response?.headers?.['retry-after'];
 
@@ -11,7 +13,7 @@ export const mapSpotifyError = (err, context = 'Spotify') => {
   if (!err.response) {
     statusCode = 503;
   } else {
-    statusCode = err.response?.status || 500;
+    statusCode = parseCode(err.response?.status);
   }
 
   const messages = {
@@ -19,13 +21,19 @@ export const mapSpotifyError = (err, context = 'Spotify') => {
     403: `This ${context} feature is not available for your account.`,
     404: `The requested content was not found on ${context}.`,
     429: `Too many requests. Please try again ${retryAfter ? `in ${secondsToReadableTime(retryAfter)}` : 'soon'}.`,
-    500: `${context} is currently experiencing issues. Please try again later.`,
-    503: `We’re having trouble reaching ${context}. Please try again in a moment.`,
+    500: `${context} is currently experiencing issues. Please refresh or try again later.`,
+    503: `${context} is temporarily unavailable. Please try again in a moment.`,
   };
   const message =
     messages[statusCode] ||
     `Something went wrong with ${context}. Please try again later.`;
 
   // return object, do not throw error here
-  return new AppError(message, statusCode);
+  return createExternalApiError('apiError', {
+    context,
+    message,
+    statusCode,
+    retryAfter: retryAfter ? secondsToReadableTime(retryAfter) : null,
+    cause: err,
+  });
 };

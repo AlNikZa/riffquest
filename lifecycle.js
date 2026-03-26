@@ -28,7 +28,16 @@ const logShutdownStatus = (signal, err, taskCount, ...taskNames) => {
 	console.log(`📌 Reason: ${reason}`);
 
 	if (err) {
-		console.error(`🔥 Triggered by error: ${err.message || err}`);
+		const errorDetail = err.errorCode
+			? `[${err.errorCode}] ${err.message || 'unknown.'}`
+			: err.message || err;
+		console.error(`🔥 Triggered by error: ${errorDetail}`);
+
+		if (err.stack) {
+			console.error('--- 📋 STACK TRACE ---');
+			console.error(err.stack);
+			console.error('----------------------');
+		}
 	}
 
 	console.log(

@@ -4,7 +4,6 @@ import { config } from '../config/env.js';
 
 import crypto from 'crypto';
 
-import { AppError } from '../AppError.js';
 import { spotifyAuthApi } from '../config/axios.js';
 
 export function buildSpotifyAuthUrl(req) {
@@ -24,8 +23,12 @@ export function buildSpotifyAuthUrl(req) {
     scope: scope,
     state: state,
     redirect_uri: config.spotify.redirectUri,
-    show_dialog: true, // Ensures user can choose a different Spotify account
   });
+
+  // Force the Spotify authorization dialog to appear during development.
+  // This allows for easier testing of different user accounts and prevents
+  // the browser from automatically logging in the last used account.
+  if (!config.isProd) params.set('show_dialog', 'true');
 
   // Final Spotify authorization URL
   const authUrl = 'https://accounts.spotify.com/authorize?' + params.toString();
@@ -34,10 +37,6 @@ export function buildSpotifyAuthUrl(req) {
 }
 
 export async function exchangeCodeForToken(code) {
-  // Throw an error if no code is provided
-  if (!code)
-    throw new AppError('Failed to log in with Spotify. Please try again.', 400);
-
   // Build POST parameters for the token exchange request
   const params = new URLSearchParams({
     grant_type: 'authorization_code', // required by Spotify
@@ -63,7 +62,8 @@ export async function exchangeCodeForToken(code) {
   return data; // token
 }
 
-export function getReturnToCookie(req) {
+function getReturnToCookie(req) {
+  // consider using cookie-parser
   const raw = req.headers.cookie || '';
   const cookies = Object.fromEntries(
     raw.split('; ').map((c) => {
@@ -73,3 +73,8 @@ export function getReturnToCookie(req) {
   );
   return cookies.returnTo || null;
 }
+
+export const getSafeRedirect = (req) => {
+  const url = getReturnToCookie(req) || config.appBaseUrl || '/';
+  return url.startsWith('/') && !url.startsWith('//') ? url : '/';
+};

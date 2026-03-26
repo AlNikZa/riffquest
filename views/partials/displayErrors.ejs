@@ -7,9 +7,11 @@
     <h3 class="my-2 text-danger"><%= title %></h3>
     <ul class="list-unstyled d-inline-block text-start">
       <% errors.forEach(error => { %>
-        <li class="mb-1 text-center"> 
-           <%= error.msg %>
-        </li>
+        <% if (error && typeof error === 'object') { %> 
+          <li class="mb-1 text-center"> 
+             <%= error.message || error.msg || 'An unknown error occurred' %>
+          </li>
+        <% } %>
       <% }) %>
     </ul>
   </div>

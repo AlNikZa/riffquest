@@ -4,7 +4,7 @@ import { refreshUserToken } from '../services/userTokenService.js';
 import { updateSpotifyUser, getUserById } from '../services/userService.js';
 import { decrypt } from '../services/cryptoService.js';
 
-import { catchAsync } from './errorHandler.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
 export const ensureValidUserToken = catchAsync(async (req, res, next) => {
   // 1. If no user is in the session, skip (public route)

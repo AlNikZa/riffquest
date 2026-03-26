@@ -1,10 +1,11 @@
 // controllers/loginController.js
+
 import { config } from '../config/env.js';
 
 import {
   buildSpotifyAuthUrl,
   exchangeCodeForToken,
-  getReturnToCookie,
+  getSafeRedirect,
 } from '../services/loginService.js';
 import {
   getUserData,
@@ -12,8 +13,9 @@ import {
   getUserDocObject,
 } from '../services/userService.js';
 
-import { AppError } from '../AppError.js';
-import { catchAsync } from '../middleware/errorHandler.js';
+import { createAuthError } from '../mappers/errorRegistry/authErrors.js';
+
+import { catchAsync } from '../utils/catchAsync.js';
 
 export const loginController = (req, res, next) => {
   try {
@@ -28,8 +30,8 @@ export const loginController = (req, res, next) => {
 export const loginCallbackController = catchAsync(async (req, res, next) => {
   // Extract authorization code and error from Spotify's redirect query parameters
   const { code, error, state } = req.query;
-  const safeRedirectUrl =
-    getReturnToCookie(req) || req.get('Referer') || config.appBaseUrl || '/';
+
+  const safeRedirectUrl = getSafeRedirect(req);
 
   // 1. Handle user cancellation
   if (error === 'access_denied') {
@@ -37,15 +39,23 @@ export const loginCallbackController = catchAsync(async (req, res, next) => {
   }
 
   // 2. Security Check: Validate state parameter
-  if (!state || state !== req.session.oauthState) {
-    throw new AppError(
-      'Login process failed. Please start the login process again.',
-      403,
-    );
+
+  const expectedState = req.session.oauthState;
+  // Cleanup sensitive state
+  delete req.session.oauthState;
+
+  if (!state || !expectedState || state !== expectedState) {
+    throw createAuthError('oauthStateMismatch', {
+      received: state,
+      expected: expectedState,
+    });
   }
 
   if (!code) {
-    return res.status(302).redirect(safeRedirectUrl);
+    throw createAuthError('tokenExchangeFailed', {
+      query: req.query,
+    });
+    // return res.status(302).redirect(safeRedirectUrl);  // consider this
   }
 
   // 3. Exchange the authorization code for access and refresh tokens
@@ -61,18 +71,21 @@ export const loginCallbackController = catchAsync(async (req, res, next) => {
   await upsertSpotifyUser(userDoc);
 
   // 7. Establish application session
+
+  // CONSIDER: Regenerating the session after successful login to issue a new session ID.
+  // This would mitigate potential session fixation attacks.
+  // User data should then be set within the regenerate callback before saving the session.
+
   req.session.spotify_user_id = userDoc.spotify_user_id;
   req.session.username = userDoc.display_name;
-  req.session.userImg = userDoc.profileImg;
+  req.session.userImg = userDoc.profile_img;
   req.session.justLoggedIn = true;
-
-  // Cleanup sensitive state
-  delete req.session.oauthState;
 
   // 8. Finalize session and redirect
   req.session.save((err) => {
     if (err) {
-      // Manual next(err) is required here because catchAsync doesn't capture errors inside nested callbacks.
+      // Manual next(err) is required as catchAsync cannot capture errors inside nested callbacks.
+      // This raw error will be intercepted and wrapped in a System AppError by the globalErrorHandler.
       return next(err);
     }
     res.clearCookie('returnTo', {
@@ -87,5 +100,5 @@ export const loginCallbackController = catchAsync(async (req, res, next) => {
 
 export const resetLoginFlagController = (req, res) => {
   req.session.justLoggedIn = false;
-  res.sendStatus(200);
+  res.sendStatus(204);
 };

@@ -1,7 +1,8 @@
 // validators/searchValidator.js
 
 import { query } from 'express-validator';
-import { AppError } from '../AppError.js';
+
+import { createValidationError } from '../mappers/errorRegistry/validationErrors.js';
 
 const REGEX = /^[\p{L}\d\s\-.,!?'"()&:/+]+$/u;
 
@@ -91,12 +92,7 @@ export const redirectQueryValidator = [
   // Custom validator to ensure at least one of artist, album, or track is present
   (req, res, next) => {
     if (!req.query.artist && !req.query.album && !req.query.track) {
-      return next(
-        new AppError(
-          'Please provide at least one of the following: artist, album, or track.',
-          400,
-        ),
-      );
+      return next(createValidationError('missingRedirectFields'));
     }
     next();
   },

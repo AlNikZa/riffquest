@@ -2,7 +2,7 @@
 
 import { config } from '../config/env.js';
 import { spotifyAuthApi } from '../config/axios.js';
-import { AppError } from '../AppError.js';
+import { AppError } from '../utils/AppError.js';
 
 // Get Spotify API credentials from configuration object
 const clientId = config.spotify.clientId;
@@ -44,12 +44,13 @@ const fetchNewToken = async (clientId, clientSecret) => {
   return TOKEN;
 };
 
-/* --------- Function: getTokenOrThrowNewAppError ----------
+/* --------- Function: getOrRefreshSpotifyToken ----------
    Returns a valid cached token if available.
    If a refresh is already in progress, returns the same in-flight Promise.
    Guarantees a single token refresh at any time.
 ------------------------------------------------------------ */
-export const getTokenOrThrowNewAppError = async () => {
+export const getOrRefreshSpotifyToken = async () => {
+  //  ex getTokenOrThrowNewAppError
   const now = Date.now();
 
   // 1. Return valid token if available

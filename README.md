@@ -110,8 +110,20 @@ RiffQuest/
 │   └── logoutController.js
 │
 ├── mappers/
+│   ├── errorRegistry/
+│   │   ├── artistErrors.js
+│   │   ├── authErrors.js
+│   │   ├── databaseErrors.js
+│   │   ├── externalApiErrors.js
+│   │   ├── routingErrors.js
+│   │   ├── securityErrors.js
+│   │   ├── systemErrors.js
+│   │   ├── userErrors.js
+│   │   └── validationErrors.js
+│   │
 │   ├── externalApiErrorMapper.js
-│   └── spotifyMapper.js
+│   ├── spotifyMapper.js
+│   └── viewContextMapper.js
 │
 ├── middleware/
 │   ├── artistMiddleware.js
@@ -149,11 +161,17 @@ RiffQuest/
 │   ├── devService.js
 │   ├── globalTokenService.js
 │   ├── loginService.js
+│   ├── unauthorizedService.js
 │   ├── userService.js
 │   └── userTokenService.js
 │
 ├── utils/
+│   ├── AppError.js
 │   ├── arrayUtils.js
+│   ├── catchAsync.js
+│   ├── errorHelpers.js
+│   ├── httpUtils.js
+│   ├── plainObjectUtils.js
 │   ├── stringUtils.js
 │   └── timeUtils.js
 │
@@ -180,13 +198,12 @@ RiffQuest/
 │
 ├── .env.example
 ├── app.js
-├── AppError.js
 ├── lifecycle.js
 ├── package.json
 ├── Procfile
 └── server.js
 
-12 directories, 68 files
+13 directories, 82 files
 ```
 
 ## Error Handling

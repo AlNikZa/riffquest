@@ -4,14 +4,21 @@ import User from '../models/User.js';
 import { encrypt } from '../services/cryptoService.js';
 import { spotifyApi } from '../config/axios.js';
 
-import { AppError } from '../AppError.js';
+import { AppError } from '../utils/AppError.js';
+import { createUserError } from '../mappers/errorRegistry/userErrors.js';
+import { createDatabaseError } from '../mappers/errorRegistry/databaseErrors.js';
 
 export const getUserById = async (spotify_user_id) => {
   try {
     const user = await User.findOne({ spotify_user_id });
+    if (!user) throw createUserError('userIdNotFound', { spotify_user_id });
+
     return user;
   } catch (err) {
-    throw new AppError('Database error while fetching user', 500);
+    if (err instanceof AppError) throw err;
+
+    // throw new AppError('Database error while fetching user', 500);
+    throw createDatabaseError('userFetchFailed', { cause: err });
   }
 };
 
@@ -36,7 +43,7 @@ export const upsertSpotifyUser = async (userDoc) => {
       refresh_token: userDoc.refresh_token, // Update refresh token
       token_expires_in: userDoc.token_expires_in, // Update token expiry
       display_name: userDoc.display_name, // Update display name
-      profile_img: userDoc.profileImg,
+      profile_img: userDoc.profile_img,
       followers: userDoc.followers, // Update followers count
       token_created_timestamp: Date.now(),
     };
@@ -58,13 +65,14 @@ export const upsertSpotifyUser = async (userDoc) => {
     );
   } catch (err) {
     if (err instanceof AppError) throw err;
-    throw new AppError('Database error during user upsert', 500);
+
+    throw createDatabaseError('userUpsertFailed', { cause: err });
   }
 };
 //
 export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
   try {
-    await User.updateOne(
+    const result = await User.updateOne(
       { spotify_user_id: spotify_user_id },
       {
         $set: {
@@ -75,9 +83,14 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
         },
       },
     );
+
+    if (result.matchedCount === 0) {
+      throw createUserError('userIdNotFound', { spotify_user_id });
+    }
   } catch (err) {
     if (err instanceof AppError) throw err;
-    throw new AppError('Database error during token update', 500);
+    // throw new AppError('Database error during token update', 500);
+    throw createDatabaseError('userUpdateFailed', { cause: err });
   }
 };
 
@@ -91,13 +104,16 @@ export const getUserDocObject = (userTokens, userData) => {
       refresh_token: encryptedRefreshToken,
       token_expires_in: userTokens.expires_in,
       display_name: userData.display_name,
-      profileImg: userData.images?.[0]?.url || null,
+      profile_img: userData.images?.[0]?.url || null,
       followers: userData.followers?.total || 0,
       spotify_user_id: userData.id,
     };
 
     return userDoc;
   } catch (error) {
-    throw new AppError('Failed to prepare secure user data object', 500);
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw createUserError('invalidUserData', { cause: error });
   }
 };

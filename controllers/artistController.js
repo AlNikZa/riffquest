@@ -1,6 +1,6 @@
 // controllers/artistController.js
 
-import { getTokenOrThrowNewAppError } from '../services/globalTokenService.js';
+import { getOrRefreshSpotifyToken } from '../services/globalTokenService.js';
 import {
   getArtistTopTracks,
   getArtistAlbums,
@@ -8,8 +8,10 @@ import {
   getArtistsList,
 } from '../services/artistService.js';
 
-import { AppError } from '../AppError.js';
-import { catchAsync } from '../middleware/errorHandler.js';
+import { createArtistError } from '../mappers/errorRegistry/artistErrors.js';
+import { createValidationError } from '../mappers/errorRegistry/validationErrors.js';
+
+import { catchAsync } from '../utils/catchAsync.js';
 
 export const artistTopTracksController = catchAsync(async (req, res, next) => {
   const artistName = req.query.artist;
@@ -18,7 +20,7 @@ export const artistTopTracksController = catchAsync(async (req, res, next) => {
   // Fetch top tracks for the artist
   const topTracks = await getArtistTopTracks(artistId, token);
   if (!topTracks || topTracks.length === 0) {
-    throw new AppError(`No top tracks found for artist "${artistName}".`, 404);
+    throw createArtistError('noTracksFound', { artistName });
   }
 
   // Render the top tracks page with dynamic title
@@ -38,7 +40,7 @@ export const artistAlbumsController = catchAsync(async (req, res, next) => {
   // Fetch all albums for the artist
   const albums = await getArtistAlbums(artistId, token);
   if (!albums || albums.length === 0) {
-    throw new AppError(`No albums found for artist "${artistName}".`, 404);
+    throw createArtistError('noAlbumsFound', { artistName });
   }
 
   // Render the albums page with dynamic title and artist info
@@ -58,7 +60,7 @@ export const artistProfileController = catchAsync(async (req, res, next) => {
   // Fetch full artist information
   const artistData = await getArtistInfo(artistId, token);
   if (!artistData) {
-    throw new AppError(`No data found for artist "${artistName}".`, 404);
+    throw createArtistError('noArtistDetails', { artistName });
   }
 
   // Render the artist profile page with dynamic title
@@ -74,7 +76,7 @@ export const artistRedirectController = (req, res, next) => {
   const { artist, option = 'details' } = req.query;
 
   if (!artist) {
-    return next(new AppError('Please provide an artist name.', 400));
+    return next(createValidationError('artistNameRequired'));
   }
 
   switch (option) {
@@ -99,7 +101,7 @@ export const artistRedirectController = (req, res, next) => {
 
 export const artistAutocompleteController = catchAsync(
   async (req, res, next) => {
-    const token = await getTokenOrThrowNewAppError();
+    const token = await getOrRefreshSpotifyToken();
 
     // Read the search query from the request query
     const query = req.query.query?.trim();

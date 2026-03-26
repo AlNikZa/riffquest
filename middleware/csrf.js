@@ -2,17 +2,12 @@
 
 import crypto from 'crypto';
 
-import { AppError } from '../AppError.js';
+import { createSecurityError } from '../mappers/errorRegistry/securityErrors.js';
 
 export const createCsrfToken = (req, res, next) => {
   if (req.method !== 'GET') return next();
   if (!req.session) {
-    return next(
-      new AppError(
-        'Something went wrong while loading the page. Please refresh and try again.',
-        500,
-      ),
-    );
+    return next(createSecurityError('sessionMissing'));
   }
 
   if (!req.session.csrfToken) {
@@ -25,12 +20,12 @@ export const createCsrfToken = (req, res, next) => {
 };
 
 export const checkCsrfToken = (req, res, next) => {
-  if (!req.session || !req.session.csrfToken) {
+  if (!req.session || !req.session?.csrfToken) {
     return next(
-      new AppError(
-        'Your session may have expired. Please refresh the page and try again.',
-        403,
-      ),
+      createSecurityError('sessionExpired', {
+        session: req.session,
+        csrfToken: req.session?.csrfToken,
+      }),
     );
   }
 
@@ -39,12 +34,7 @@ export const checkCsrfToken = (req, res, next) => {
   const tokenFromSession = req.session.csrfToken;
 
   if (!tokenFromClient) {
-    return next(
-      new AppError(
-        'Your session has timed out. Please refresh the page before submitting.',
-        403,
-      ),
-    );
+    return next(createSecurityError('csrfTokenMissing'));
   }
 
   const clientBuffer = Buffer.from(String(tokenFromClient || ''));
@@ -55,10 +45,12 @@ export const checkCsrfToken = (req, res, next) => {
     !crypto.timingSafeEqual(clientBuffer, sessionBuffer)
   ) {
     return next(
-      new AppError(
-        'We couldn’t verify your request. This usually happens if the page was open too long—please refresh and try again.',
-        403,
-      ),
+      createSecurityError('invalidCsrfToken', {
+        method: req.method,
+        path: req.originalUrl,
+        hasBodyToken: !!req.body._csrf,
+        hasHeaderToken: !!req.headers['x-csrf-token'],
+      }),
     );
   }
 
