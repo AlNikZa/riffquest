@@ -20,7 +20,7 @@
     "scripts:list": "Show all npm scripts with description and full command"
   },
   "keywords": [
-    "spotify",
+    "musicbrainz",
     "music",
     "express",
     "ejs",
@@ -35,7 +35,7 @@
   ],
   "author": "Aleksandar Nikolic",
   "license": "ISC",
-  "description": "A Spotify-powered music discovery app to explore genres, artists, albums, and tracks.",
+  "description": "A music discovery app powered by MusicBrainz and Cover Art Archive.",
   "dependencies": {
     "axios": "^1.13.5",
     "connect-mongo": "^5.1.0",
@@ -46,7 +46,8 @@
     "express-session": "^1.18.2",
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
-    "mongoose": "^8.18.3"
+    "mongoose": "^8.18.3",
+    "qs": "^6.15.0"
   },
   "devDependencies": {
     "directory-tree": "^3.5.2",

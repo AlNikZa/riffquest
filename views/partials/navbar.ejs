@@ -24,7 +24,7 @@
       <form
         id="artist-navbar-form"
         class="d-flex align-items-center"
-        action="/artists/redirect"
+        action="/artists/search"
         method="get"
         autocomplete="off"
       >
@@ -36,7 +36,7 @@
 
         <input
           id="artist-navbar-input"
-          class="form-control me-2 w-50"
+          class="form-control me-2 w-100"
           type="text"
           name="artist"
           placeholder="Enter artist name..."
@@ -47,56 +47,23 @@
 
         <datalist id="navbar-suggestions"></datalist>
 
-        <div class="dropdown me-2">
-          <button
-            class="btn btn-success dropdown-toggle"
-            type="button"
-            id="artistDropdown"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Artist action
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="artistDropdown">
-            <li>
-              <button
-                class="dropdown-item"
-                type="submit"
-                formaction="/artists/albums"
-              >
-                All albums
-              </button>
-            </li>
-            <li>
-              <button
-                class="dropdown-item"
-                type="submit"
-                formaction="/artists/top-tracks"
-              >
-                Top tracks
-              </button>
-            </li>
-            <li>
-              <button
-                class="dropdown-item"
-                type="submit"
-                formaction="/artists/profile"
-              >
-                Artist details
-              </button>
-            </li>
-          </ul>
-        </div>
+        <button type="submit" class="btn btn-outline-light text-nowrap">
+          Search
+        </button>
+
       </form>
 
-      <!-- Right side: Spotify login CTA -->
+      <!-- Right side: XYZ login CTA -->
       <% if (!isLoggedIn) { %>
       <div class="d-flex ms-auto align-items-center">
         <a
-          href="/auth/login"
-          class="btn btn-outline-light mt-2 mt-lg-0 spotify-login-btn"
+          href="#"
+          class="btn btn-outline-light mt-2 mt-lg-0 main-auth-btn disabled"
+          tabindex="-1"
+          aria-disabled="true"
+          role="button"
         >
-          Log in with Spotify
+        Login (Coming Soon)
         </a>
       </div>
       <% } else { %>
@@ -110,7 +77,7 @@
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button
             type="submit"
-            class="btn btn-outline-light mt-2 mt-lg-0 spotify-logout-btn"
+            class="btn btn-outline-light mt-2 mt-lg-0 logout-btn"
           >
             Log out
           </button>

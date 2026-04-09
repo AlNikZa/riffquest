@@ -2,7 +2,7 @@
 
 _Every song has its own riff._
 
-Search for your favorite artists and explore their albums, top tracks, and detailed info via Spotify API.
+RiffQuest is a music data aggregator that combines information from multiple external sources (MusicBrainz, Last.fm) to provide a comprehensive overview of artist discographies, biographies, and metadata. The project focuses on clean architecture, security, and precise data mapping across diverse API ecosystems.
 
 > ⚠️ **Project status:** This app is still under active development.  
 > Features and UI may change frequently.
@@ -11,22 +11,26 @@ Search for your favorite artists and explore their albums, top tracks, and detai
 
 ## Features
 
-- Search artists by name
-- View all albums
-- View top tracks
-- View artist details
-- Responsive design with Bootstrap 5
-- Modals for action selection
+- Deep Artist Insights: Access comprehensive artist profiles including type (Group/Person), origin, and active status.
+
+- Member Lineup History: View detailed band member records with specific roles (e.g., "electric guitar", "drums") and their active timeframes within the project.
+
+- Visual Discography: Explore full album lists with release dates and direct links to cover art via the Cover Art Archive.
+
+- Biography & Metadata: Read full artist summaries and detailed histories aggregated from Last.fm and MusicBrainz.
+
+- Engagement Stats: Real-time data on listener counts and total playcounts to gauge artist popularity.
 
 ---
 
 ## Tech
 
-- Node.js & Express.js (using ES modules: import/export)
-- EJS templates
-- Bootstrap 5
-- Spotify API
-- Vanilla JS for interactivity
+- **Node.js & Express.js** (using ES modules: import/export)
+- **EJS templates** for server-side rendering
+- **Bootstrap 5** for responsive UI
+- **MusicBrainz API** for artist metadata and relationships
+- **Last.fm API** for biographies and listener statistics
+- **Vanilla JS** for client-side interactivity
 
 ---
 
@@ -51,13 +55,26 @@ cd riffquest
 npm install
 ```
 
-### Create a `.env` file in the root with your Spotify credentials.
+### Get API Keys
 
-You can get your credentials from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/):
+- **MusicBrainz**
+  - No API key required
+  - A custom `User-Agent` is mandatory
+  - See: https://musicbrainz.org/doc/MusicBrainz_API
+
+- **Last.fm**
+  - You need to register your application to get an API key
+  - Register here: https://www.last.fm/api/account/create
+
+### Create a `.env` file in the root with your credentials.
 
 ```env
-CLIENT_ID=your_spotify_client_id
-CLIENT_SECRET=your_spotify_client_secret
+MUSIC_BRAINZ_USER_AGENT=YourAppName/Version ( your-email@example.com )
+LASTFM_API_KEY=your_last_fm_api_key_here
+
+BASE_URL_DEV=http://127.0.0.1:3000
+BASE_URL_PROD=https://your-production-domain.com
+
 ...
 ```
 
@@ -79,15 +96,19 @@ http://127.0.0.1:3000
 
 ## Usage
 
-Type an artist's name in the search bar.
+Search: Type an artist's name in the search bar on the home page.
 
-Choose an action via buttons, navbar dropdown or modal:
+Select: Choose the correct artist from the search results (powered by MusicBrainz).
 
-View all albums
+Explore: Access a unified dashboard that displays:
 
-View top tracks
+Artist Info: Full biography, origin, and active years.
 
-View artist details
+Discography: A visual list of albums with release dates and cover art.
+
+Band Lineup: Current and former members with their specific roles and timeframes.
+
+Statistics: Real-time listener counts and playcounts.
 
 ## Project Structure
 
@@ -122,7 +143,8 @@ RiffQuest/
 │   │   └── validationErrors.js
 │   │
 │   ├── externalApiErrorMapper.js
-│   ├── spotifyMapper.js
+│   ├── lastFmMapper.js
+│   ├── musicBrainzMapper.js
 │   └── viewContextMapper.js
 │
 ├── middleware/
@@ -144,9 +166,9 @@ RiffQuest/
 │   ├── autocomplete.js
 │   ├── custom.css
 │   ├── favicon.ico
-│   ├── formModals.js
-│   ├── Full_Logo_Green_CMYK.svg
-│   └── logo.png
+│   ├── lastfmLogo.svg
+│   ├── logo.png
+│   └── MusicBrainzLogo.svg
 │
 ├── routes/
 │   ├── artist.js
@@ -159,7 +181,6 @@ RiffQuest/
 │   ├── artistService.js
 │   ├── cryptoService.js
 │   ├── devService.js
-│   ├── globalTokenService.js
 │   ├── loginService.js
 │   ├── unauthorizedService.js
 │   ├── userService.js
@@ -176,6 +197,7 @@ RiffQuest/
 │   └── timeUtils.js
 │
 ├── validators/
+│   ├── commonValidators.js
 │   ├── loginValidator.js
 │   └── searchValidator.js
 │
@@ -203,18 +225,24 @@ RiffQuest/
 ├── Procfile
 └── server.js
 
-13 directories, 82 files
+13 directories, 83 files
 ```
 
-## Error Handling
+## Error Management
 
-### Client errors
+### Robust Error Registry
 
-**noResultsFound.ejs** is rendered if no artist, album, or track is found.
+The application utilizes a Centralized Error Registry Pattern to categorize and handle issues across different layers:
 
-### Server errors
+Operational Errors: Handled gracefully with user-friendly feedback (e.g., validation, authentication, or "no results" scenarios).
 
-**error.ejs** is rendered for server/API errors with details for debugging.
+System & API Errors: Mapped from external sources (MusicBrainz/Last.fm) and logged for debugging while maintaining a stable UI.
+
+### User Feedback
+
+**noResultsFound.ejs**: Rendered when a search or specific resource lookup returns no data.
+
+**error.ejs**: A dedicated global error page that provides context-aware messages based on the error type (Validation, Database, or External API issues).
 
 ## License
 

@@ -31,3 +31,13 @@ export const cleanEmptyFields = (obj, depth = 0) => {
 
 	return cleaned;
 };
+
+export const deepFreeze = (obj) => {
+	Object.getOwnPropertyNames(obj).forEach((name) => {
+		const prop = obj[name];
+		if (prop !== null && typeof prop === 'object') {
+			deepFreeze(prop);
+		}
+	});
+	return Object.freeze(obj);
+};

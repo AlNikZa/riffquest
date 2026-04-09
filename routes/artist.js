@@ -2,73 +2,38 @@
 
 import express from 'express';
 
-import {
-  artistQueryValidator,
-  autocompleteQueryValidator,
-  redirectQueryValidator,
-} from '../validators/searchValidator.js';
+import { artistQueryValidator } from '../validators/searchValidator.js';
+import { validateId } from '../validators/commonValidators.js';
+
 import { handleValidationErrors } from '../middleware/validationHandler.js';
-import { getTokenAndArtistIdMiddleware } from '../middleware/artistMiddleware.js';
+
 import {
-  artistTopTracksController,
-  artistAlbumsController,
-  artistProfileController,
-  artistRedirectController,
-  artistAutocompleteController,
+  artistSuggestionsController,
+  artistSearchController,
+  getArtistByIdController,
 } from '../controllers/artistController.js';
 
 const router = express.Router();
 
-/* ----------------------------------------------------------- */
-/* ---------------- Artist Top Tracks Route ------------------ */
-/* ----------------------------------------------------------- */
 router.get(
-  '/artists/top-tracks',
+  '/artists/suggestions',
   artistQueryValidator,
   handleValidationErrors,
-  getTokenAndArtistIdMiddleware,
-  artistTopTracksController
+  artistSuggestionsController,
 );
 
-/* ----------------------------------------------------------- */
-/* ------------------- Artist Albums Route ------------------- */
-/* ----------------------------------------------------------- */
 router.get(
-  '/artists/albums',
+  '/artists/search',
   artistQueryValidator,
   handleValidationErrors,
-  getTokenAndArtistIdMiddleware,
-  artistAlbumsController
+  artistSearchController,
 );
 
-/* ---------------------------------------------------------- */
-/* ------------------- Show Artist Route -------------------- */
-/* ---------------------------------------------------------- */
 router.get(
-  '/artists/profile',
-  artistQueryValidator,
+  '/artists/:id',
+  validateId,
   handleValidationErrors,
-  getTokenAndArtistIdMiddleware,
-  artistProfileController
-);
-
-/* -------------------------------------------------------- */
-/* ------------------- Artist Redirect -------------------- */
-/* -------------------------------------------------------- */
-router.get(
-  '/artists/redirect',
-  redirectQueryValidator,
-  handleValidationErrors,
-  artistRedirectController
-);
-/* -------------------------------------------------------------------- */
-/* ------------------- Artist Input Suggestions -------------------- */
-/* -------------------------------------------------------------------- */
-router.get(
-  '/artists/autocomplete',
-  autocompleteQueryValidator,
-  handleValidationErrors,
-  artistAutocompleteController
+  getArtistByIdController,
 );
 
 export default router;

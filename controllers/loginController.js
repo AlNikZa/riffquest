@@ -3,13 +3,13 @@
 import { config } from '../config/env.js';
 
 import {
-  buildSpotifyAuthUrl,
+  buildOAuthUrl,
   exchangeCodeForToken,
   getSafeRedirect,
 } from '../services/loginService.js';
 import {
   getUserData,
-  upsertSpotifyUser,
+  upsertUser,
   getUserDocObject,
 } from '../services/userService.js';
 
@@ -19,7 +19,7 @@ import { catchAsync } from '../utils/catchAsync.js';
 
 export const loginController = (req, res, next) => {
   try {
-    const authUrl = buildSpotifyAuthUrl(req);
+    const authUrl = buildOAuthUrl(req);
     // Redirect the user to Spotify's login/authorization page
     res.status(302).redirect(authUrl);
   } catch (error) {
@@ -68,7 +68,7 @@ export const loginCallbackController = catchAsync(async (req, res, next) => {
   const userDoc = getUserDocObject(userTokens, userData);
 
   // 6. Persist user and tokens to MongoDB
-  await upsertSpotifyUser(userDoc);
+  await upsertUser(userDoc);
 
   // 7. Establish application session
 

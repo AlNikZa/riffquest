@@ -5,19 +5,19 @@ into process.env globally
 so they can be accessed anywhere in the app
 */
 
+import { deepFreeze } from '../utils/plainObjectUtils.js';
+
 import dotenv from 'dotenv';
 dotenv.config();
 
 const requiredVars = [
-  'CLIENT_ID',
-  'CLIENT_SECRET',
+  'MUSIC_BRAINZ_USER_AGENT',
+  'LASTFM_API_KEY',
   'MONGO_USER',
   'MONGO_PASS',
   'MONGO_DB',
   'MONGO_CLUSTER',
   'MONGO_HOST',
-  'REDIRECT_URI_DEV',
-  'REDIRECT_URI_PROD',
   'BASE_URL_DEV',
   'BASE_URL_PROD',
   'SESSION_SECRET',
@@ -36,10 +36,6 @@ requiredVars.forEach((varName) => {
 const environment = process.env.NODE_ENV || 'development';
 const isProd = environment === 'production';
 
-const spotifyRedirectUri = isProd
-  ? process.env.REDIRECT_URI_PROD
-  : process.env.REDIRECT_URI_DEV;
-
 const appBaseUrl = isProd
   ? process.env.BASE_URL_PROD
   : process.env.BASE_URL_DEV;
@@ -50,10 +46,13 @@ const config = {
   isProd,
   port: process.env.PORT || 3000,
   appBaseUrl,
-  spotify: {
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    redirectUri: spotifyRedirectUri,
+  musicBrainz: {
+    userAgent: process.env.MUSIC_BRAINZ_USER_AGENT,
+    baseUrl: 'https://musicbrainz.org/ws/2/',
+    format: 'json',
+  },
+  lastFm: {
+    apiKey: process.env.LASTFM_API_KEY,
   },
   mongo: {
     user: process.env.MONGO_USER,
@@ -77,10 +76,10 @@ const sensitiveMongoVars = [
 sensitiveMongoVars.forEach(({ name, value }) => {
   if (forbiddenChars.test(value)) {
     console.error(
-      `💥 SECURITY ERROR: ${name} contains forbidden URL characters (space : / ? # [ ] @ %).`
+      `💥 SECURITY ERROR: ${name} contains forbidden URL characters (space : / ? # [ ] @ %).`,
     );
     console.error(
-      `👉 Please change your MongoDB credentials to avoid connection string corruption.`
+      `👉 Please change your MongoDB credentials to avoid connection string corruption.`,
     );
     process.exit(1);
   }
@@ -90,22 +89,9 @@ sensitiveMongoVars.forEach(({ name, value }) => {
 const keyLength = Buffer.byteLength(config.encryptionKey, 'utf8');
 if (keyLength !== 32) {
   console.error(
-    `💥 FATAL: ENCRYPTION_KEY must be exactly 32 bytes (currently ${keyLength} bytes).`
+    `💥 FATAL: ENCRYPTION_KEY must be exactly 32 bytes (currently ${keyLength} bytes).`,
   );
   process.exit(1);
-}
-
-/**
- * Deep freezes an object to ensure runtime immutability of the configuration.
- */
-function deepFreeze(obj) {
-  Object.getOwnPropertyNames(obj).forEach((name) => {
-    const prop = obj[name];
-    if (prop !== null && typeof prop === 'object') {
-      deepFreeze(prop);
-    }
-  });
-  return Object.freeze(obj);
 }
 
 deepFreeze(config);

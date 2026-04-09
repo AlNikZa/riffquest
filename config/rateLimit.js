@@ -9,7 +9,7 @@
 import rateLimit from 'express-rate-limit';
 
 function renderRateLimitError(req, res, title, message) {
-  const isLoggedIn = !!req.session?.spotify_user_id;
+  const isLoggedIn = false; // no working auth flow curently
 
   res.status(429);
   res.render('error', {
@@ -38,7 +38,7 @@ export const generalLimiter = rateLimit({
       req,
       res,
       'Too Many Requests',
-      '⏳ You have reached the request limit. Please wait a few minutes and try again.'
+      '⏳ You have reached the request limit. Please wait a few minutes and try again.',
     );
   },
 });
@@ -54,7 +54,7 @@ export const loginLimiter = rateLimit({
       req,
       res,
       'Login Rate Limit Exceeded',
-      '🚫 You have made too many login attempts. Please wait a few minutes and try again.'
+      '🚫 You have made too many login attempts. Please wait a few minutes and try again.',
     );
   },
 });
@@ -69,7 +69,7 @@ export const devLimiter = rateLimit({
       req,
       res,
       'Development Rate Limit Exceeded',
-      '🚫 You have made too many requests to the development endpoints. Please wait a while and try again.'
+      '🚫 You have made too many requests to the development endpoints. Please wait a while and try again.',
     );
   },
 });

@@ -17,43 +17,75 @@ function initAutocomplete(inputSelector, datalistSelector) {
   // Exit if input or datalist does not exist on this page
   if (!input || !datalist) return;
 
+  let currentSuggestions = [];
+  let abortController = null;
+
   // Function to fetch suggestions from backend
   const fetchArtists = async () => {
     const query = input.value.trim();
-    if (!query) return; // Do nothing if input is empty
+    if (!query || query.length < 2) {
+      datalist.innerHTML = '';
+      currentSuggestions = [];
+      return; // Do nothing if input is empty or too short
+    }
+
+    if (abortController) {
+      abortController.abort();
+    }
+    abortController = new AbortController();
 
     try {
       const response = await fetch(
-        `/artists/autocomplete?query=${encodeURIComponent(query)}`,
+        `/artists/suggestions?artist=${encodeURIComponent(query)}`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+          signal: abortController.signal,
+        },
       );
 
-      const artists = await response.json(); // parse JSON array
-      // Clear previous options
-      datalist.innerHTML = '';
+      const result = await response.json();
 
-      // Populate datalist with new options
-      artists.forEach((name) => {
-        const option = document.createElement('option');
-        option.value = name;
-        datalist.appendChild(option);
-      });
+      if (result.status === 'success') {
+        const artists = result.data;
+        currentSuggestions = artists;
+        datalist.innerHTML = '';
+        // Populate datalist with new options
+        currentSuggestions.forEach((artist) => {
+          const option = document.createElement('option');
+          const displayName = artist.country
+            ? `${artist.name} (${artist.country})`
+            : `${artist.name}`;
+          option.value = displayName;
+          option.dataset.id = artist.id;
+          datalist.appendChild(option);
+        });
+      }
     } catch (err) {
+      if (err.name === 'AbortError') return;
       console.error('❌ Autocomplete fetch failed:', err);
-      // TODO: Notify the user that suggestions could not be loaded (e.g., toast or inline message)
     }
   };
 
   // Wrap fetchArtists with debounce (400ms delay)
-  const debouncedFetch = debounce(fetchArtists, 300);
+  const debouncedFetch = debounce(fetchArtists, 400);
 
-  // Listen for input events on the input field
-  input.addEventListener('input', debouncedFetch);
+  input.addEventListener('input', () => {
+    const match = currentSuggestions.find((a) => {
+      const displayName = a.country ? `${a.name} (${a.country})` : a.name;
+      return displayName === input.value;
+    });
+    if (match) {
+      if (abortController) abortController.abort();
+      window.location.href = `/artists/${match.id}`;
+      return;
+    }
+
+    // Listen for input events on the input field
+    debouncedFetch();
+  });
 }
 
 // Apply autocomplete conditionally based on element existence

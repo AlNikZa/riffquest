@@ -69,8 +69,6 @@ app.use(sessionInit());
 app.use(noCacheMiddleware);
 // Global rate limiting
 app.use(generalLimiter);
-// Ensures that the user's Spotify access token is valid and refreshed
-app.use(ensureValidUserToken);
 // Store current URL for post-login redirect
 app.use(setReturnToCookie);
 // Expose user session data to all views

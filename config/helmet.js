@@ -61,19 +61,26 @@ export const helmetConfig = (req, res, next) => {
 
         // img-src: Specifies valid sources for images.
         // - data:: Allows Base64 encoded images (often used for icons).
-        // - i.scdn.co: Spotify's Content Delivery Network (CDN) for artist/album art.
-        imgSrc: ["'self'", 'data:', 'https://i.scdn.co'],
+        // - *.musicbrainz.org: Enable for MusicBrainz covers
+        // - lastfm.freetls.fastly.net: Enable for Last.fm image CDN
+        // - *.last.fm: Enable for Last.fm fallback domains
+        imgSrc: [
+          "'self'",
+          'data:',
+          // 'https://*.musicbrainz.org',
+          // 'https://lastfm.freetls.fastly.net',
+          // 'https://*.last.fm',
+        ],
 
         // frame-src: Specifies valid sources for nested browsing contexts (iframes).
-        // - spotify.com: Necessary to allow the Spotify Embedded Player to load.
-        frameSrc: ["'self'", 'https://open.spotify.com'],
+        frameSrc: ["'self'"],
 
         // connect-src: Limits the origins to which you can send AJAX requests (Fetch/XHR).
-        // - spotify.com: Allows frontend interaction with Spotify's API if needed.
         connectSrc: [
           "'self'",
           'https://cdn.jsdelivr.net',
-          'https://api.spotify.com',
+          // 'https://musicbrainz.org',
+          // 'https://ws.audioscrobbler.com',
         ],
         // object-src: Disables plugins like Flash, Java, or Silverlight to reduce attack surface.
         objectSrc: ["'none'"],

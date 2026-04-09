@@ -1,12 +1,12 @@
 // public/authModals.js
 
 document.addEventListener('DOMContentLoaded', function () {
-  // === Spotify login button ===
-  // Select all elements with class 'spotify-login-btn' and add a click listener
-  document.querySelectorAll('.spotify-login-btn').forEach((btn) => {
+  // === Login button ===
+  // Select all elements with class 'login-btn' and add a click listener
+  document.querySelectorAll('.login-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault(); // Prevent default navigation
-      window.location.href = btn.href; // Redirect to Spotify login
+      window.location.href = btn.href; // Redirect to login
     });
   });
 
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // === Logout modal ===
-  const logoutBtn = document.querySelector('.spotify-logout-btn');
+  const logoutBtn = document.querySelector('.logout-btn');
   const confirmBtn = document.getElementById('confirmLogout');
   const logoutNoBtn = document.getElementById('logoutNo'); // Optional: "No" button
   const logoutModalEl = document.getElementById('logoutModal');
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Logout failed. Please try again.'); // temporary solution, replace with modal or toast.
           }
         },
-        { once: true }
+        { once: true },
       );
     });
 

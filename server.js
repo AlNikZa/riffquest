@@ -9,7 +9,6 @@ import {
 } from './lifecycle.js';
 import connectDB from './config/db.js';
 import app from './app.js';
-import { initToken } from './services/globalTokenService.js';
 
 // Initialize global listeners for process termination and unhandled errors
 registerShutdownHandlers();
@@ -30,11 +29,7 @@ async function startServer() {
       }
     });
 
-    // 2. Initialize external dependencies (e.g., Spotify API Client Credentials)
-    await initToken();
-    console.log('🔑 Spotify Global Token Initialized');
-
-    // 3. Start Listening: Launch the HTTP server
+    // 2. Start Listening: Launch the HTTP server
     const server = app.listen(config.port, () => {
       console.log(`📡 Server started on port ${config.port}`);
 

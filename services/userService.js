@@ -2,16 +2,15 @@
 
 import User from '../models/User.js';
 import { encrypt } from '../services/cryptoService.js';
-import { spotifyApi } from '../config/axios.js';
 
 import { AppError } from '../utils/AppError.js';
 import { createUserError } from '../mappers/errorRegistry/userErrors.js';
 import { createDatabaseError } from '../mappers/errorRegistry/databaseErrors.js';
 
-export const getUserById = async (spotify_user_id) => {
+export const getUserById = async (user_id) => {
   try {
-    const user = await User.findOne({ spotify_user_id });
-    if (!user) throw createUserError('userIdNotFound', { spotify_user_id });
+    const user = await User.findOne({ user_id });
+    if (!user) throw createUserError('userIdNotFound', { user_id });
 
     return user;
   } catch (err) {
@@ -23,8 +22,7 @@ export const getUserById = async (spotify_user_id) => {
 };
 
 export const getUserData = async (userAccessToken) => {
-  // Error handling managed by spotifyApi interceptor
-  const response = await spotifyApi.get('/me', {
+  const response = await api.get('/me', {
     headers: {
       Authorization: `Bearer ${userAccessToken}`,
     },
@@ -34,7 +32,7 @@ export const getUserData = async (userAccessToken) => {
   return data;
 };
 
-export const upsertSpotifyUser = async (userDoc) => {
+export const upsertUser = async (userDoc) => {
   try {
     // Prepare only the fields to update for an existing user
     // NOTE: access_token and refresh_token are expected to be already encrypted
@@ -49,11 +47,11 @@ export const upsertSpotifyUser = async (userDoc) => {
     };
 
     await User.findOneAndUpdate(
-      { spotify_user_id: userDoc.spotify_user_id }, // Find user by Spotify ID
+      { user_id: userDoc.user_id }, // Find user by Spotify ID
       {
         $set: updateFields,
         $setOnInsert: {
-          spotify_user_id: userDoc.spotify_user_id,
+          user_id: userDoc.user_id,
         },
       },
 
@@ -70,10 +68,10 @@ export const upsertSpotifyUser = async (userDoc) => {
   }
 };
 //
-export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
+export const updateSpotifyUser = async (updatedUserTokens, user_id) => {
   try {
     const result = await User.updateOne(
-      { spotify_user_id: spotify_user_id },
+      { user_id: user_id },
       {
         $set: {
           access_token: encrypt(updatedUserTokens.accessToken),
@@ -85,7 +83,7 @@ export const updateSpotifyUser = async (updatedUserTokens, spotify_user_id) => {
     );
 
     if (result.matchedCount === 0) {
-      throw createUserError('userIdNotFound', { spotify_user_id });
+      throw createUserError('userIdNotFound', { user_id });
     }
   } catch (err) {
     if (err instanceof AppError) throw err;
@@ -106,7 +104,7 @@ export const getUserDocObject = (userTokens, userData) => {
       display_name: userData.display_name,
       profile_img: userData.images?.[0]?.url || null,
       followers: userData.followers?.total || 0,
-      spotify_user_id: userData.id,
+      user_id: userData.id,
     };
 
     return userDoc;

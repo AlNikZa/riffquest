@@ -14,74 +14,53 @@
     <h2 class="text-secondary text-center fs-5 mb-5">
       Every song has its own riff
     </h2>
-    <!-- Call to action: log in with Spotify -->
+
+    <!-- Call to action: log in with XYZ -->
+
     <% if (!isLoggedIn) { %>
     <div class="text-center mb-5">
-      <h3 class="text-secondary mb-3 fs-5">
-        For full experience, log in with your Spotify account
-      </h3>
       <a
-        href="/auth/login"
-        class="btn btn-success btn-lg mb-2 spotify-login-btn"
+        href="#"
+        class="btn btn-danger btn-lg mb-2 main-auth-btn disabled"
+        tabindex="-1"
+        aria-disabled="true"
+        role="button"
       >
-        Log in with Spotify
+        Login (Coming Soon)
       </a>
+
       <div class="fs-6 text-secondary">
-        Don't have a Spotify account?
-        <a
-          href="https://www.spotify.com/signup/"
-          target="_blank"
-          class="text-success"
-        >
-          Create one
-        </a>
+        User accounts are coming.
+        <span class="text-muted text-decoration-none">
+        Registration will be available soon.
+        </span>
       </div>
     </div>
     <% } %>
 
     <!-- Artist search form -->
-    <form method="get" id="artist-form" autocomplete="off">
-      <!-- Container for input + buttons; responsive layout -->
-      <div class="w-75 mx-auto d-flex flex-column flex-md-row">
-        <!-- Text input for artist name -->
-        <!-- <div class="form-group"> -->
-        <input
-          id="artist-input"
-          type="text"
-          name="artist"
-          class="form-control mb-2 mb-md-0 me-md-2"
-          placeholder="Enter artist name…"
-          list="suggestions"
-          required
-        />
-        <datalist id="suggestions"></datalist>
+    <form method="get" action="/artists/search" id="artist-form" autocomplete="off" class="container">
+      <div class="row justify-content-center">
+        <div class="col-11 col-md-8 col-lg-6"> 
+          <div class="d-flex flex-column flex-md-row gap-2">
+            
+            <input
+              id="artist-input"
+              type="text"
+              name="artist"
+              class="form-control"
+              placeholder="Enter artist name…"
+              list="suggestions"
+              required
+            />
+            <datalist id="suggestions"></datalist>
 
-        <!-- Button to view all albums of the artist -->
-        <button
-          type="submit"
-          class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
-          formaction="/artists/albums"
-        >
-          View all albums
-        </button>
-
-        <!-- Button to view top tracks of the artist -->
-        <button
-          type="submit"
-          class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
-          formaction="/artists/top-tracks"
-        >
-          View top tracks
-        </button>
-
-        <!-- Button to view detailed artist profile -->
-        <button
-          type="submit"
-          class="btn btn-success mb-2 mb-md-0 me-md-2 text-nowrap"
-          formaction="/artists/profile"
-        >
-          View artist details
-        </button>
+            <button type="submit" class="btn btn-success text-nowrap px-4">
+              Search
+            </button>
+            
+          </div>
+        </div>
       </div>
     </form>
 
@@ -121,7 +100,7 @@
     <%- include('partials/bootstrapModals') %>
 
     <!-- Custom JavaScript for handling modal forms -->
-    <script nonce="<%= nonce %>" src="/formModals.js"></script>
+
     <script nonce="<%= nonce %>" src="/autocomplete.js"></script>
     <script nonce="<%= nonce %>" src="/authModals.js"></script>
 
