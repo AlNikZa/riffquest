@@ -29,7 +29,7 @@ musicBrainzApi.interceptors.response.use(
 
 // Last.fm API instance
 export const lastFmApi = axios.create({
-  baseURL: 'https://ws.audioscrobbler.com/2.0/',
+  baseURL: config.lastFm.baseUrl,
   timeout: 8000,
   params: {
     api_key: config.lastFm.apiKey,
@@ -41,5 +41,21 @@ lastFmApi.interceptors.response.use(
   (response) => response,
   (error) => {
     throw mapExternalApiError(error, 'Last.fm API');
+  },
+);
+
+// Fanart.tv API instance
+export const fanartTvApi = axios.create({
+  baseURL: config.fanartTv.baseUrl,
+  timeout: 8000,
+  params: {
+    api_key: config.fanartTv.apiKey,
+  },
+});
+
+fanartTvApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    throw mapExternalApiError(error, 'Fanart.tv API');
   },
 );

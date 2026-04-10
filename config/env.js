@@ -13,6 +13,7 @@ dotenv.config();
 const requiredVars = [
   'MUSIC_BRAINZ_USER_AGENT',
   'LASTFM_API_KEY',
+  'FANARTTV_API_KEY',
   'MONGO_USER',
   'MONGO_PASS',
   'MONGO_DB',
@@ -53,6 +54,11 @@ const config = {
   },
   lastFm: {
     apiKey: process.env.LASTFM_API_KEY,
+    baseUrl: 'https://ws.audioscrobbler.com/2.0/',
+  },
+  fanartTv: {
+    apiKey: process.env.FANARTTV_API_KEY,
+    baseUrl: 'https://webservice.fanart.tv/v3',
   },
   mongo: {
     user: process.env.MONGO_USER,

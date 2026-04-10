@@ -21,6 +21,8 @@ RiffQuest is a music data aggregator that combines information from multiple ext
 
 - Engagement Stats: Real-time data on listener counts and total playcounts to gauge artist popularity.
 
+- High-Quality Artist Images: Artist backgrounds, logos, and thumbnails powered by Fanart.tv.
+
 ---
 
 ## Tech
@@ -30,6 +32,7 @@ RiffQuest is a music data aggregator that combines information from multiple ext
 - **Bootstrap 5** for responsive UI
 - **MusicBrainz API** for artist metadata and relationships
 - **Last.fm API** for biographies and listener statistics
+- **Fanart.tv API** for high-quality artist images and artwork
 - **Vanilla JS** for client-side interactivity
 
 ---
@@ -66,11 +69,16 @@ npm install
   - You need to register your application to get an API key
   - Register here: https://www.last.fm/api/account/create
 
+- **Fanart.tv**
+  - Free API key required
+  - Get your key here: https://fanart.tv/get-an-api-key/
+
 ### Create a `.env` file in the root with your credentials.
 
 ```env
 MUSIC_BRAINZ_USER_AGENT=YourAppName/Version ( your-email@example.com )
 LASTFM_API_KEY=your_last_fm_api_key_here
+FANARTTV_API_KEY=your_fanarttv_api_key_here
 
 BASE_URL_DEV=http://127.0.0.1:3000
 BASE_URL_PROD=https://your-production-domain.com
@@ -165,6 +173,7 @@ RiffQuest/
 │   ├── authModals.js
 │   ├── autocomplete.js
 │   ├── custom.css
+│   ├── fanartTvLogo.svg
 │   ├── favicon.ico
 │   ├── lastfmLogo.svg
 │   ├── logo.png

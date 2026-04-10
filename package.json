@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
@@ -21,6 +24,9 @@
   },
   "keywords": [
     "musicbrainz",
+    "lastfm",
+    "fanart",
+    "music-api",
     "music",
     "express",
     "ejs",
@@ -31,11 +37,12 @@
     "bands",
     "artists",
     "tracks",
-    "genres"
+    "genres",
+    "artist-data"
   ],
   "author": "Aleksandar Nikolic",
-  "license": "ISC",
-  "description": "A music discovery app powered by MusicBrainz and Cover Art Archive.",
+  "license": "MIT",
+  "description": "A music data aggregator combining MusicBrainz, Last.fm, and Fanart.tv for rich artist insights and visuals.",
   "dependencies": {
     "axios": "^1.13.5",
     "connect-mongo": "^5.1.0",

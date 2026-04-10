@@ -2,7 +2,7 @@
 
 import qs from 'qs';
 
-import { musicBrainzApi, lastFmApi } from '../config/axios.js';
+import { musicBrainzApi, lastFmApi, fanartTvApi } from '../config/axios.js';
 
 import { mapMusicBrainzArtist } from '../mappers/musicBrainzMapper.js';
 import { mapLastFmArtist } from '../mappers/lastFmMapper.js';
@@ -18,6 +18,16 @@ const isArtistMatch = (foundName = '', searchName = '') => {
   const normalizedSearch = normalizeString(searchName);
 
   return normalizedFound.includes(normalizedSearch);
+};
+
+const extractFanart = (data) => {
+  if (!data) return {};
+
+  return {
+    background: data.artistbackground?.[0]?.url || null,
+    logo: data.hdmusiclogo?.[0]?.url || data.musiclogo?.[0]?.url || null,
+    thumbnail: data.artistthumb?.[0]?.url || null,
+  };
 };
 
 export const getArtistId = async (artist) => {
@@ -85,7 +95,7 @@ export const findBestArtistMatch = (artists) => {
 
 export const getMappedArtistData = async (mbid) => {
   try {
-    const [mbResponse, lfmResponse] = await Promise.all([
+    const [mbResponse, lfmResponse, fanartTvResponse] = await Promise.all([
       musicBrainzApi.get(`/artist/${mbid}`, {
         params: {
           inc: 'release-groups+artist-rels+aliases',
@@ -104,10 +114,15 @@ export const getMappedArtistData = async (mbid) => {
           console.error('Last.fm API Error:', err.message);
           return { data: null };
         }),
+      fanartTvApi.get(`/music/${mbid}`).catch((err) => {
+        console.error('Fanat.tv API Error:', err.message);
+        return { data: null };
+      }),
     ]);
 
     const mbData = mbResponse.data;
     const lfmData = lfmResponse.data?.artist;
+    const fanartTvData = fanartTvResponse.data;
 
     const mappedMbData = mapMusicBrainzArtist(mbData);
 
@@ -119,6 +134,7 @@ export const getMappedArtistData = async (mbid) => {
     const mappedData = {
       ...mappedMbData,
       ...mappedLfmData,
+      images: extractFanart(fanartTvData),
     };
 
     return mappedData;
@@ -127,4 +143,3 @@ export const getMappedArtistData = async (mbid) => {
     return null;
   }
 };
-//
